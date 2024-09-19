@@ -1,0 +1,105 @@
+.hero {
+  min-height: 100vh;
+  background-image: url("../../images/hero.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  position: relative;
+}
+
+.hero-container,
+.button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3.75rem;
+}
+
+.hero-container {
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.button-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.navigation {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.75);
+  position: fixed;
+  width: 100%;
+}
+
+.navigation > a {
+  color: white;
+  font-size: 2rem;
+  text-decoration: none;
+}
+
+.hero-title,
+.hero-paragraph {
+  color: white;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.75);
+  padding: 20px;
+  border-radius: 15px;
+}
+
+.hero-title {
+  font-weight: 900;
+  font-size: 3.75rem;
+}
+
+.hero-paragraph {
+  font-size: 2.5rem;
+  line-height: 1.2;
+  width: 50%;
+  text-wrap: wrap;
+}
+
+.sign-up-btn,
+.log-in-btn {
+  font-size: 2rem;
+  border-radius: 15px;
+  padding: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sign-up-btn {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  border: none;
+}
+
+.log-in-btn {
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 5px solid var(--secondary-color);
+}
+
+.sign-up-btn:hover,
+.log-in-btn:hover {
+  scale: 1.05;
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  border: 5px solid var(--primary-color);
+}
+
+.perfect {
+  color: var(--secondary-color);
+  text-decoration: underline;
+}
+
+.room {
+  color: var(--primary-color);
+  text-decoration: underline;
+}

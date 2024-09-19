@@ -4,7 +4,11 @@ import "./Footer.css";
 const Footer = () => {
   return (
     <Fragment>
-      <footer>Footer</footer>
+      <section>
+        <footer>
+          <p>© {new Date().getFullYear()} Deividas Dulinskas</p>
+        </footer>
+      </section>
     </Fragment>
   );
 };

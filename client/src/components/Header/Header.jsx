@@ -1,19 +1,15 @@
 import React, { Fragment } from "react";
-import "./Header.css";
+import "./header.css";
 
 const Header = () => {
   return (
     <Fragment>
       <header className="header">
-        <a href="/">Home</a>
-        <a href="/rooms">Rooms</a>
-        <a href="/students">Students</a>
-        <button className="login-btn">
-          <a href="/login">Login</a>
-        </button>
-        <button className="register-btn">
-          <a href="/register">Register</a>
-        </button>
+        <nav className="nav-bar">
+          <a href="/">Home</a>
+          <a href="/register">Sign Up</a>
+          <a href="/login">Log In</a>
+        </nav>
       </header>
     </Fragment>
   );

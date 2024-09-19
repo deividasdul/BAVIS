@@ -1,40 +1,29 @@
 .header {
+  background-color: rgb(0, 0, 0);
+  height: 10vh;
+}
+
+.nav-bar {
+  height: 10vh;
   display: flex;
-  align-items: center;
-  gap: 20px;
+  flex-direction: row;
   justify-content: center;
-
-  background-color: hsl(0, 0%, 30%);
-  box-shadow: 0px 5px 10px hsl(0, 0%, 40%);
-  color: white;
-
-  height: 100px;
+  align-items: center;
+  gap: 2rem;
 }
 
-.header > a {
+.nav-bar > a {
   text-decoration: none;
-
-  color: white;
-
-  font-size: 2rem;
-}
-
-.header > a:hover {
-  text-decoration: underline;
-}
-
-.login-btn,
-.register-btn {
-  width: 100px;
-  height: 50px;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
-}
-
-.login-btn > a,
-.register-btn > a {
+  color: var(--primary-color);
   font-size: 1.5rem;
-  text-decoration: none;
-  color: hsl(0, 0%, 0%);
+}
+
+.nav-bar > a:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--secondary-color);
+}
+
+.title {
+  font-size: 2rem;
+  color: var(--secondary-color);
 }

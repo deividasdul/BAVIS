@@ -1,17 +1,30 @@
-import React, { Fragment } from "react";
-import "./header.css";
+import React from "react";
+import { AppBar, Toolbar, CssBaseline, Typography, Box } from "@mui/material";
+import HomeIcon from "@mui/icons-material/Home";
+import LoginIcon from "@mui/icons-material/Login";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import NavigationButton from "../NavigationButton";
 
 const Header = () => {
   return (
-    <Fragment>
-      <header className="header">
-        <nav className="nav-bar">
-          <a href="/">Home</a>
-          <a href="/register">Sign Up</a>
-          <a href="/login">Log In</a>
-        </nav>
-      </header>
-    </Fragment>
+    <>
+      <CssBaseline />
+      <Box sx={{ flexGrow: 1 }}>
+        <AppBar position="static">
+          <Toolbar>
+            <Typography variant="h1">BAVIS</Typography>
+            <Typography sx={{ flexGrow: 1 }}></Typography>
+            <NavigationButton href="/" icon={<HomeIcon />} name="Home" />
+            <NavigationButton href="/login" icon={<LoginIcon />} name="Login" />
+            <NavigationButton
+              href="/register"
+              icon={<AccountCircleIcon />}
+              name="Sign Up"
+            />
+          </Toolbar>
+        </AppBar>
+      </Box>
+    </>
   );
 };
 

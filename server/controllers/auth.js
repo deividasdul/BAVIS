@@ -52,4 +52,6 @@ const logout = (req, res) => {
   });
 };
 
+// const login = (req, res) => {};
+
 export { register, logout };

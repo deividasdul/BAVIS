@@ -18,7 +18,7 @@ const Hero = () => {
         <div className="hero">
           <div className="hero-container">
             <h1 className="hero-title">
-              Find Your <span className="perfect">Perfect </span>
+              Find Your <span className="room">Perfect </span>
               <span className="room">Room</span>
             </h1>
             <p className="hero-paragraph">

@@ -1,6 +1,6 @@
 .hero {
   min-height: 100vh;
-  background-image: url("../../images/hero.jpg");
+  background-image: url("../../images/image (1).jpg");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -44,9 +44,8 @@
 .hero-paragraph {
   color: white;
   text-align: center;
-  background-color: rgba(0, 0, 0, 0.75);
   padding: 20px;
-  border-radius: 15px;
+  text-shadow: 5px 5px 1px rgb(0, 0, 0);
 }
 
 .hero-title {
@@ -59,12 +58,13 @@
   line-height: 1.2;
   width: 50%;
   text-wrap: wrap;
+  font-weight: 600;
 }
 
 .sign-up-btn,
 .log-in-btn {
   font-size: 2rem;
-  border-radius: 15px;
+  border-radius: 25px;
   padding: 10px;
   font-weight: bold;
   cursor: pointer;
@@ -72,6 +72,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  box-shadow: 0px 7.6px 7.6px 7.6px rgb(0, 0, 0);
+  flex: 1;
 }
 
 .sign-up-btn {

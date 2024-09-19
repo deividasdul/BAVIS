@@ -1,34 +1,41 @@
-import React, { Fragment, useState } from "react";
-import "./Register.css";
+import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import GoogleIcon from "@mui/icons-material/Google";
-import AlternateEmailIcon from "@mui/icons-material/AlternateEmail";
-import PasswordIcon from "@mui/icons-material/Password";
+import {
+  Paper,
+  Typography,
+  CssBaseline,
+  Alert,
+  AlertTitle,
+} from "@mui/material";
+import Grid from "@mui/material/Grid2";
+import { Box } from "@mui/system";
+import TextInputField from "../TextInputField";
+import AuthButton from "../AuthButton";
 
 const Register = () => {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [userInfo, setUserInfo] = useState({
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
   const [error, setError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState();
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleEmail = (e) => {
-    setEmail(e.target.value);
-  };
+  const handleUserInput = (e) => {
+    const { name, value } = e.target;
 
-  const handlePassword = (e) => {
-    setPassword(e.target.value);
-  };
-
-  const handleConfirmPassword = (e) => {
-    setConfirmPassword(e.target.value);
+    setUserInfo({
+      ...userInfo,
+      [name]: value,
+    });
   };
 
   const registerUser = async (e) => {
-    e.preventDefault();
+    const { password, confirmPassword } = userInfo;
 
     if (password === confirmPassword) {
       try {
@@ -36,19 +43,25 @@ const Register = () => {
         if (response.message === "Email address is already in use") {
           setError(true);
           setErrorMessage(response.message);
-        } else if (response.message === "Student registered successfully") {
+        } else if (response.message === "User registered successfully") {
           navigate("/login");
         }
       } catch (e) {
         console.error(e);
+        setError(true);
+        setErrorMessage(e.message);
+        e.preventDefault();
       }
     } else {
       setError(true);
       setErrorMessage("Both passwords must match ");
+      e.preventDefault();
     }
   };
 
   const insertUser = async () => {
+    const { email, password } = userInfo;
+
     const data = {
       email: email,
       password: password,
@@ -65,74 +78,64 @@ const Register = () => {
     }
   };
 
-  const customStyle = {
-    color: "white",
-    width: "46px",
-    height: "46px",
-    marginRight: "10px",
-  };
-
   return (
     <>
-      {error && <Error errorMessage={errorMessage} />}
-      <form className="register-form" action="">
-        <div className="register-container">
-          <h2 className="title">REGISTRATION</h2>
-          <label>Enter your email address:</label>
-          <div className="input-field">
-            <AlternateEmailIcon sx={customStyle} />
-            <input
-              value={email}
-              name="email"
-              placeholder="Email..."
-              type="text"
-              onChange={handleEmail}
-              required
-            />
-          </div>
-          <label>Enter your password:</label>
-          <div className="input-field">
-            <PasswordIcon sx={customStyle} />
-            <input
-              value={password}
-              name="password"
-              placeholder="Password..."
-              type="password"
-              onChange={handlePassword}
-              required
-            />
-          </div>
-          <p className="text">Password must be at least 8 characters long*</p>
-          <label>Confirm your password:</label>
-          <div className="input-field">
-            <PasswordIcon sx={customStyle} />
-            <input
-              value={confirmPassword}
-              name="password"
-              placeholder="Confirm password..."
-              type="password"
-              onChange={handleConfirmPassword}
-              required
-            />
-          </div>
-          <button
-            className="register-button"
-            onClick={registerUser}
-            type="submit"
-          >
-            Create Account
-          </button>
-          <p className="text">
-            By clicking Create Account, I state that I have read and understood
-            the terms and conditions.
-          </p>
-          <h2 className="text">Or</h2>
-          <a class="google-btn" href="/google" role="button">
-            <GoogleIcon sx={{ mr: 1 }} />
-            Sign Up with Google
-          </a>
-        </div>
-      </form>
+      <CssBaseline />
+      {error && (
+        <Alert variant="filled" severity="error" color="error">
+          Error
+          <AlertTitle>{errorMessage}</AlertTitle>
+        </Alert>
+      )}
+      <Box
+        container
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Paper elevation={12}>
+          <Typography color="success" align="center" variant="h2">
+            Registration
+          </Typography>
+          <form action="">
+            <Grid maxWidth="md" sx={{ padding: "25px" }} container spacing={2}>
+              <TextInputField
+                value={userInfo.email}
+                label="Enter your email"
+                type="email"
+                handleUserInput={handleUserInput}
+                name="email"
+              />
+              <TextInputField
+                value={userInfo.password}
+                label="Enter password"
+                type="password"
+                handleUserInput={handleUserInput}
+                name="password"
+              />
+              <TextInputField
+                value={userInfo.confirmPassword}
+                label="Confirm password"
+                type="password"
+                handleUserInput={handleUserInput}
+                name="confirmPassword"
+              />
+              <AuthButton auth={registerUser} btnTitle="Create Account" />
+              <Grid size={2}></Grid>
+              <Grid size={8}>
+                <Typography align="center" variant="subtitle1">
+                  By clicking Create Account, I state that I have read and
+                  understood the terms and conditions.
+                </Typography>
+              </Grid>
+              <Grid size={2}></Grid>
+            </Grid>
+          </form>
+        </Paper>
+      </Box>
     </>
   );
 };

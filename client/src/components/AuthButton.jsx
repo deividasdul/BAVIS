@@ -6,9 +6,10 @@ const AuthButton = (props) => {
     <>
       <Button
         size="large"
-        color="success"
+        color="primary"
         fullWidth
         variant="contained"
+        sx={{ p: 2 }}
         onClick={() => {
           {
             props.auth();

@@ -1,26 +1,4 @@
-:root {
-  --primary-color: #c4ee11;
-  --secondary-color: #3b11ee;
-  --ff: Arial, Helvetica, sans-serif;
-  --transition: all 0.15s;
-}
-
-* {
-  font-family: var(--ff);
-  margin: 0;
-  padding: 0;
-}
-
 body {
   background-color: #ffffff;
-  background-image: url("https://www.transparenttextures.com/patterns/fake-brick.png");
-  /* This is mostly intended for prototyping; please download the pattern and re-host for production environments. Thank you! */
+  background-image: url("https://www.transparenttextures.com/patterns/connected.png");
 }
-
-/* html {
-  scroll-snap-type: y mandatory;
-}
-
-section {
-  scroll-snap-align: start;
-} */

@@ -1,20 +1,59 @@
-import React, { Fragment } from "react";
-import { useNavigate } from "react-router-dom";
-import "./Hero.css";
-import Person2RoundedIcon from "@mui/icons-material/Person2Rounded";
-import LoginRounded from "@mui/icons-material/LoginRounded";
-
+import React from "react";
+import { Box, Typography, CssBaseline, Button } from "@mui/material";
+import cover from "../../images/cover.jpg";
+import Grid from "@mui/material/Grid2";
 const Hero = () => {
-  const navigate = useNavigate();
-
-  const customIconStyle = {
-    width: "36px",
-    height: "36px",
-  };
-
   return (
-    <Fragment>
-      <section>
+    <>
+      <CssBaseline />
+      <Box
+        sx={{
+          width: "100%",
+          minHeight: "95vh",
+          display: "flex",
+          justifyContent: "center",
+          flexDirection: "column",
+          alignItems: "center",
+          backgroundImage: `url(${cover})`,
+          backgroundSize: "cover",
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "center",
+          flexGrow: 1,
+        }}
+      >
+        <Typography
+          sx={{ textShadow: "0px 0px 10px black" }}
+          gutterBottom
+          color="white"
+          align="center"
+          variant="h1"
+        >
+          Find Your Perfect Room
+        </Typography>
+        <Typography
+          sx={{ textShadow: "0px 0px 10px black" }}
+          gutterBottom
+          color="white"
+          align="center"
+          variant="h4"
+        >
+          Select your room based on your interests and connect with like-minded
+          neighbors.
+        </Typography>
+        <Grid sx={{ justifyContent: "center", alignItems: "center" }} container>
+          <Grid size={12}>
+            <Button
+              href="/register"
+              sx={{ p: 2 }}
+              size="large"
+              variant="contained"
+            >
+              Sign Up
+            </Button>
+          </Grid>
+        </Grid>
+      </Box>
+      {/* <section>
         <div className="hero">
           <div className="hero-container">
             <h1 className="hero-title">
@@ -52,8 +91,8 @@ const Hero = () => {
             </div>
           </div>
         </div>
-      </section>
-    </Fragment>
+      </section> */}
+    </>
   );
 };
 

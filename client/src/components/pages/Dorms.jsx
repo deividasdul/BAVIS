@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   Card,
-  CssBaseline,
   CardContent,
   Typography,
   CardActionArea,
@@ -28,13 +27,12 @@ const Dorms = () => {
 
   return (
     <>
-      <CssBaseline />
       <Box
         sx={{
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          height: "60vh",
+          minHeight: "100vh",
           flexWrap: "wrap",
         }}
       >

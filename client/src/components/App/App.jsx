@@ -1,14 +1,19 @@
 import React from "react";
-import Home from "../Home/Home.jsx";
-import Rooms from "../Rooms/Rooms.jsx";
-import Students from "../Students/Students.jsx";
-import Login from "../Login/Login.jsx";
-import Register from "../Register/Register.jsx";
-import Dorms from "../pages/Dorms.jsx";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Header from "../Header/Header.jsx";
 
-function App() {
+import Header from "../Header.jsx";
+import Footer from "../Footer.jsx";
+
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+
+import Home from "../pages/Home.jsx";
+import Login from "../pages/Login.jsx";
+import Register from "../pages/Register.jsx";
+
+import Rooms from "../Rooms/Rooms.jsx";
+import Dorms from "../pages/dorms.jsx";
+import Students from "../Students/Students.jsx";
+
+const App = () => {
   return (
     <>
       <Header />
@@ -22,8 +27,9 @@ function App() {
           <Route path="/students" element={<Students />} />
         </Routes>
       </BrowserRouter>
+      <Footer />
     </>
   );
-}
+};
 
 export default App;

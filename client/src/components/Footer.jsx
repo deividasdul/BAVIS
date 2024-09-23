@@ -5,17 +5,14 @@ const Footer = () => {
   return (
     <>
       <Container
-        maxWidth
+        maxWidth={false}
         sx={{
           bgcolor: "primary.dark",
-          width: "100%",
           height: "5vh",
-          bottom: "0",
           color: "white",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          marginTop: "auto",
         }}
       >
         <Typography variant="h6">

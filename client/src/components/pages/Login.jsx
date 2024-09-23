@@ -1,16 +1,8 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Paper,
-  Typography,
-  Button,
-  TextField,
-  Link,
-  Alert,
-  AlertTitle,
-} from "@mui/material";
+import { Box, Paper, Typography, Button, TextField, Link } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { useNavigate } from "react-router-dom";
+import Error from "../Error";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -34,12 +26,7 @@ const Login = () => {
 
   return (
     <>
-      {isError && (
-        <Alert variant="filled" severity="error" color="error">
-          Error
-          <AlertTitle>{errorMessage}</AlertTitle>
-        </Alert>
-      )}
+      {isError && <Error errorMessage={errorMessage} />}
       <Box
         sx={{
           display: "flex",

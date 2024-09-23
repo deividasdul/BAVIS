@@ -1,16 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import {
-  Box,
-  Paper,
-  Typography,
-  Button,
-  TextField,
-  Alert,
-  AlertTitle,
-} from "@mui/material";
+import { Box, Paper, Typography, Button, TextField } from "@mui/material";
 import Grid from "@mui/material/Grid2";
+import Error from "../Error";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -167,14 +160,7 @@ const Register = () => {
 
   return (
     <>
-      {isError && (
-        <Alert variant="filled" severity="error" color="error">
-          <Typography variant="h6">Klaida:</Typography>
-          <AlertTitle>
-            <Typography variant="h5">{errorMessage}</Typography>
-          </AlertTitle>
-        </Alert>
-      )}
+      {isError && <Error errorMessage={errorMessage} />}
       <Box
         sx={{
           display: "flex",
@@ -190,7 +176,7 @@ const Register = () => {
             align="center"
             variant="h2"
           >
-            Susikurti pakyrą
+            Susikurti paskyrą
           </Typography>
           <form action="">
             <Grid maxWidth="md" sx={{ p: 5 }} container spacing={4}>

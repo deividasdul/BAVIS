@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  DialogContentText,
 } from "@mui/material";
 import axios from "axios";
 import Grid from "@mui/material/Grid2";
@@ -29,6 +30,7 @@ const Dorms = () => {
 
   const [dorms, setDorms] = useState([]);
   const [currentId, setCurrentId] = useState();
+  const [dormId, setDormId] = useState(0);
 
   const [inputAddress, setInputAddress] = useState("");
 
@@ -105,6 +107,15 @@ const Dorms = () => {
     }
   };
 
+  const [confirm, setConfirm] = useState(false);
+  const handleConfirmClose = () => {
+    setConfirm(false);
+  };
+
+  const handleConfirmOpen = () => {
+    setConfirm(true);
+  };
+
   return (
     <>
       <Box sx={{ minHeight: "100vh" }}>
@@ -153,7 +164,8 @@ const Dorms = () => {
                     </IconButton>
                     <IconButton
                       onClick={() => {
-                        deleteDorm(dorm.id);
+                        setDormId(dorm.id);
+                        handleConfirmOpen();
                       }}
                       color="warning"
                     >
@@ -179,12 +191,7 @@ const Dorms = () => {
               ></TextField>
             </DialogContent>
             <DialogActions>
-              <ButtonGroup
-                variant="contained"
-                size="large"
-                sx={{ gap: 1 }}
-                disableElevation
-              >
+              <ButtonGroup variant="contained" size="large" sx={{ gap: 1 }}>
                 <Button onClick={handleClose}>Uždaryti</Button>
                 <Button
                   onClick={() => {
@@ -218,7 +225,7 @@ const Dorms = () => {
           </Grid>
         </Grid>
         <form method="POST" action="">
-          <Dialog open={openAdd} onClose={handleAddClose}>
+          <Dialog fullWidth={true} open={openAdd} onClose={handleAddClose}>
             <DialogTitle>Bendrabučio pridėjimas</DialogTitle>
 
             <DialogContent dividers={true}>
@@ -241,8 +248,11 @@ const Dorms = () => {
                 sx={{ gap: 1 }}
                 disableElevation
               >
-                <Button onClick={handleAddClose}>Uždaryti</Button>
+                <Button color="info" onClick={handleAddClose}>
+                  Uždaryti
+                </Button>
                 <Button
+                  color="success"
                   onClick={() => {
                     insertDorm();
                     handleAddClose();
@@ -255,6 +265,36 @@ const Dorms = () => {
             </DialogActions>
           </Dialog>
         </form>
+        <Dialog
+          open={confirm}
+          onClose={handleConfirmClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            {"Ištrinti šį bendrabutį?"}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Paspaudus, pasirinktas bendrabutis bus ištrintas iš sistemos.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleConfirmClose}>Atšaukti</Button>
+            <Button
+              variant="contained"
+              color="error"
+              disableElevation
+              onClick={() => {
+                deleteDorm(dormId);
+                handleConfirmClose();
+              }}
+              autoFocus
+            >
+              Patvirtinti
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </>
   );

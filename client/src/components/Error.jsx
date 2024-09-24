@@ -5,7 +5,7 @@ const Error = ({ errorMessage }) => {
   return (
     <>
       <Alert variant="filled" severity="error" color="error">
-        Error
+        Klaida
         <AlertTitle>{errorMessage}</AlertTitle>
       </Alert>
     </>

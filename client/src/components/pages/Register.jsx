@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Box, Paper, Typography, Button, TextField } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import Error from "../Error";
+import { styled } from "@mui/system";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ const Register = () => {
     confirmPasswordHelperText: "",
   });
 
-  const handleUserInput = (e) => {
+  const handleInput = (e) => {
     const { name, value } = e.target;
 
     setUserInfo({
@@ -161,91 +162,54 @@ const Register = () => {
   return (
     <>
       {isError && <Error errorMessage={errorMessage} />}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "100vh",
-        }}
-      >
-        <Paper elevation={12}>
-          <Typography
-            sx={{ mt: 2 }}
-            color="primary.main"
-            align="center"
-            variant="h2"
-          >
-            Susikurti paskyrą
-          </Typography>
-          <form action="">
-            <Grid maxWidth="md" sx={{ p: 5 }} container spacing={4}>
-              <Grid size={12}>
-                <TextField
-                  error={isInputError.emailInput}
-                  helperText={
-                    isInputError.emailInput && inputErrorMessage.emailHelperText
-                  }
-                  value={userInfo.email}
-                  fullWidth
-                  variant="filled"
-                  label="Įveskite savo el. pašto adresą"
-                  type="email"
-                  required
-                  onChange={handleUserInput}
-                  name="email"
-                ></TextField>
-              </Grid>
-              <Grid size={12}>
-                <TextField
-                  value={userInfo.password}
-                  error={isInputError.passwordInput}
-                  helperText={
-                    isInputError.passwordInput &&
-                    inputErrorMessage.passwordHelperText
-                  }
-                  fullWidth
-                  variant="filled"
-                  label="Įveskite slaptažodį"
-                  type="password"
-                  required
-                  onChange={handleUserInput}
-                  name="password"
-                ></TextField>
-              </Grid>
-              <Grid size={12}>
-                <TextField
-                  value={userInfo.confirmPassword}
-                  error={isInputError.confirmPasswordInput}
-                  helperText={
-                    isInputError.confirmPasswordInput &&
-                    inputErrorMessage.confirmPasswordHelperText
-                  }
-                  fullWidth
-                  variant="filled"
-                  label="Patvirtinkite slaptažodį"
-                  type="password"
-                  required
-                  onChange={handleUserInput}
-                  name="confirmPassword"
-                ></TextField>
-              </Grid>
-              <Button
-                size="large"
-                fullWidth
-                variant="contained"
-                sx={{ p: 2 }}
+      <RegisterBox>
+        <Paper sx={{ p: 5 }} elevation={12}>
+          <FormTitle title="Registracija" />
+          <form>
+            <Grid maxWidth="sm" container spacing={4}>
+              <InputTextField
+                value={userInfo.email}
+                label="Įveskite savo el. pašto adresą"
+                type="email"
+                onChange={handleInput}
+                name="email"
+                error={isInputError.emailInput}
+                errorMessage={
+                  isInputError.emailInput && inputErrorMessage.emailHelperText
+                }
+              />
+              <InputTextField
+                value={userInfo.password}
+                label="Įveskite slaptažodį"
+                type="password"
+                onChange={handleInput}
+                name="password"
+                error={isInputError.passwordInput}
+                errorMessage={
+                  isInputError.passwordInput &&
+                  inputErrorMessage.passwordHelperText
+                }
+              />
+              <InputTextField
+                value={userInfo.confirmPassword}
+                label="Patvirtinkite slaptažodį"
+                type="password"
+                onChange={handleInput}
+                name="confirmPassword"
+                error={isInputError.confirmPasswordInput}
+                errorMessage={
+                  isInputError.confirmPasswordInput &&
+                  inputErrorMessage.confirmPasswordHelperText
+                }
+              />
+              <FormButton
                 onClick={(e) => {
-                  {
-                    e.preventDefault();
-                    registerUser();
-                  }
+                  e.preventDefault();
+                  registerUser();
                 }}
-              >
-                Užsiregistruoti
-              </Button>
-              <Grid size={2}></Grid>
-              <Grid size={8}>
+                text="Užsiregistruoti"
+              />
+              <Grid size={12}>
                 <Typography align="center" variant="subtitle1">
                   Spausdamas UŽSIREGISTRUOTI patvirtinu, kad perskaičiau ir
                   supratau terminus ir sąlygas.
@@ -254,8 +218,62 @@ const Register = () => {
             </Grid>
           </form>
         </Paper>
-      </Box>
+      </RegisterBox>
     </>
+  );
+};
+
+const RegisterBox = styled(Box)({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  minHeight: "100vh",
+});
+
+const InputTextField = ({
+  value,
+  label,
+  type,
+  onChange,
+  name,
+  error,
+  errorMessage,
+}) => {
+  return (
+    <TextField
+      value={value}
+      fullWidth
+      variant="filled"
+      label={label}
+      type={type}
+      required
+      onChange={onChange}
+      name={name}
+      error={error}
+      helperText={error && errorMessage}
+    />
+  );
+};
+
+const FormTitle = ({ title }) => {
+  return (
+    <Typography color="primary.main" align="center" variant="h2" gutterBottom>
+      {title}
+    </Typography>
+  );
+};
+
+const FormButton = ({ text, onClick }) => {
+  return (
+    <Button
+      onClick={onClick}
+      size="large"
+      fullWidth
+      variant="contained"
+      sx={{ p: 2 }}
+    >
+      {text}
+    </Button>
   );
 };
 

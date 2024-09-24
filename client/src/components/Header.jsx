@@ -13,12 +13,15 @@ import HomeIcon from "@mui/icons-material/Home";
 import LoginIcon from "@mui/icons-material/Login";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import HowToRegIcon from "@mui/icons-material/HowToReg";
+import { styled } from "@mui/system";
 
 const Header = () => {
   const [anchorEl, setAnchorEl] = useState();
   const open = Boolean(anchorEl);
 
   const [isAdmin, setIsAdmin] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const handleClick = (e) => {
     setAnchorEl(e.currentTarget);
@@ -27,6 +30,7 @@ const Header = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
   return (
     <>
       <AppBar position="static" sx={{ p: 1 }}>
@@ -35,71 +39,42 @@ const Header = () => {
             BAVIS
           </Typography>
           <ButtonGroup sx={{ ml: 2, gap: 1 }} size="large" variant="container">
-            <Button
-              sx={{
-                bgcolor: "info.main",
-                display: "flex",
-                flexDirection: "column",
-              }}
-              href="/"
-              startIcon={<HomeIcon />}
-            >
-              Pagrindinis
-            </Button>
-            <Button
-              sx={{
-                bgcolor: "info.main",
-                display: "flex",
-                flexDirection: "column",
-              }}
-              href="/login"
-              startIcon={<LoginIcon />}
-            >
-              Prisijungti
-            </Button>
-            <Button
-              sx={{
-                bgcolor: "info.main",
-                display: "flex",
-                flexDirection: "column",
-              }}
-              href="/register"
-              startIcon={<AccountCircleIcon />}
-            >
-              Užsiregistruoti
-            </Button>
+            <NavButton title="Pagrindinis" href="/" icon={<HomeIcon />} />
+            {!isLoggedIn && (
+              <>
+                <NavButton
+                  title="Prisijungti"
+                  href="/login"
+                  icon={<LoginIcon />}
+                />
+                <NavButton
+                  title="Užsiregistruoti"
+                  href="/register"
+                  icon={<HowToRegIcon />}
+                />
+              </>
+            )}
+
             {isAdmin ? (
-              <Button
-                sx={{
-                  bgcolor: "info.main",
-                  display: "flex",
-                  flexDirection: "column",
-                }}
+              <NavButton
+                title="Administratoriaus skydelis"
+                icon={<AdminPanelSettingsIcon />}
                 id="basic-button"
                 aria-controls={open ? "basic-menu" : undefined}
                 aria-haspopup="true"
                 aria-expanded={open ? "true" : undefined}
                 onClick={handleClick}
-                startIcon={<AdminPanelSettingsIcon />}
-              >
-                Administratorius skydelis
-              </Button>
+              />
             ) : (
-              <Button
-                sx={{
-                  bgcolor: "info.main",
-                  display: "flex",
-                  flexDirection: "column",
-                }}
+              <NavButton
+                title="Vartotojo profilis"
+                icon={<AccountCircleIcon />}
                 id="basic-button"
                 aria-controls={open ? "basic-menu" : undefined}
                 aria-haspopup="true"
                 aria-expanded={open ? "true" : undefined}
                 onClick={handleClick}
-                startIcon={<AccountCircleIcon />}
-              >
-                Vartotojo profilis
-              </Button>
+              />
             )}
           </ButtonGroup>
           {isAdmin ? (
@@ -144,7 +119,7 @@ const Header = () => {
               }}
             >
               <MenuItem onClick={handleClose}>
-                <Link underline="none" variant="button" href="/dorms">
+                <Link underline="none" variant="button" href="/profile">
                   Profilis
                 </Link>
               </MenuItem>
@@ -158,6 +133,24 @@ const Header = () => {
         </Toolbar>
       </AppBar>
     </>
+  );
+};
+
+const StyledButton = styled(Button)(({ theme }) => ({
+  backgroundColor: theme.palette.info.main,
+  display: "flex",
+  flexDirection: "column",
+
+  "&.MuiButton-root:hover": {
+    backgroundColor: theme.palette.info.dark,
+  },
+}));
+
+const NavButton = ({ href, icon, title, onClick }) => {
+  return (
+    <StyledButton sx={{}} href={href} startIcon={icon} onClick={onClick}>
+      {title}
+    </StyledButton>
   );
 };
 

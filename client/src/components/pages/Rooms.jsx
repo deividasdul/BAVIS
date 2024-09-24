@@ -18,6 +18,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  DialogContentText,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
@@ -32,6 +33,7 @@ function Rooms() {
   const [rooms, setRooms] = useState([]);
   const [openAdd, setAddOpen] = useState(false);
   const [openEdit, setOpen] = useState(false);
+  const [roomId, setRoomId] = useState(0);
 
   const [input, setInput] = useState({
     number: 0,
@@ -50,13 +52,22 @@ function Rooms() {
     };
 
     try {
-      await axios.post("apiURL", data);
+      await axios.post(apiURL, data);
+      handleAddClose();
       setInput({
         number: 0,
         floor: 0,
         capacity: 0,
         price: 0,
       });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const deleteRoom = async (id) => {
+    try {
+      await axios.delete(`${apiURL}/${id}`);
     } catch (e) {
       console.log(e);
     }
@@ -100,6 +111,21 @@ function Rooms() {
     }
   };
 
+  const putRoom = async (roomId) => {
+    const data = {
+      number: input.number,
+      floor: input.floor,
+      capacity: input.capacity,
+      price: input.price,
+      dormitory_id: id,
+    };
+    try {
+      await axios.put(`${apiURL}/${roomId}`, data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setInput({
@@ -114,6 +140,15 @@ function Rooms() {
 
   const handleClose = () => {
     setOpen(false);
+  };
+
+  const [confirm, setConfirm] = useState(false);
+  const handleConfirmClose = () => {
+    setConfirm(false);
+  };
+
+  const handleConfirmOpen = () => {
+    setConfirm(true);
   };
 
   return (
@@ -154,6 +189,7 @@ function Rooms() {
                     <IconButton
                       onClick={() => {
                         handleOpen();
+                        setRoomId(room.id);
                         setInput({
                           number: room.number,
                           floor: room.floor,
@@ -165,7 +201,13 @@ function Rooms() {
                     >
                       <EditIcon fontSize="large" />
                     </IconButton>
-                    <IconButton color="warning">
+                    <IconButton
+                      onClick={() => {
+                        setRoomId(room.id);
+                        handleConfirmOpen();
+                      }}
+                      color="warning"
+                    >
                       <DeleteForeverIcon fontSize="large" />
                     </IconButton>
                   </CardActions>
@@ -237,13 +279,14 @@ function Rooms() {
             ></TextField>
             <TextField
               value={id}
+              onChange={handleChange}
               fullWidth
               variant="filled"
-              label="Įveskite kambario kainą"
+              label="Bendrabučio id"
               type="number"
               required
               disabled
-              name="price"
+              name="id"
             ></TextField>
           </DialogContent>
           <DialogActions>
@@ -254,7 +297,13 @@ function Rooms() {
               disableElevation
             >
               <Button onClick={handleClose}>Uždaryti</Button>
-              <Button onClick={handleClose} type="submit">
+              <Button
+                onClick={() => {
+                  putRoom(roomId);
+                  handleClose();
+                }}
+                type="submit"
+              >
                 Redaguoti
               </Button>
             </ButtonGroup>
@@ -304,7 +353,13 @@ function Rooms() {
                 required
                 name="price"
               ></TextField>
-              <input hidden value={id} name="id" type="text" />
+              <input
+                onChange={handleAddChange}
+                hidden
+                value={id}
+                name="id"
+                type="text"
+              />
             </DialogContent>
 
             <DialogActions>
@@ -316,9 +371,9 @@ function Rooms() {
               >
                 <Button onClick={handleAddClose}>Uždaryti</Button>
                 <Button
+                  color="success"
                   onClick={() => {
                     insertRoom();
-                    handleAddClose();
                   }}
                   type="submit"
                 >
@@ -328,6 +383,35 @@ function Rooms() {
             </DialogActions>
           </Dialog>
         </form>
+        <Dialog
+          open={confirm}
+          onClose={handleConfirmClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            {"Ištrinti šį kambarį?"}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Paspaudus, pasirinktas kambarys bus ištrintas iš sistemos.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleConfirmClose}>Atšaukti</Button>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={() => {
+                deleteRoom(roomId);
+                handleConfirmClose();
+              }}
+              autoFocus
+            >
+              Patvirtinti
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </>
   );

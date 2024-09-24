@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import { Box, Paper, Typography, Button, TextField, Link } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import { useNavigate } from "react-router-dom";
 import Error from "../Error";
+import { styled } from "@mui/system";
 
 const Login = () => {
-  const navigate = useNavigate();
-
   const [userInfo, setUserInfo] = useState({
     email: "",
     password: "",
@@ -15,7 +13,7 @@ const Login = () => {
   const [isError, setIsError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleUserInput = (e) => {
+  const handleInput = (e) => {
     const { name, value } = e.target;
 
     setUserInfo({
@@ -27,64 +25,27 @@ const Login = () => {
   return (
     <>
       {isError && <Error errorMessage={errorMessage} />}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "100vh",
-        }}
-      >
-        <Paper elevation={12}>
-          <Typography
-            sx={{ mt: 2 }}
-            color="primary.main"
-            align="center"
-            variant="h2"
-          >
-            Prisijungimas
-          </Typography>
-          <form action="">
-            <Grid maxWidth="sm" sx={{ p: 5 }} container spacing={4}>
+      <LoginBox>
+        <Paper sx={{ p: 5 }} elevation={12}>
+          <FormTitle title="Prisijungimas" />
+          <form>
+            <Grid maxWidth="sm" container spacing={4}>
+              <InputTextField
+                value={userInfo.email}
+                label="Įveskite savo el. pašto adresą"
+                type="email"
+                onChange={handleInput}
+                name="email"
+              />
+              <InputTextField
+                value={userInfo.password}
+                label="Įveskite slaptažodį"
+                type="password"
+                onChange={handleInput}
+                name="password"
+              />
+              <FormButton text="Prisijungti" />
               <Grid size={12}>
-                <TextField
-                  value={userInfo.email}
-                  fullWidth
-                  variant="filled"
-                  label="Įveskite savo el. pašto adresą"
-                  type="email"
-                  required
-                  onChange={handleUserInput}
-                  name="email"
-                ></TextField>
-              </Grid>
-              <Grid size={12}>
-                <TextField
-                  value={userInfo.password}
-                  fullWidth
-                  variant="filled"
-                  label="Įveskite slaptažodį"
-                  type="password"
-                  required
-                  onChange={handleUserInput}
-                  name="password"
-                ></TextField>
-              </Grid>
-              <Button
-                size="large"
-                fullWidth
-                variant="contained"
-                sx={{ p: 2 }}
-                onClick={() => {
-                  {
-                    return;
-                  }
-                }}
-              >
-                Prisijungti
-              </Button>
-              <Grid size={2}></Grid>
-              <Grid size={8}>
                 <Typography align="center" variant="subtitle1">
                   <Link variant="button">Pamirsau slaptažodį</Link>
                 </Typography>
@@ -92,8 +53,46 @@ const Login = () => {
             </Grid>
           </form>
         </Paper>
-      </Box>
+      </LoginBox>
     </>
+  );
+};
+
+const LoginBox = styled(Box)({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  minHeight: "100vh",
+});
+
+const InputTextField = ({ value, label, type, onChange, name }) => {
+  return (
+    <TextField
+      value={value}
+      fullWidth
+      variant="filled"
+      label={label}
+      type={type}
+      required
+      onChange={onChange}
+      name={name}
+    />
+  );
+};
+
+const FormTitle = ({ title }) => {
+  return (
+    <Typography color="primary.main" align="center" variant="h2" gutterBottom>
+      {title}
+    </Typography>
+  );
+};
+
+const FormButton = ({ text }) => {
+  return (
+    <Button size="large" fullWidth variant="contained" sx={{ p: 2 }}>
+      {text}
+    </Button>
   );
 };
 

@@ -12,6 +12,7 @@ import Register from "../pages/Register.jsx";
 import Rooms from "../pages/Rooms.jsx";
 import Dorms from "../pages/dorms.jsx";
 import Users from "../pages/Users.jsx";
+import NotFound from "../pages/NotFound.jsx";
 
 const App = () => {
   return (
@@ -19,12 +20,14 @@ const App = () => {
       <Header />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route index element={<Home />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dorms" element={<Dorms />} />
           <Route path="/rooms/:id" element={<Rooms />} />
           <Route path="/users" element={<Users />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
       <Footer />

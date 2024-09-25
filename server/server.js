@@ -4,6 +4,7 @@ import cors from "cors";
 import rooms from "./routes/rooms.js";
 import auth from "./routes/auth.js";
 import dorms from "./routes/dorms.js";
+import users from "./routes/users.js";
 
 env.config();
 
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 // Route middlewares
 app.use("/api/v1/rooms", rooms);
 app.use("/api/v1/dorms", dorms);
+app.use("/api/v1/users", users);
 app.use("/auth", auth);
 
 app.listen(port, () => {

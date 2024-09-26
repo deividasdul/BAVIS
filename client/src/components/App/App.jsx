@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import "./App.css";
 
 import Header from "../Header.jsx";
@@ -17,8 +17,8 @@ import NotFound from "../pages/NotFound.jsx";
 const App = () => {
   return (
     <>
-      <Header />
       <BrowserRouter>
+        <Header />
         <Routes>
           <Route index element={<Home />} />
           <Route path="/home" element={<Home />} />

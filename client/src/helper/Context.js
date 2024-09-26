@@ -1,3 +1,5 @@
 import { createContext } from "react";
 
-export const HeaderContext = createContext({});
+const UserContext = createContext({});
+
+export { UserContext };

@@ -15,13 +15,22 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
 import { styled } from "@mui/system";
+import { useNavigate } from "react-router-dom";
+
+import { useAuth } from "../helper/AuthContext";
 
 const Header = () => {
+  const navigate = useNavigate();
+
+  const { user } = useAuth();
+  const { logout } = useAuth();
+  const { isLoggedIn } = useAuth();
+  const { setIsLoggedIn } = useAuth();
+
   const [anchorEl, setAnchorEl] = useState();
   const open = Boolean(anchorEl);
 
-  const [isAdmin, setIsAdmin] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const handleClick = (e) => {
     setAnchorEl(e.currentTarget);
@@ -55,7 +64,7 @@ const Header = () => {
               </>
             )}
 
-            {isAdmin ? (
+            {isAdmin && (
               <NavButton
                 title="Administratoriaus skydelis"
                 icon={<AdminPanelSettingsIcon />}
@@ -65,7 +74,8 @@ const Header = () => {
                 aria-expanded={open ? "true" : undefined}
                 onClick={handleClick}
               />
-            ) : (
+            )}
+            {user && (
               <NavButton
                 title="Vartotojo profilis"
                 icon={<AccountCircleIcon />}
@@ -103,7 +113,15 @@ const Header = () => {
                 </Link>
               </MenuItem>
               <MenuItem onClick={handleClose}>
-                <Link underline="none" variant="button" href="/logout">
+                <Link
+                  onClick={() => {
+                    logout();
+                    navigate("/");
+                    setIsLoggedIn(false);
+                  }}
+                  underline="none"
+                  variant="button"
+                >
                   Atsijungti
                 </Link>
               </MenuItem>
@@ -124,7 +142,16 @@ const Header = () => {
                 </Link>
               </MenuItem>
               <MenuItem onClick={handleClose}>
-                <Link underline="none" variant="button" href="/logout">
+                <Link
+                  onClick={() => {
+                    logout();
+                    navigate("/");
+                    setIsLoggedIn(false);
+                  }}
+                  underline="none"
+                  variant="button"
+                  href="/logout"
+                >
                   Atsijungti
                 </Link>
               </MenuItem>

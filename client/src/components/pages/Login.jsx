@@ -1,14 +1,58 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Box, Paper, Typography, Button, TextField, Link } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import Error from "../Error";
 import { styled } from "@mui/system";
 
+import { useAuth } from "../../helper/AuthContext";
+
+import { useNavigate } from "react-router-dom";
+
 const Login = () => {
+  const navigate = useNavigate();
+  const [error, setError] = useState(null);
+  const { login } = useAuth(); // Get login function from AuthContext
+
+  const handleLogin = async (e) => {
+    try {
+      const data = await login(userInfo);
+      navigate("/profile");
+    } catch (err) {
+      setError(err.response?.data?.message || "Login failed");
+    }
+  };
+
   const [userInfo, setUserInfo] = useState({
     email: "",
     password: "",
   });
+
+  // const loginUser = async (username, password) => {
+  //   const bodyInput = {
+  //     username: username,
+  //     password: password,
+  //   };
+
+  //   const response = await fetch("http://localhost:3000/auth/login", {
+  //     credentials: "include",
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify(bodyInput),
+  //   });
+
+  //   const data = await response.json();
+  //   if (response.ok) {
+  //     console.log("Login successful", data);
+  //     const res = await axios.get("http://localhost:3000/auth/user", {
+  //       withCredentials: true,
+  //     });
+  //     console.log("USER DATA:", res.data.user);
+  //   } else {
+  //     console.log("Login failed", data);
+  //   }
+  // };
 
   const [isError, setIsError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -44,10 +88,23 @@ const Login = () => {
                 onChange={handleInput}
                 name="password"
               />
-              <FormButton text="Prisijungti" />
+              <FormButton
+                onClick={(e) => {
+                  handleLogin();
+                }}
+                text="Prisijungti"
+              />
               <Grid size={12}>
                 <Typography align="center" variant="subtitle1">
-                  <Link variant="button">Pamirsau slaptažodį</Link>
+                  <Link
+                    onClick={() => {
+                      console.log("Logged in user data: ", currentUser);
+                      console.log(isLoggedIn);
+                    }}
+                    variant="button"
+                  >
+                    Pamirsau slaptažodį
+                  </Link>
                 </Typography>
               </Grid>
             </Grid>
@@ -88,9 +145,15 @@ const FormTitle = ({ title }) => {
   );
 };
 
-const FormButton = ({ text }) => {
+const FormButton = ({ text, onClick }) => {
   return (
-    <Button size="large" fullWidth variant="contained" sx={{ p: 2 }}>
+    <Button
+      onClick={onClick}
+      size="large"
+      fullWidth
+      variant="contained"
+      sx={{ p: 2 }}
+    >
       {text}
     </Button>
   );

@@ -43,15 +43,14 @@ const register = async (req, res) => {
 };
 
 const logout = (req, res) => {
-  req.logout(function (e) {
-    if (e) {
-      return next(e);
+  req.logout(function (err) {
+    if (err) {
+      return next(err);
     }
-    console.log("Logged out");
-    // res.redirect("/");
+    req.session.destroy();
+    res.clearCookie("connect.sid");
+    res.status(200).json({ message: "Logged out successfully" });
   });
 };
-
-// const login = (req, res) => {};
 
 export { register, logout };

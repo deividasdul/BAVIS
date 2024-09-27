@@ -96,13 +96,7 @@ const Login = () => {
               />
               <Grid size={12}>
                 <Typography align="center" variant="subtitle1">
-                  <Link
-                    onClick={() => {
-                      console.log("Logged in user data: ", currentUser);
-                      console.log(isLoggedIn);
-                    }}
-                    variant="button"
-                  >
+                  <Link onClick={() => {}} variant="button">
                     Pamirsau slaptažodį
                   </Link>
                 </Typography>
@@ -130,7 +124,6 @@ const InputTextField = ({ value, label, type, onChange, name }) => {
       variant="filled"
       label={label}
       type={type}
-      required
       onChange={onChange}
       name={name}
     />

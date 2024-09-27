@@ -31,4 +31,18 @@ const deleteUser = async (req, res) => {
   }
 };
 
-export { getUsers, deleteUser };
+const getUser = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT * FROM contact WHERE contact.user_id = ($1)`,
+      [id]
+    );
+    res.status(200).json(result.rows[0]);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export { getUsers, deleteUser, getUser };

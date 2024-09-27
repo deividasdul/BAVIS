@@ -16,21 +16,17 @@ import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
 import { styled } from "@mui/system";
 import { useNavigate } from "react-router-dom";
+import ApartmentIcon from "@mui/icons-material/Apartment";
 
 import { useAuth } from "../helper/AuthContext";
 
 const Header = () => {
   const navigate = useNavigate();
 
-  const { user } = useAuth();
-  const { logout } = useAuth();
-  const { isLoggedIn } = useAuth();
-  const { setIsLoggedIn } = useAuth();
+  const { user, logout, isLoggedIn, setIsLoggedIn } = useAuth();
 
   const [anchorEl, setAnchorEl] = useState();
   const open = Boolean(anchorEl);
-
-  const [isAdmin, setIsAdmin] = useState(false);
 
   const handleClick = (e) => {
     setAnchorEl(e.currentTarget);
@@ -49,7 +45,7 @@ const Header = () => {
           </Typography>
           <ButtonGroup sx={{ ml: 2, gap: 1 }} size="large" variant="container">
             <NavButton title="Pagrindinis" href="/" icon={<HomeIcon />} />
-            {!isLoggedIn && (
+            {!user && (
               <>
                 <NavButton
                   title="Prisijungti"
@@ -63,31 +59,41 @@ const Header = () => {
                 />
               </>
             )}
-
-            {isAdmin && (
+            {user && user.role === "User" && (
               <NavButton
-                title="Administratoriaus skydelis"
-                icon={<AdminPanelSettingsIcon />}
-                id="basic-button"
-                aria-controls={open ? "basic-menu" : undefined}
-                aria-haspopup="true"
-                aria-expanded={open ? "true" : undefined}
-                onClick={handleClick}
+                title="Bendrabučio nuoma"
+                href="/dorms-list"
+                icon={<ApartmentIcon />}
               />
             )}
             {user && (
-              <NavButton
-                title="Vartotojo profilis"
-                icon={<AccountCircleIcon />}
-                id="basic-button"
-                aria-controls={open ? "basic-menu" : undefined}
-                aria-haspopup="true"
-                aria-expanded={open ? "true" : undefined}
-                onClick={handleClick}
-              />
+              <>
+                {user.role === "Admin" && (
+                  <NavButton
+                    title="Administratoriaus skydelis"
+                    icon={<AdminPanelSettingsIcon />}
+                    id="basic-button"
+                    aria-controls={open ? "basic-menu" : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={open ? "true" : undefined}
+                    onClick={handleClick}
+                  />
+                )}
+                {user.role === "User" && (
+                  <NavButton
+                    title={user.email}
+                    icon={<AccountCircleIcon />}
+                    id="basic-button"
+                    aria-controls={open ? "basic-menu" : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={open ? "true" : undefined}
+                    onClick={handleClick}
+                  />
+                )}
+              </>
             )}
           </ButtonGroup>
-          {isAdmin ? (
+          {user && user.role === "Admin" ? (
             <Menu
               id="basic-menu"
               anchorEl={anchorEl}
@@ -142,6 +148,11 @@ const Header = () => {
                 </Link>
               </MenuItem>
               <MenuItem onClick={handleClose}>
+                <Link underline="none" variant="button" href="/payment-history">
+                  Mokėjimų istorija
+                </Link>
+              </MenuItem>
+              <MenuItem onClick={handleClose}>
                 <Link
                   onClick={() => {
                     logout();
@@ -150,7 +161,7 @@ const Header = () => {
                   }}
                   underline="none"
                   variant="button"
-                  href="/logout"
+                  href="/"
                 >
                   Atsijungti
                 </Link>

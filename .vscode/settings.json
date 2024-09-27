@@ -1,0 +1,8 @@
+{
+  "eslint.runtime": "",
+  "eslint.options": {
+    "rules": {
+      "react/prop-types": "off"
+    }
+  }
+}

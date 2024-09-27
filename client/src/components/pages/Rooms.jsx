@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import {
@@ -25,12 +25,15 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import { RoomsContext } from "../../helper/RoomsContext";
 
 function Rooms() {
+  const { rooms } = useContext(RoomsContext);
+
   const apiURL = "http://localhost:3000/api/v1/rooms";
 
   const { id } = useParams();
-  const [rooms, setRooms] = useState([]);
+
   const [openAdd, setAddOpen] = useState(false);
   const [openEdit, setOpen] = useState(false);
   const [roomId, setRoomId] = useState(0);
@@ -96,20 +99,20 @@ function Rooms() {
     setAddOpen(false);
   };
 
-  useEffect(() => {
-    fetchRooms();
-  }, [rooms]);
+  // useEffect(() => {
+  //   fetchRooms();
+  // }, [rooms]);
 
-  const fetchRooms = async () => {
-    try {
-      const result = await axios.get(
-        `http://localhost:3000/api/v1/dorms/${id}`
-      );
-      setRooms(result.data);
-    } catch (e) {
-      console.error(e);
-    }
-  };
+  // const fetchRooms = async () => {
+  //   try {
+  //     const result = await axios.get(
+  //       `http://localhost:3000/api/v1/dorms/${id}`
+  //     );
+  //     setRooms(result.data);
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // };
 
   const putRoom = async (roomId) => {
     const data = {

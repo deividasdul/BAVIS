@@ -12,7 +12,9 @@ import Register from "../pages/Register.jsx";
 import Rooms from "../pages/Rooms.jsx";
 import Dorms from "../pages/dorms.jsx";
 import Users from "../pages/Users.jsx";
+import Profile from "../pages/Profile.jsx";
 import NotFound from "../pages/NotFound.jsx";
+import DormsList from "../pages/DormsList.jsx";
 
 const App = () => {
   return (
@@ -27,6 +29,8 @@ const App = () => {
           <Route path="/dorms" element={<Dorms />} />
           <Route path="/rooms/:id" element={<Rooms />} />
           <Route path="/users" element={<Users />} />
+          <Route path="/profile" element={<Profile />}></Route>
+          <Route path="/dorms-list" element={<DormsList />}></Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -19,11 +19,9 @@ app.use(
   })
 );
 app.use(cors());
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Route middlewares
 app.use("/api/v1/rooms", rooms);
 app.use("/api/v1/dorms", dorms);
 app.use("/api/v1/users", users);

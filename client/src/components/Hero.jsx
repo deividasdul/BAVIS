@@ -1,4 +1,3 @@
-import React from "react";
 import { Box, Typography, Button } from "@mui/material";
 import backgroundImage from "../images/cover.jpg";
 import { styled } from "@mui/system";

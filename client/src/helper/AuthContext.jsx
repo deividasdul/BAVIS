@@ -14,8 +14,8 @@ export const AuthProvider = ({ children }) => {
         withCredentials: true,
       });
       setUser(res.data.user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
+    } catch (e) {
+      console.error(e);
       setUser(null);
     } finally {
       setLoading(false);
@@ -66,7 +66,6 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Custom hook to access AuthContext
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

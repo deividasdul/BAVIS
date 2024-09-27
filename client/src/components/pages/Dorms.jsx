@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Card,
   CardActionArea,
@@ -17,31 +17,23 @@ import {
   DialogActions,
   DialogContentText,
 } from "@mui/material";
-import axios from "axios";
 import Grid from "@mui/material/Grid2";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import PlaceIcon from "@mui/icons-material/Place";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
+import { DormsContext } from "../../helper/DormsContext";
 
 const Dorms = () => {
-  const apiURL = "http://localhost:3000/api/v1/dorms";
+  const { dorms, insertDorm, putDorm, deleteDorm } = useContext(DormsContext);
 
-  const [dorms, setDorms] = useState([]);
-  const [currentId, setCurrentId] = useState();
-  const [dormId, setDormId] = useState(0);
-
+  const [dormId, setDormId] = useState();
   const [inputAddress, setInputAddress] = useState("");
-
-  useEffect(() => {
-    fetchDorms();
-  }, [dorms]);
-
   const [address, setAddress] = useState("");
-
-  const [openEdit, setOpen] = useState(false);
-  const [openAdd, setAddOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const handleChange = (e) => {
     setAddress(e.target.value);
@@ -51,69 +43,16 @@ const Dorms = () => {
     setInputAddress(e.target.value);
   };
 
-  const handleOpen = () => {
-    setOpen(true);
+  const handleEdit = () => {
+    setEditOpen(!editOpen);
   };
 
-  const handleClose = () => {
-    setOpen(false);
+  const handleAdd = () => {
+    setAddOpen(!addOpen);
   };
 
-  const handleAddOpen = () => {
-    setAddOpen(true);
-  };
-
-  const handleAddClose = () => {
-    setAddOpen(false);
-  };
-
-  const fetchDorms = async () => {
-    try {
-      const result = await axios.get(apiURL);
-      setDorms(result.data);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const insertDorm = async () => {
-    const data = {
-      address: inputAddress,
-    };
-    try {
-      await axios.post(apiURL, data);
-      setInputAddress("");
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const deleteDorm = async (id) => {
-    try {
-      axios.delete(`${apiURL}/${id}`);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const putDorm = async (id) => {
-    const data = {
-      address: address,
-    };
-    try {
-      axios.put(`${apiURL}/${id}`, data);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const [confirm, setConfirm] = useState(false);
-  const handleConfirmClose = () => {
-    setConfirm(false);
-  };
-
-  const handleConfirmOpen = () => {
-    setConfirm(true);
+  const handleConfirm = () => {
+    setConfirmOpen(!confirmOpen);
   };
 
   return (
@@ -154,9 +93,9 @@ const Dorms = () => {
                     </Button>
                     <IconButton
                       onClick={() => {
-                        handleOpen();
+                        handleEdit();
                         setAddress(dorm.address);
-                        setCurrentId(dorm.id);
+                        setDormId(dorm.id);
                       }}
                       color="info"
                     >
@@ -165,7 +104,7 @@ const Dorms = () => {
                     <IconButton
                       onClick={() => {
                         setDormId(dorm.id);
-                        handleConfirmOpen();
+                        handleConfirm();
                       }}
                       color="warning"
                     >
@@ -176,14 +115,14 @@ const Dorms = () => {
               </Grid>
             );
           })}
-          <Dialog open={openEdit} onClose={handleClose}>
+          <Dialog fullWidth={true} open={editOpen} onClose={handleEdit}>
             <DialogTitle>Bendrabučio redagavimas</DialogTitle>
             <DialogContent dividers={true}>
               <TextField
                 value={address}
                 onChange={handleChange}
                 fullWidth
-                variant="filled"
+                variant="outlined"
                 label="Įveskite bendrabučio adresą"
                 type="text"
                 required
@@ -192,11 +131,11 @@ const Dorms = () => {
             </DialogContent>
             <DialogActions>
               <ButtonGroup variant="contained" size="large" sx={{ gap: 1 }}>
-                <Button onClick={handleClose}>Uždaryti</Button>
+                <Button onClick={handleEdit}>Uždaryti</Button>
                 <Button
                   onClick={() => {
-                    putDorm(currentId);
-                    handleClose();
+                    putDorm(dormId, address);
+                    handleEdit();
                   }}
                   type="submit"
                 >
@@ -218,14 +157,14 @@ const Dorms = () => {
               color="success"
               size="large"
               startIcon={<AddIcon />}
-              onClick={handleAddOpen}
+              onClick={handleAdd}
             >
               Pridėti
             </Button>
           </Grid>
         </Grid>
         <form method="POST" action="">
-          <Dialog fullWidth={true} open={openAdd} onClose={handleAddClose}>
+          <Dialog fullWidth={true} open={addOpen} onClose={handleAdd}>
             <DialogTitle>Bendrabučio pridėjimas</DialogTitle>
 
             <DialogContent dividers={true}>
@@ -233,7 +172,7 @@ const Dorms = () => {
                 value={inputAddress}
                 onChange={handleAddChange}
                 fullWidth
-                variant="filled"
+                variant="outlined"
                 label="Įveskite bendrabučio adresą"
                 type="text"
                 required
@@ -248,14 +187,14 @@ const Dorms = () => {
                 sx={{ gap: 1 }}
                 disableElevation
               >
-                <Button color="info" onClick={handleAddClose}>
+                <Button color="info" onClick={handleAdd}>
                   Uždaryti
                 </Button>
                 <Button
                   color="success"
                   onClick={() => {
-                    insertDorm();
-                    handleAddClose();
+                    insertDorm(inputAddress);
+                    handleAdd();
                   }}
                   type="submit"
                 >
@@ -266,8 +205,8 @@ const Dorms = () => {
           </Dialog>
         </form>
         <Dialog
-          open={confirm}
-          onClose={handleConfirmClose}
+          open={confirmOpen}
+          onClose={handleConfirm}
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
@@ -280,14 +219,14 @@ const Dorms = () => {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleConfirmClose}>Atšaukti</Button>
+            <Button onClick={handleConfirm}>Atšaukti</Button>
             <Button
               variant="contained"
               color="error"
               disableElevation
               onClick={() => {
                 deleteDorm(dormId);
-                handleConfirmClose();
+                handleConfirm();
               }}
               autoFocus
             >

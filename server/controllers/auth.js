@@ -26,8 +26,13 @@ const register = async (req, res) => {
               `INSERT INTO "user" (email, password, role) VALUES ($1, $2, $3) RETURNING *`,
               [email, hash, "User"]
             );
-            const student = result.rows[0];
-            req.login(student, (e) => {
+
+            const user = result.rows[0];
+            const result1 = await pool.query(
+              `INSERT INTO contact (first_name, last_name, user_id) VALUES ($1, $2, $3) RETURNING *`,
+              ["Vardas", "Pavardė", user.id]
+            );
+            req.login(user, (e) => {
               res.json({ message: "User registered successfully" });
             });
           } catch (e) {

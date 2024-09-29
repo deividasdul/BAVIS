@@ -3,6 +3,7 @@ import { useAuth } from "../../helper/AuthContext";
 import { Box, Typography, TextField, Paper, Button } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import axios from "axios";
+import { styled } from "@mui/system";
 
 const Profile = () => {
   const fetchContact = async (id) => {
@@ -60,14 +61,7 @@ const Profile = () => {
   }
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "100vh",
-      }}
-    >
+    <ProfileBox>
       <Paper elevation={12} sx={{ p: 5 }}>
         <Typography gutterBottom variant="h4">
           Sveiki, {user.email}
@@ -83,6 +77,7 @@ const Profile = () => {
               required
               onChange={handleChange}
               name="firstName"
+              disabled
             />
           </Grid>
           <Grid size={6}>
@@ -95,6 +90,7 @@ const Profile = () => {
               required
               onChange={handleChange}
               name="lastName"
+              disabled
             />
           </Grid>
           <TextField
@@ -129,8 +125,17 @@ const Profile = () => {
           </Button>
         </Grid>
       </Paper>
-    </Box>
+    </ProfileBox>
   );
 };
+
+const ProfileBox = styled(Box)(({ theme }) => ({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  minHeight: "100vh",
+  backgroundColor: theme.palette.background.default,
+  color: theme.palette.text.primary,
+}));
 
 export default Profile;

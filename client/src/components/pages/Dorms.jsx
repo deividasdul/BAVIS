@@ -24,6 +24,7 @@ import AddIcon from "@mui/icons-material/Add";
 import PlaceIcon from "@mui/icons-material/Place";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import { DormsContext } from "../../helper/DormsContext";
+import { styled } from "@mui/system";
 
 const Dorms = () => {
   const { dorms, insertDorm, putDorm, deleteDorm } = useContext(DormsContext);
@@ -57,7 +58,7 @@ const Dorms = () => {
 
   return (
     <>
-      <Box sx={{ minHeight: "100vh" }}>
+      <DormsBox sx={{ minHeight: "100vh" }}>
         <Grid container spacing={2}>
           {dorms.map((dorm) => {
             return (
@@ -234,9 +235,15 @@ const Dorms = () => {
             </Button>
           </DialogActions>
         </Dialog>
-      </Box>
+      </DormsBox>
     </>
   );
 };
+
+const DormsBox = styled(Box)(({ theme }) => ({
+  minHeight: "100vh",
+  backgroundColor: theme.palette.background.default,
+  color: theme.palette.text.primary,
+}));
 
 export default Dorms;

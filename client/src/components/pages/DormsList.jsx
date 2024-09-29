@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { DormsContext } from "../../helper/DormsContext";
 import {
   Card,
@@ -8,26 +8,19 @@ import {
   Box,
   CardActions,
   CardContent,
-  IconButton,
   Divider,
-  TextField,
-  ButtonGroup,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  DialogContentText,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import PlaceIcon from "@mui/icons-material/Place";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
+import { styled } from "@mui/system";
 
 const DormsList = () => {
   const { dorms } = useContext(DormsContext);
 
   return (
     <>
-      <Box sx={{ minHeight: "100vh" }}>
+      <DormsBox>
         <Grid container spacing={2}>
           {dorms.map((dorm) => {
             return (
@@ -53,7 +46,7 @@ const DormsList = () => {
                   </CardContent>
                   <CardActions>
                     <Button
-                      href={"/rooms/" + dorm.id}
+                      href={"/rooms-list/" + dorm.id}
                       size="large"
                       sx={{ p: 1, m: 2 }}
                       variant="contained"
@@ -75,9 +68,15 @@ const DormsList = () => {
             size={3}
           ></Grid>
         </Grid>
-      </Box>
+      </DormsBox>
     </>
   );
 };
+
+const DormsBox = styled(Box)(({ theme }) => ({
+  minHeight: "100vh",
+  backgroundColor: theme.palette.background.default,
+  color: theme.palette.text.primary,
+}));
 
 export default DormsList;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Paper,
   Box,
@@ -11,17 +11,20 @@ import {
   Button,
   TextField,
   ButtonGroup,
+  Stack,
+  Skeleton,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import axios from "axios";
 import EditIcon from "@mui/icons-material/Edit";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
+import { styled } from "@mui/system";
+import Grid from "@mui/material/Grid2";
+import { UsersContext } from "../../helper/UsersContext";
 
 function Users() {
-  const [users, setUsers] = useState([]);
+  const { users, putUser, deleteUser, isLoading } = useContext(UsersContext);
 
   const [userId, setUserId] = useState(0);
-
   const [isConfirmRequired, setConfirmedRequired] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
 
@@ -100,10 +103,11 @@ function Users() {
             <ActionButton
               onClick={() => {
                 handleEditOpen(row);
+                setUserId(row.id);
               }}
               color="primary"
               icon={<EditIcon fontSize="large" />}
-            />{" "}
+            />
             <ActionButton
               onClick={() => {
                 setUserId(row.id);
@@ -118,25 +122,15 @@ function Users() {
     },
   ];
 
-  const fetchUsers = async () => {
-    const usersData = await axios.get("http://localhost:3000/api/v1/users");
-    setUsers(usersData.data);
-  };
-
-  const deleteUser = async () => {
-    console.log(userId);
-
-    const result = await axios.delete(
-      `http://localhost:3000/api/v1/users/${userId}`
-    );
-  };
-
-  useEffect(() => {
-    fetchUsers();
-  }, [users]);
-
   return (
-    <Box sx={{ minHeight: "100vh" }}>
+    <UsersBox>
+      {isLoading && (
+        <Stack spacing={1}>
+          <Skeleton animation="wave" />
+          <Skeleton animation="wave" />
+          <Skeleton animation="wave" />
+        </Stack>
+      )}
       <Paper elevation={24}>
         <DataGrid
           density="comfortable"
@@ -177,7 +171,7 @@ function Users() {
             color="error"
             disableElevation
             onClick={() => {
-              deleteUser();
+              deleteUser(userId);
               handleConfirm();
             }}
             autoFocus
@@ -189,25 +183,29 @@ function Users() {
       <Dialog fullWidth={true} open={isEditOpen} onClose={handleEditClose}>
         <DialogTitle>Vartotojo redagavimas</DialogTitle>
         <DialogContent dividers={true}>
-          <CustomTextField
-            value={input.firstName}
-            onChange={handleChange}
-            label="Įveskite vartotojo vardą"
-            name="firstName"
-          />
-          <CustomTextField
-            value={input.lastName}
-            onChange={handleChange}
-            label="Įveskite vartotojo pavardę"
-            name="lastName"
-          />
+          <form>
+            <Grid container spacing={2}>
+              <CustomTextField
+                value={input.firstName}
+                onChange={handleChange}
+                label="Įveskite vartotojo vardą"
+                name="firstName"
+              />
+              <CustomTextField
+                value={input.lastName}
+                onChange={handleChange}
+                label="Įveskite vartotojo pavardę"
+                name="lastName"
+              />
+            </Grid>
+          </form>
         </DialogContent>
         <DialogActions>
           <ButtonGroup variant="contained" size="large" sx={{ gap: 1 }}>
             <Button onClick={handleEditClose}>Uždaryti</Button>
             <Button
               onClick={() => {
-                putDorm(currentId);
+                putUser(input, userId);
                 handleEditClose();
               }}
               type="submit"
@@ -217,7 +215,7 @@ function Users() {
           </ButtonGroup>
         </DialogActions>
       </Dialog>
-    </Box>
+    </UsersBox>
   );
 }
 
@@ -235,13 +233,18 @@ const CustomTextField = ({ value, onChange, label, name }) => {
       value={value}
       onChange={onChange}
       fullWidth
-      variant="filled"
+      variant="outlined"
       label={label}
       type="text"
-      required
       name={name}
     ></TextField>
   );
 };
+
+const UsersBox = styled(Box)(({ theme }) => ({
+  minHeight: "100vh",
+  backgroundColor: theme.palette.background.default,
+  color: theme.palette.text.primary,
+}));
 
 export default Users;

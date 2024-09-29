@@ -1,26 +1,27 @@
-import { StrictMode } from "react";
+import { StrictMode, useContext } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./components/App/App.jsx";
-import { ThemeProvider, createTheme } from "@mui/material";
 import { CssBaseline } from "@mui/material";
 import { AuthProvider } from "./helper/AuthContext.jsx";
 import { DormsProvider } from "./helper/DormsContext.jsx";
 import { RoomsProvider } from "./helper/RoomsContext.jsx";
-
-const theme = createTheme({});
+import { ModeProvider } from "./helper/ModeContext.jsx";
+import { UsersProvider } from "./helper/UsersContext.jsx";
 
 const root = createRoot(document.getElementById("root"));
 root.render(
   <StrictMode>
     <CssBaseline />
-    <ThemeProvider theme={theme}>
-      <AuthProvider>
-        <DormsProvider>
-          <RoomsProvider>
-            <App />
-          </RoomsProvider>
-        </DormsProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <AuthProvider>
+      <DormsProvider>
+        <RoomsProvider>
+          <ModeProvider>
+            <UsersProvider>
+              <App />
+            </UsersProvider>
+          </ModeProvider>
+        </RoomsProvider>
+      </DormsProvider>
+    </AuthProvider>
   </StrictMode>
 );

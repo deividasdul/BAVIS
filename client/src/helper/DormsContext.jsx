@@ -33,7 +33,7 @@ export const DormsProvider = ({ children }) => {
       address: address,
     };
     try {
-      axios.put(`${apiURL}/${id}`, data);
+      await axios.put(`${apiURL}/${id}`, data);
     } catch (e) {
       console.log(e);
     }
@@ -41,7 +41,7 @@ export const DormsProvider = ({ children }) => {
 
   const deleteDorm = async (id) => {
     try {
-      axios.delete(`${apiURL}/${id}`);
+      await axios.delete(`${apiURL}/${id}`);
     } catch (e) {
       console.log(e);
     }

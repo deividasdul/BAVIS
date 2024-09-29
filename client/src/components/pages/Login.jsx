@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { Box, Paper, Typography, Button, TextField, Link } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import Error from "../Error";
@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 const Login = () => {
   const navigate = useNavigate();
   const [error, setError] = useState(null);
-  const { login } = useAuth(); // Get login function from AuthContext
+  const { login } = useAuth();
 
   const handleLogin = async (e) => {
     try {
@@ -26,33 +26,6 @@ const Login = () => {
     email: "",
     password: "",
   });
-
-  // const loginUser = async (username, password) => {
-  //   const bodyInput = {
-  //     username: username,
-  //     password: password,
-  //   };
-
-  //   const response = await fetch("http://localhost:3000/auth/login", {
-  //     credentials: "include",
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify(bodyInput),
-  //   });
-
-  //   const data = await response.json();
-  //   if (response.ok) {
-  //     console.log("Login successful", data);
-  //     const res = await axios.get("http://localhost:3000/auth/user", {
-  //       withCredentials: true,
-  //     });
-  //     console.log("USER DATA:", res.data.user);
-  //   } else {
-  //     console.log("Login failed", data);
-  //   }
-  // };
 
   const [isError, setIsError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -109,12 +82,14 @@ const Login = () => {
   );
 };
 
-const LoginBox = styled(Box)({
+const LoginBox = styled(Box)(({ theme }) => ({
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
   minHeight: "100vh",
-});
+  backgroundColor: theme.palette.background.default,
+  color: theme.palette.text.primary,
+}));
 
 const InputTextField = ({ value, label, type, onChange, name }) => {
   return (

@@ -1,5 +1,4 @@
-import React, { useContext, useState } from "react";
-import axios from "axios";
+import React, { useContext, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import {
   Box,
@@ -26,108 +25,27 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { RoomsContext } from "../../helper/RoomsContext";
+import { styled } from "@mui/system";
 
 function Rooms() {
-  const { rooms } = useContext(RoomsContext);
-
   const apiURL = "http://localhost:3000/api/v1/rooms";
 
+  const { rooms, fetchRooms, insertRoom, putRoom, deleteRoom } =
+    useContext(RoomsContext);
+
+  // Dorm id
   const { id } = useParams();
-
-  const [openAdd, setAddOpen] = useState(false);
-  const [openEdit, setOpen] = useState(false);
-  const [roomId, setRoomId] = useState(0);
-
   const [input, setInput] = useState({
     number: 0,
     floor: 0,
     capacity: 0,
     price: 0,
+    id: id,
   });
-
-  const insertRoom = async () => {
-    const data = {
-      number: input.number,
-      floor: input.floor,
-      capacity: input.capacity,
-      price: input.price,
-      dormitory_id: id,
-    };
-
-    try {
-      await axios.post(apiURL, data);
-      handleAddClose();
-      setInput({
-        number: 0,
-        floor: 0,
-        capacity: 0,
-        price: 0,
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const deleteRoom = async (id) => {
-    try {
-      await axios.delete(`${apiURL}/${id}`);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const handleAddChange = (e) => {
-    const { value, name } = e.target;
-
-    setInput({
-      ...input,
-      [name]: value,
-    });
-  };
-
-  const handleAddOpen = () => {
-    setAddOpen(true);
-    setInput({
-      number: 0,
-      floor: 0,
-      capacity: 0,
-      price: 0,
-    });
-  };
-
-  const handleAddClose = () => {
-    setAddOpen(false);
-  };
-
-  // useEffect(() => {
-  //   fetchRooms();
-  // }, [rooms]);
-
-  // const fetchRooms = async () => {
-  //   try {
-  //     const result = await axios.get(
-  //       `http://localhost:3000/api/v1/dorms/${id}`
-  //     );
-  //     setRooms(result.data);
-  //   } catch (e) {
-  //     console.error(e);
-  //   }
-  // };
-
-  const putRoom = async (roomId) => {
-    const data = {
-      number: input.number,
-      floor: input.floor,
-      capacity: input.capacity,
-      price: input.price,
-      dormitory_id: id,
-    };
-    try {
-      await axios.put(`${apiURL}/${roomId}`, data);
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  const [editOpen, setEditOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [roomId, setRoomId] = useState(0);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -137,26 +55,49 @@ function Rooms() {
     });
   };
 
-  const handleOpen = () => {
-    setOpen(true);
+  const handleAddChange = (e) => {
+    const { name, value } = e.target;
+
+    setInput({
+      ...input,
+      [name]: value,
+    });
   };
 
-  const handleClose = () => {
-    setOpen(false);
+  const handleEdit = () => {
+    setEditOpen(!editOpen);
   };
 
-  const [confirm, setConfirm] = useState(false);
-  const handleConfirmClose = () => {
-    setConfirm(false);
+  const handleAdd = () => {
+    setAddOpen(!addOpen);
   };
 
-  const handleConfirmOpen = () => {
-    setConfirm(true);
+  const handleConfirm = () => {
+    setConfirmOpen(!confirmOpen);
   };
+
+  const handleAddOpen = () => {
+    setAddOpen(true);
+    setInput({
+      number: 0,
+      floor: 0,
+      capacity: 0,
+      price: 0,
+      id: id,
+    });
+  };
+
+  const handleAddClose = () => {
+    setAddOpen(false);
+  };
+
+  useEffect(() => {
+    fetchRooms(id);
+  }, [rooms]);
 
   return (
     <>
-      <Box sx={{ minHeight: "100vh" }}>
+      <RoomsBox>
         <Grid container spacing={2}>
           {rooms.map((room, _) => {
             return (
@@ -187,17 +128,18 @@ function Rooms() {
                       variant="contained"
                       startIcon={<MoreHorizIcon />}
                     >
-                      Daugiau informacijos
+                      Daugiau...
                     </Button>
                     <IconButton
                       onClick={() => {
-                        handleOpen();
+                        handleEdit();
                         setRoomId(room.id);
                         setInput({
                           number: room.number,
                           floor: room.floor,
                           capacity: room.capacity,
                           price: room.price,
+                          id: id,
                         });
                       }}
                       color="info"
@@ -207,7 +149,7 @@ function Rooms() {
                     <IconButton
                       onClick={() => {
                         setRoomId(room.id);
-                        handleConfirmOpen();
+                        handleConfirm();
                       }}
                       color="warning"
                     >
@@ -237,60 +179,42 @@ function Rooms() {
             </Button>
           </Grid>
         </Grid>
-        <Dialog open={openEdit} onClose={handleClose}>
+        <Dialog open={editOpen} onClose={handleEdit}>
           <DialogTitle>Kambario redagavimas</DialogTitle>
           <DialogContent dividers={true}>
-            <TextField
-              value={input.number}
-              onChange={handleChange}
-              fullWidth
-              variant="filled"
-              label="Įveskite kambario nr."
-              type="number"
-              required
-              name="number"
-            ></TextField>
-            <TextField
-              value={input.floor}
-              onChange={handleChange}
-              fullWidth
-              variant="filled"
-              label="Įveskite kambario aukštą"
-              type="number"
-              required
-              name="floor"
-            ></TextField>
-            <TextField
-              value={input.capacity}
-              onChange={handleChange}
-              fullWidth
-              variant="filled"
-              label="Įveskite maksimalų žmonių skaičių"
-              type="number"
-              required
-              name="capacity"
-            ></TextField>
-            <TextField
-              value={input.price}
-              onChange={handleChange}
-              fullWidth
-              variant="filled"
-              label="Įveskite kambario kainą"
-              type="number"
-              required
-              name="price"
-            ></TextField>
-            <TextField
-              value={id}
-              onChange={handleChange}
-              fullWidth
-              variant="filled"
-              label="Bendrabučio id"
-              type="number"
-              required
-              disabled
-              name="id"
-            ></TextField>
+            <Grid container spacing={2}>
+              <InputTextField
+                value={input.number || ""}
+                onChange={handleChange}
+                label="Įveskite kambario nr."
+                name="number"
+              />
+              <InputTextField
+                value={input.floor || ""}
+                onChange={handleChange}
+                label="Įveskite kambario aukštą"
+                name="floor"
+              />
+              <InputTextField
+                value={input.capacity || ""}
+                onChange={handleChange}
+                label="Įveskite maksimalų žmonių skaičių"
+                name="capacity"
+              />
+              <InputTextField
+                value={input.price || ""}
+                onChange={handleChange}
+                label="Įveskite kambario kainą"
+                name="price"
+              />
+              <InputTextField
+                value={input.id || ""}
+                onChange={handleChange}
+                label="Bendrabučio id"
+                name="id"
+                isDisabled={true}
+              />
+            </Grid>
           </DialogContent>
           <DialogActions>
             <ButtonGroup
@@ -299,11 +223,11 @@ function Rooms() {
               sx={{ gap: 1 }}
               disableElevation
             >
-              <Button onClick={handleClose}>Uždaryti</Button>
+              <Button onClick={handleEdit}>Uždaryti</Button>
               <Button
                 onClick={() => {
-                  putRoom(roomId);
-                  handleClose();
+                  putRoom(input, roomId);
+                  handleEdit();
                 }}
                 type="submit"
               >
@@ -313,56 +237,42 @@ function Rooms() {
           </DialogActions>
         </Dialog>
         <form method="POST" action="">
-          <Dialog open={openAdd} onClose={handleAddClose}>
+          <Dialog open={addOpen} onClose={handleAddClose}>
             <DialogTitle>Kambario pridėjimas</DialogTitle>
             <DialogContent dividers={true}>
-              <TextField
-                value={input.number}
-                onChange={handleAddChange}
-                fullWidth
-                variant="filled"
-                label="Įveskite kambario nr."
-                type="number"
-                required
-                name="number"
-              ></TextField>
-              <TextField
-                value={input.floor}
-                onChange={handleAddChange}
-                fullWidth
-                variant="filled"
-                label="Įveskite kambario aukštą"
-                type="number"
-                required
-                name="floor"
-              ></TextField>
-              <TextField
-                value={input.capacity}
-                onChange={handleAddChange}
-                fullWidth
-                variant="filled"
-                label="Įveskite maksimalų žmonių skaičių"
-                type="number"
-                required
-                name="capacity"
-              ></TextField>
-              <TextField
-                value={input.price}
-                onChange={handleAddChange}
-                fullWidth
-                variant="filled"
-                label="Įveskite kambario kainą"
-                type="number"
-                required
-                name="price"
-              ></TextField>
-              <input
-                onChange={handleAddChange}
-                hidden
-                value={id}
-                name="id"
-                type="text"
-              />
+              <Grid container spacing={2}>
+                <InputTextField
+                  value={input.number}
+                  onChange={handleAddChange}
+                  label="Įveskite kambario nr."
+                  name="number"
+                />
+                <InputTextField
+                  value={input.floor}
+                  onChange={handleAddChange}
+                  label="Įveskite kambario aukštą"
+                  name="floor"
+                />
+                <InputTextField
+                  value={input.capacity}
+                  onChange={handleAddChange}
+                  label="Įveskite maksimalų žmonių skaičių"
+                  name="capacity"
+                />
+                <InputTextField
+                  value={input.price}
+                  onChange={handleAddChange}
+                  label="Įveskite kambario kainą"
+                  name="price"
+                />
+                <InputTextField
+                  value={input.id}
+                  onChange={handleChange}
+                  label="Bendrabučio id"
+                  name="id"
+                  isDisabled={true}
+                />
+              </Grid>
             </DialogContent>
 
             <DialogActions>
@@ -376,7 +286,8 @@ function Rooms() {
                 <Button
                   color="success"
                   onClick={() => {
-                    insertRoom();
+                    insertRoom(input);
+                    handleAdd();
                   }}
                   type="submit"
                 >
@@ -387,8 +298,8 @@ function Rooms() {
           </Dialog>
         </form>
         <Dialog
-          open={confirm}
-          onClose={handleConfirmClose}
+          open={confirmOpen}
+          onClose={handleConfirm}
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
@@ -401,13 +312,13 @@ function Rooms() {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleConfirmClose}>Atšaukti</Button>
+            <Button onClick={handleConfirm}>Atšaukti</Button>
             <Button
               variant="contained"
               color="error"
               onClick={() => {
                 deleteRoom(roomId);
-                handleConfirmClose();
+                handleConfirm();
               }}
               autoFocus
             >
@@ -415,9 +326,31 @@ function Rooms() {
             </Button>
           </DialogActions>
         </Dialog>
-      </Box>
+      </RoomsBox>
     </>
   );
 }
+
+const InputTextField = ({ value, onChange, label, name, isDisabled }) => {
+  return (
+    <TextField
+      value={value}
+      onChange={onChange}
+      fullWidth
+      variant="outlined"
+      label={label}
+      type="number"
+      required
+      name={name}
+      disabled={isDisabled}
+    ></TextField>
+  );
+};
+
+const RoomsBox = styled(Box)(({ theme }) => ({
+  minHeight: "100vh",
+  backgroundColor: theme.palette.background.default,
+  color: theme.palette.text.primary,
+}));
 
 export default Rooms;

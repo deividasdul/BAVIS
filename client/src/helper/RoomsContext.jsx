@@ -1,5 +1,4 @@
-import { createContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { createContext, useState } from "react";
 import axios from "axios";
 
 export const RoomsContext = createContext();
@@ -9,9 +8,7 @@ export const RoomsProvider = ({ children }) => {
 
   const [rooms, setRooms] = useState([]);
 
-  const { id } = useParams();
-
-  const insertRoom = async (number, floor, capacity, price, id) => {
+  const insertRoom = async ({ number, floor, capacity, price, id }) => {
     const data = {
       number: number,
       floor: floor,
@@ -38,35 +35,33 @@ export const RoomsProvider = ({ children }) => {
     }
   };
 
-  const putRoom = async (roomId) => {
+  const putRoom = async ({ number, floor, capacity, price, id }, roomId) => {
     const data = {
-      number: input.number,
-      floor: input.floor,
-      capacity: input.capacity,
-      price: input.price,
+      number: number,
+      floor: floor,
+      capacity: capacity,
+      price: price,
       dormitory_id: id,
     };
     try {
       await axios.put(`${apiURL}/${roomId}`, data);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 
-  const deleteRoom = async (id) => {
+  const deleteRoom = async (roomId) => {
     try {
-      await axios.delete(`${apiURL}/${id}`);
+      await axios.delete(`${apiURL}/${roomId}`);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
-
-  useEffect(() => {
-    fetchRooms();
-  }, [rooms]);
 
   return (
-    <RoomsContext.Provider value={{ rooms, insertRoom, putRoom, deleteRoom }}>
+    <RoomsContext.Provider
+      value={{ rooms, fetchRooms, insertRoom, putRoom, deleteRoom }}
+    >
       {children}
     </RoomsContext.Provider>
   );

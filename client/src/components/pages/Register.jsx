@@ -1,7 +1,18 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Box, Paper, Typography, Button, TextField } from "@mui/material";
+import {
+  Box,
+  Paper,
+  Typography,
+  Button,
+  TextField,
+  RadioGroup,
+  FormControl,
+  FormLabel,
+  FormControlLabel,
+  Radio,
+} from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import Error from "../Error";
 import { styled } from "@mui/system";
@@ -10,6 +21,9 @@ const Register = () => {
   const navigate = useNavigate();
 
   const [userInfo, setUserInfo] = useState({
+    firstName: "",
+    lastName: "",
+    gender: "Vyras",
     email: "",
     password: "",
     confirmPassword: "",
@@ -141,11 +155,14 @@ const Register = () => {
   }
 
   const insertUser = async () => {
-    const { email, password } = userInfo;
+    const { email, password, firstName, lastName, gender } = userInfo;
 
     const data = {
       email: email,
       password: password,
+      firstName: firstName,
+      lastName: lastName,
+      gender: gender,
     };
 
     try {
@@ -167,6 +184,49 @@ const Register = () => {
           <FormTitle title="Registracija" />
           <form>
             <Grid maxWidth="sm" container spacing={4}>
+              <Grid size={6}>
+                <InputTextField
+                  value={userInfo.firstName}
+                  label="Įveskite savo vardą"
+                  type="text"
+                  onChange={handleInput}
+                  name="firstName"
+                />
+              </Grid>
+              <Grid size={6}>
+                <InputTextField
+                  value={userInfo.lastName}
+                  label="Įveskite savo pavardę"
+                  type="text"
+                  onChange={handleInput}
+                  name="lastName"
+                />
+              </Grid>
+              <Grid size={12}>
+                <FormControl>
+                  <FormLabel id="demo-row-radio-buttons-group-label">
+                    Lytis
+                  </FormLabel>
+                  <RadioGroup
+                    row
+                    aria-labelledby="demo-row-radio-buttons-group-label"
+                    name="gender"
+                    value={userInfo.gender}
+                    onChange={handleInput}
+                  >
+                    <FormControlLabel
+                      value="Vyras"
+                      control={<Radio />}
+                      label="Vyras"
+                    />
+                    <FormControlLabel
+                      value="Moteris"
+                      control={<Radio />}
+                      label="Moteris"
+                    />
+                  </RadioGroup>
+                </FormControl>
+              </Grid>
               <InputTextField
                 value={userInfo.email}
                 label="Įveskite savo el. pašto adresą"
@@ -223,12 +283,14 @@ const Register = () => {
   );
 };
 
-const RegisterBox = styled(Box)({
+const RegisterBox = styled(Box)(({ theme }) => ({
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
   minHeight: "100vh",
-});
+  backgroundColor: theme.palette.background.default,
+  color: theme.palette.text.primary,
+}));
 
 const InputTextField = ({
   value,

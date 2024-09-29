@@ -45,4 +45,21 @@ const getUser = async (req, res) => {
   }
 };
 
-export { getUsers, deleteUser, getUser };
+const putUser = async (req, res) => {
+  const { id } = req.params;
+
+  const { first_name, last_name } = req.body;
+
+  try {
+    const result = await pool.query(
+      `UPDATE contact SET first_name = ($1), last_name = ($2) WHERE user_id = ($3) RETURNING *`,
+      [first_name, last_name, id]
+    );
+    res.status(200).json(result.rows[0]);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export { getUsers, deleteUser, getUser, putUser };

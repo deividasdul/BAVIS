@@ -40,6 +40,7 @@ const register = async (req, res) => {
               `INSERT INTO contact (first_name, last_name, gender, user_id) VALUES ($1, $2, $3, $4) RETURNING *`,
               [fixedFirstName, fixedLastName, gender, user.id]
             );
+
             req.login(user, (e) => {
               res.json({ message: "User registered successfully" });
             });

@@ -62,4 +62,78 @@ const putUser = async (req, res) => {
   }
 };
 
-export { getUsers, deleteUser, getUser, putUser };
+// const patchUser = async (req, res) => {
+//   const interests = req.body;
+//   const { id } = req.params;
+
+//   interests.forEach(async (interest) => {
+//     try {
+//       await pool.query(
+//         `INSERT INTO user_interest (interest_id, user_id) VALUES ($1, $2) RETURNING *`,
+//         [interest, id]
+//       );
+//     } catch (e) {
+//       console.error(e);
+//       res.status(500).json({ message: "Internal server error" });
+//     }
+//   });
+// };
+
+const getUserInterests = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT * FROM user_interest WHERE user_id = ($1)`,
+      [id]
+    );
+    res.status(200).json(result.rows);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const patchUser = async (req, res) => {
+  const interests = req.body;
+  const { id } = req.params;
+
+  try {
+    const interestsResult = await pool.query(
+      `SELECT interest_id FROM user_interest WHERE user_id = $1`,
+      [id]
+    );
+
+    const existingInterests = interestsResult.rows.map(
+      (row) => row.interest_id
+    );
+
+    for (const interest of interests) {
+      if (existingInterests.includes(interest)) {
+        await pool.query(
+          `UPDATE user_interest SET interest_id = ($1) WHERE user_id = ($2) AND interest_id = ($1) RETURNING *`,
+          [interest, id]
+        );
+      } else {
+        await pool.query(
+          `INSERT INTO user_interest (interest_id, user_id) VALUES ($1, $2) RETURNING *`,
+          [interest, id]
+        );
+      }
+    }
+
+    for (const existingInterest of existingInterests) {
+      if (!interests.includes(existingInterest)) {
+        await pool.query(
+          `DELETE FROM user_interest WHERE interest_id = ($1) AND user_id = ($2)`,
+          [existingInterest, id]
+        );
+      }
+    }
+    res.status(200).json({ message: "Interests updated successfully" });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export { getUsers, deleteUser, getUser, putUser, patchUser, getUserInterests };

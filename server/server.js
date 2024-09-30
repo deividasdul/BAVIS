@@ -5,6 +5,7 @@ import rooms from "./routes/rooms.js";
 import auth from "./routes/auth.js";
 import dorms from "./routes/dorms.js";
 import users from "./routes/users.js";
+import interests from "./routes/interests.js";
 
 env.config();
 
@@ -25,6 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/v1/rooms", rooms);
 app.use("/api/v1/dorms", dorms);
 app.use("/api/v1/users", users);
+app.use("/api/v1/interests", interests);
 app.use("/auth", auth);
 
 app.listen(port, () => {

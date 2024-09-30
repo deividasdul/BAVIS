@@ -31,6 +31,14 @@ export const UsersProvider = ({ children }) => {
     }
   };
 
+  const patchUser = async (input, id) => {
+    try {
+      await axios.patch(`http://localhost:3000/api/v1/users/${id}`, input);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const deleteUser = async (id) => {
     try {
       await axios.delete(`http://localhost:3000/api/v1/users/${id}`);
@@ -44,7 +52,9 @@ export const UsersProvider = ({ children }) => {
   }, []);
 
   return (
-    <UsersContext.Provider value={{ users, putUser, deleteUser, isLoading }}>
+    <UsersContext.Provider
+      value={{ users, putUser, deleteUser, isLoading, patchUser }}
+    >
       {children}
     </UsersContext.Provider>
   );

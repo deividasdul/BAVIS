@@ -1,11 +1,28 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useAuth } from "../../helper/AuthContext";
-import { Box, Typography, TextField, Paper, Button } from "@mui/material";
+import {
+  Box,
+  Chip,
+  FormControl,
+  InputLabel,
+  Select,
+  OutlinedInput,
+  MenuItem,
+  Typography,
+  Button,
+  TextField,
+  Paper,
+} from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import axios from "axios";
 import { styled } from "@mui/system";
+import { UsersContext } from "../../helper/UsersContext";
 
 const Profile = () => {
+  const [selectedInterestIds, setSelectedInterestIds] = useState([]);
+  const [selectedInterestNames, setSelectedInterestNames] = useState([]);
+  const { patchUser } = useContext(UsersContext);
+
   const fetchContact = async (id) => {
     try {
       const result = await axios.get(
@@ -17,16 +34,31 @@ const Profile = () => {
     }
   };
 
+  const fetchUserInterests = async (id) => {
+    try {
+      const result = await axios.get(
+        `http://localhost:3000/api/v1/users/${id}/interests`
+      );
+      const interestIds = result.data.map((interest) => interest.interest_id);
+      const interestNames = result.data.map((interest) => interest.interest);
+
+      setSelectedInterestIds(interestIds);
+      setSelectedInterestNames(interestNames);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const { user } = useAuth();
 
   useEffect(() => {
-    {
-      if (user && user.id) fetchContact(user.id);
+    if (user && user.id) {
+      fetchContact(user.id);
+      fetchUserInterests(user.id);
     }
   }, [user]);
 
   const [contact, setContact] = useState({});
-
   const [contactInput, setContactInput] = useState({
     firstName: "",
     lastName: "",
@@ -45,18 +77,48 @@ const Profile = () => {
 
   const handleChange = (e) => {
     const { value, name } = e.target;
-
     setContactInput((prevValue) => ({
       ...prevValue,
       [name]: value,
     }));
   };
 
+  const [interests, setInterests] = useState([]);
+
+  const fetchInterests = async () => {
+    try {
+      const result = await axios.get("http://localhost:3000/api/v1/interests");
+      setInterests(result.data);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    fetchInterests();
+  }, []);
+
+  const handleInterests = (e) => {
+    const { value } = e.target;
+
+    const names = value.map((id) => {
+      const foundInterest = interests.find((interest) => interest.id === id);
+      if (foundInterest) {
+        return foundInterest.interest;
+      } else {
+        return "";
+      }
+    });
+
+    setSelectedInterestIds(value);
+    setSelectedInterestNames(names);
+  };
+
   if (!user) {
     return (
-      <Box sx={{ minHeight: "100vh" }}>
+      <ProfileBox>
         <Typography variant="h2">Neteisėta prieiga</Typography>
-      </Box>
+      </ProfileBox>
     );
   }
 
@@ -93,6 +155,48 @@ const Profile = () => {
               disabled
             />
           </Grid>
+          <FormControl sx={{ width: "100%" }}>
+            <InputLabel>Interesai</InputLabel>
+            <Select
+              multiple
+              value={selectedInterestIds}
+              onChange={handleInterests}
+              input={<OutlinedInput />}
+              renderValue={() => (
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                  {selectedInterestIds.map((id) => {
+                    const interest = interests.find(
+                      (interest) => interest.id === id
+                    );
+                    return (
+                      <Chip key={id} label={interest?.interest || "Unknown"} />
+                    );
+                  })}
+                </Box>
+              )}
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    maxHeight: 224,
+                    width: 250,
+                  },
+                },
+              }}
+            >
+              {interests.map((interest) => (
+                <MenuItem
+                  key={interest.id}
+                  disabled={
+                    selectedInterestIds.length >= 3 &&
+                    !selectedInterestIds.includes(interest.id)
+                  }
+                  value={interest.id}
+                >
+                  {interest.interest}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           <TextField
             value={contactInput.oldPassword}
             fullWidth
@@ -120,7 +224,14 @@ const Profile = () => {
             onChange={handleChange}
             name="confirmNewPassword"
           />
-          <Button fullWidth sx={{ p: 2 }} variant="contained">
+          <Button
+            onClick={() => {
+              patchUser(selectedInterestIds, user["id"]);
+            }}
+            fullWidth
+            sx={{ p: 2 }}
+            variant="contained"
+          >
             Atnaujinti
           </Button>
         </Grid>

@@ -5,20 +5,14 @@ import { styled } from "@mui/system";
 const Hero = () => {
   return (
     <HeroBox>
-      <HeaderTypography variant="h1" title="Raskite tobulą kambarį" />
-      <HeaderTypography
-        variant="h4"
-        title="Pasirinkite kambarį pagal savo pomėgius ir bendraukite su bendraminčiais
-        kaimynais"
-      ></HeaderTypography>
-      <Button
-        href="/register"
-        sx={{ p: 2, mt: 3 }}
-        size="large"
-        variant="contained"
-      >
+      <HeaderTypography variant="h1">Raskite tobulą kambarį</HeaderTypography>
+      <HeaderTypography variant="h4">
+        Pasirinkite kambarį pagal savo pomėgius ir bendraukite su bendraminčiais
+        kaimynais
+      </HeaderTypography>
+      <RegisterButton href="/register" size="large" variant="contained">
         Užsiregistruoti
-      </Button>
+      </RegisterButton>
     </HeroBox>
   );
 };
@@ -34,18 +28,16 @@ const HeroBox = styled(Box)({
   backgroundPosition: "center",
 });
 
-const HeaderTypography = ({ title, variant }) => {
-  return (
-    <Typography
-      sx={{ textShadow: "0px 0px 10px black" }}
-      gutterBottom
-      color="white"
-      align="center"
-      variant={variant}
-    >
-      {title}
-    </Typography>
-  );
-};
+const HeaderTypography = styled(Typography)(({ theme }) => ({
+  textShadow: "0px 0px 10px black",
+  color: "white",
+  textAlign: "center",
+  marginBottom: theme.spacing(2),
+}));
+
+const RegisterButton = styled(Button)(({ theme }) => ({
+  padding: theme.spacing(2),
+  marginTop: theme.spacing(3),
+}));
 
 export default Hero;

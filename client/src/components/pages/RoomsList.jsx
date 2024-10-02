@@ -21,6 +21,7 @@ import {
 import Grid from "@mui/material/Grid2";
 import { RoomsContext } from "../../helper/RoomsContext";
 import { styled } from "@mui/system";
+import ProtectedRoute from "../ProtectedRoute";
 
 function RoomsList() {
   const { rooms, fetchRooms, insertRoom, putRoom, deleteRoom } =
@@ -41,7 +42,7 @@ function RoomsList() {
   }, [rooms]);
 
   return (
-    <>
+    <ProtectedRoute>
       <RoomsBox>
         <Typography variant="h2">Rekomenduojama</Typography>
         <Grid container spacing={2}>
@@ -148,7 +149,7 @@ function RoomsList() {
           </DialogActions>
         </Dialog>
       </RoomsBox>
-    </>
+    </ProtectedRoute>
   );
 }
 

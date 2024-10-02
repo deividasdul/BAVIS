@@ -20,6 +20,7 @@ import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 import { styled } from "@mui/system";
 import Grid from "@mui/material/Grid2";
 import { UsersContext } from "../../helper/UsersContext";
+import ProtectedRoute from "../ProtectedRoute";
 
 function Users() {
   const { users, putUser, deleteUser, isLoading } = useContext(UsersContext);
@@ -123,99 +124,101 @@ function Users() {
   ];
 
   return (
-    <UsersBox>
-      {isLoading && (
-        <Stack spacing={1}>
-          <Skeleton animation="wave" />
-          <Skeleton animation="wave" />
-          <Skeleton animation="wave" />
-        </Stack>
-      )}
-      <Paper elevation={24}>
-        <DataGrid
-          density="comfortable"
-          autoHeight={true}
-          rows={users}
-          columns={columns}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 10,
+    <ProtectedRoute>
+      <UsersBox>
+        {isLoading && (
+          <Stack spacing={1}>
+            <Skeleton animation="wave" />
+            <Skeleton animation="wave" />
+            <Skeleton animation="wave" />
+          </Stack>
+        )}
+        <Paper elevation={24}>
+          <DataGrid
+            density="comfortable"
+            autoHeight={true}
+            rows={users}
+            columns={columns}
+            initialState={{
+              pagination: {
+                paginationModel: {
+                  pageSize: 10,
+                },
               },
-            },
-          }}
-          pageSizeOptions={[10]}
-          checkboxSelection
-          disableRowSelectionOnClick
-          disableColumnFilter
-        />
-      </Paper>
-      <Dialog
-        open={isConfirmRequired}
-        onClose={handleConfirm}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"Ištrinti šį vartotoją?"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Paspaudus, pasirinktas vartotojas bus ištrintas iš sistemos.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleConfirm}>Atšaukti</Button>
-          <Button
-            variant="contained"
-            color="error"
-            disableElevation
-            onClick={() => {
-              deleteUser(userId);
-              handleConfirm();
             }}
-            autoFocus
-          >
-            Patvirtinti
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog fullWidth={true} open={isEditOpen} onClose={handleEditClose}>
-        <DialogTitle>Vartotojo redagavimas</DialogTitle>
-        <DialogContent dividers={true}>
-          <form>
-            <Grid container spacing={2}>
-              <CustomTextField
-                value={input.firstName}
-                onChange={handleChange}
-                label="Įveskite vartotojo vardą"
-                name="firstName"
-              />
-              <CustomTextField
-                value={input.lastName}
-                onChange={handleChange}
-                label="Įveskite vartotojo pavardę"
-                name="lastName"
-              />
-            </Grid>
-          </form>
-        </DialogContent>
-        <DialogActions>
-          <ButtonGroup variant="contained" size="large" sx={{ gap: 1 }}>
-            <Button onClick={handleEditClose}>Uždaryti</Button>
+            pageSizeOptions={[10]}
+            checkboxSelection
+            disableRowSelectionOnClick
+            disableColumnFilter
+          />
+        </Paper>
+        <Dialog
+          open={isConfirmRequired}
+          onClose={handleConfirm}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            {"Ištrinti šį vartotoją?"}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Paspaudus, pasirinktas vartotojas bus ištrintas iš sistemos.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleConfirm}>Atšaukti</Button>
             <Button
+              variant="contained"
+              color="error"
+              disableElevation
               onClick={() => {
-                putUser(input, userId);
-                handleEditClose();
+                deleteUser(userId);
+                handleConfirm();
               }}
-              type="submit"
+              autoFocus
             >
-              Redaguoti
+              Patvirtinti
             </Button>
-          </ButtonGroup>
-        </DialogActions>
-      </Dialog>
-    </UsersBox>
+          </DialogActions>
+        </Dialog>
+        <Dialog fullWidth={true} open={isEditOpen} onClose={handleEditClose}>
+          <DialogTitle>Vartotojo redagavimas</DialogTitle>
+          <DialogContent dividers={true}>
+            <form>
+              <Grid container spacing={2}>
+                <CustomTextField
+                  value={input.firstName}
+                  onChange={handleChange}
+                  label="Įveskite vartotojo vardą"
+                  name="firstName"
+                />
+                <CustomTextField
+                  value={input.lastName}
+                  onChange={handleChange}
+                  label="Įveskite vartotojo pavardę"
+                  name="lastName"
+                />
+              </Grid>
+            </form>
+          </DialogContent>
+          <DialogActions>
+            <ButtonGroup variant="contained" size="large" sx={{ gap: 1 }}>
+              <Button onClick={handleEditClose}>Uždaryti</Button>
+              <Button
+                onClick={() => {
+                  putUser(input, userId);
+                  handleEditClose();
+                }}
+                type="submit"
+              >
+                Redaguoti
+              </Button>
+            </ButtonGroup>
+          </DialogActions>
+        </Dialog>
+      </UsersBox>
+    </ProtectedRoute>
   );
 }
 

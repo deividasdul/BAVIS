@@ -14,12 +14,13 @@ import Grid from "@mui/material/Grid2";
 import PlaceIcon from "@mui/icons-material/Place";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import { styled } from "@mui/system";
+import ProtectedRoute from "../ProtectedRoute";
 
 const DormsList = () => {
   const { dorms } = useContext(DormsContext);
 
   return (
-    <>
+    <ProtectedRoute>
       <DormsBox>
         <Grid container spacing={2}>
           {dorms.map((dorm) => {
@@ -69,7 +70,7 @@ const DormsList = () => {
           ></Grid>
         </Grid>
       </DormsBox>
-    </>
+    </ProtectedRoute>
   );
 };
 

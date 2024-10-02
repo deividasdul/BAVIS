@@ -7,10 +7,29 @@ import cors from "cors";
 import { logout, register } from "../controllers/auth.js";
 import pool from "../db/db.js";
 import bcrypt from "bcrypt";
+import ejs from "ejs";
+
+import jwt from "jsonwebtoken";
+import nodemailer from "nodemailer";
 
 env.config();
 
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false, // true for port 465, false for other ports
+  auth: {
+    user: process.env.GMAIL_ADDRESS,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+});
+
+const JWT_SECRET = process.env.JWT_SECRET;
+
 const router = express.Router();
+
+router.use(express.urlencoded({ extended: true }));
 
 router.use(
   cors({
@@ -97,6 +116,140 @@ passport.use(
     }
   })
 );
+
+router.post("/forgot-password", async (req, res) => {
+  const { recipient, subject, text, html } = req.body;
+
+  try {
+    const findUser = await pool.query(
+      `SELECT * FROM "user" WHERE email = ($1)`,
+      [recipient]
+    );
+    if (findUser.rows.length <= 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const secret = JWT_SECRET + findUser.rows[0].password;
+    const token = jwt.sign(
+      {
+        email: findUser.rows[0].email,
+        id: findUser.rows[0].id,
+      },
+      secret,
+      { expiresIn: "5m" }
+    );
+    // res.json(
+    //   `http://localhost:3000/auth/reset-password/${findUser.rows[0].id}/${token}`
+    // );
+
+    const link = `http://localhost:3000/auth/reset-password/${findUser.rows[0].id}/${token}`;
+
+    const mailOptions = {
+      from: {
+        name: "BAVIS",
+        address: process.env.GMAIL_ADDRESS,
+      },
+      to: [`${recipient}`],
+      subject: `🔑 Slaptažodžio atkūrimas 🔑`,
+      text: ``,
+      html: `<html>
+               <body>
+                 <h1>Slaptažodžio atkūrimo užklausa</h1>
+                 <p>Spustelėkite <a href="${link}">šią nuorodą</a>, kad atkurtumėte slaptažodį.</p>
+                 <p>Jei neprašėte atkurti slaptažodžio, nespauskite jokios nuorodos ir ignoruokite šį el. laišką.</p>
+               </body>
+             </html>`,
+    };
+
+    const sendMail = async (mailOptions) => {
+      try {
+        await transporter.sendMail(mailOptions);
+        res.status(200).json({ message: "Sent" });
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    sendMail(mailOptions);
+  } catch (e) {
+    console.error(e);
+  }
+});
+
+router.get("/reset-password/:id/:token", async (req, res) => {
+  const { id, token } = req.params;
+
+  try {
+    const findUser = await pool.query(`SELECT * FROM "user" WHERE id = ($1)`, [
+      id,
+    ]);
+    if (findUser.rows.length <= 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const secret = JWT_SECRET + findUser.rows[0].password;
+
+    try {
+      const verify = jwt.verify(token, secret);
+      res.render("index.ejs");
+    } catch (e) {
+      res.send("Not verified");
+      console.error(e);
+    }
+  } catch (e) {
+    console.error(e);
+  }
+});
+
+router.post("/reset-password/:id/:token", async (req, res) => {
+  const { id, token } = req.params;
+  const { password, confirmPassword } = req.body;
+
+  if (password !== confirmPassword) {
+    return res.status(400).json({ message: "Passwords do not match" });
+  }
+
+  if (password.length <= 8 || confirmPassword.length <= 8) {
+    return res
+      .status(400)
+      .json({ message: "Password length must be greater than 8" });
+  }
+
+  try {
+    const findUser = await pool.query(`SELECT * FROM "user" WHERE id = $1`, [
+      id,
+    ]);
+
+    if (findUser.rows.length <= 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const user = findUser.rows[0];
+    const secret = JWT_SECRET + user.password;
+
+    try {
+      const verify = jwt.verify(token, secret);
+
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+
+      await pool.query(`UPDATE "user" SET password = ($1) WHERE id = ($2)`, [
+        hashedPassword,
+        id,
+      ]);
+
+      res
+        .status(200)
+        .json({ message: "Password has been successfully updated" });
+    } catch (e) {
+      console.error(e);
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
 
 passport.serializeUser((user, cb) => {
   cb(null, user);

@@ -19,6 +19,7 @@ import Profile from "../pages/Profile.jsx";
 import NotFound from "../pages/NotFound.jsx";
 import DormsList from "../pages/DormsList.jsx";
 import RoomsList from "../pages/RoomsList.jsx";
+import { HeaderProvider } from "../../helper/HeaderContext.jsx";
 
 const App = () => {
   const { isDarkMode } = useContext(ModeContext);
@@ -34,7 +35,9 @@ const App = () => {
     <>
       <ThemeProvider theme={theme}>
         <BrowserRouter>
-          <Header />
+          <HeaderProvider>
+            <Header />
+          </HeaderProvider>
           <Routes>
             <Route index element={<Home />} />
             <Route path="/home" element={<Home />} />

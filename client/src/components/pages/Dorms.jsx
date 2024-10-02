@@ -25,6 +25,7 @@ import PlaceIcon from "@mui/icons-material/Place";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import { DormsContext } from "../../helper/DormsContext";
 import { styled } from "@mui/system";
+import ProtectedRoute from "../ProtectedRoute";
 
 const Dorms = () => {
   const { dorms, insertDorm, putDorm, deleteDorm } = useContext(DormsContext);
@@ -57,7 +58,7 @@ const Dorms = () => {
   };
 
   return (
-    <>
+    <ProtectedRoute>
       <DormsBox sx={{ minHeight: "100vh" }}>
         <Grid container spacing={2}>
           {dorms.map((dorm) => {
@@ -236,7 +237,7 @@ const Dorms = () => {
           </DialogActions>
         </Dialog>
       </DormsBox>
-    </>
+    </ProtectedRoute>
   );
 };
 

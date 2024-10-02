@@ -17,6 +17,7 @@ import Grid from "@mui/material/Grid2";
 import axios from "axios";
 import { styled } from "@mui/system";
 import { UsersContext } from "../../helper/UsersContext";
+import ProtectedRoute from "../../components/ProtectedRoute";
 
 const Profile = () => {
   const [selectedInterestIds, setSelectedInterestIds] = useState([]);
@@ -123,120 +124,125 @@ const Profile = () => {
   }
 
   return (
-    <ProfileBox>
-      <Paper elevation={12} sx={{ p: 5 }}>
-        <Typography gutterBottom variant="h4">
-          Sveiki, {user.email}
-        </Typography>
-        <Grid maxWidth="sm" container spacing={4}>
-          <Grid size={6}>
-            <TextField
-              fullWidth
-              value={contactInput.firstName || ""}
-              variant="filled"
-              label="Vardas"
-              type="text"
-              required
-              onChange={handleChange}
-              name="firstName"
-              disabled
-            />
-          </Grid>
-          <Grid size={6}>
-            <TextField
-              fullWidth
-              value={contactInput.lastName || ""}
-              variant="filled"
-              label="Pavardė"
-              type="text"
-              required
-              onChange={handleChange}
-              name="lastName"
-              disabled
-            />
-          </Grid>
-          <FormControl sx={{ width: "100%" }}>
-            <InputLabel>Interesai</InputLabel>
-            <Select
-              multiple
-              value={selectedInterestIds}
-              onChange={handleInterests}
-              input={<OutlinedInput />}
-              renderValue={() => (
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                  {selectedInterestIds.map((id) => {
-                    const interest = interests.find(
-                      (interest) => interest.id === id
-                    );
-                    return (
-                      <Chip key={id} label={interest?.interest || "Unknown"} />
-                    );
-                  })}
-                </Box>
-              )}
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: 224,
-                    width: 250,
+    <ProtectedRoute>
+      <ProfileBox>
+        <Paper elevation={12} sx={{ p: 5 }}>
+          <Typography gutterBottom variant="h4">
+            Sveiki, {user.email}
+          </Typography>
+          <Grid maxWidth="sm" container spacing={4}>
+            <Grid size={6}>
+              <TextField
+                fullWidth
+                value={contactInput.firstName || ""}
+                variant="filled"
+                label="Vardas"
+                type="text"
+                required
+                onChange={handleChange}
+                name="firstName"
+                disabled
+              />
+            </Grid>
+            <Grid size={6}>
+              <TextField
+                fullWidth
+                value={contactInput.lastName || ""}
+                variant="filled"
+                label="Pavardė"
+                type="text"
+                required
+                onChange={handleChange}
+                name="lastName"
+                disabled
+              />
+            </Grid>
+            <FormControl sx={{ width: "100%" }}>
+              <InputLabel>Interesai</InputLabel>
+              <Select
+                multiple
+                value={selectedInterestIds}
+                onChange={handleInterests}
+                input={<OutlinedInput />}
+                renderValue={() => (
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                    {selectedInterestIds.map((id) => {
+                      const interest = interests.find(
+                        (interest) => interest.id === id
+                      );
+                      return (
+                        <Chip
+                          key={id}
+                          label={interest?.interest || "Unknown"}
+                        />
+                      );
+                    })}
+                  </Box>
+                )}
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 224,
+                      width: 250,
+                    },
                   },
-                },
+                }}
+              >
+                {interests.map((interest) => (
+                  <MenuItem
+                    key={interest.id}
+                    disabled={
+                      selectedInterestIds.length >= 3 &&
+                      !selectedInterestIds.includes(interest.id)
+                    }
+                    value={interest.id}
+                  >
+                    {interest.interest}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <TextField
+              value={contactInput.oldPassword}
+              fullWidth
+              variant="filled"
+              label="Senas slaptažodis"
+              type="password"
+              onChange={handleChange}
+              name="oldPassword"
+            />
+            <TextField
+              value={contactInput.newPassword}
+              fullWidth
+              variant="filled"
+              label="Naujas slaptažodis"
+              type="password"
+              onChange={handleChange}
+              name="newPassword"
+            />
+            <TextField
+              value={contactInput.confirmNewPassword}
+              fullWidth
+              variant="filled"
+              label="Pakartoti naują slaptažodį"
+              type="password"
+              onChange={handleChange}
+              name="confirmNewPassword"
+            />
+            <Button
+              onClick={() => {
+                patchUser(selectedInterestIds, user["id"]);
               }}
+              fullWidth
+              sx={{ p: 2 }}
+              variant="contained"
             >
-              {interests.map((interest) => (
-                <MenuItem
-                  key={interest.id}
-                  disabled={
-                    selectedInterestIds.length >= 3 &&
-                    !selectedInterestIds.includes(interest.id)
-                  }
-                  value={interest.id}
-                >
-                  {interest.interest}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <TextField
-            value={contactInput.oldPassword}
-            fullWidth
-            variant="filled"
-            label="Senas slaptažodis"
-            type="password"
-            onChange={handleChange}
-            name="oldPassword"
-          />
-          <TextField
-            value={contactInput.newPassword}
-            fullWidth
-            variant="filled"
-            label="Naujas slaptažodis"
-            type="password"
-            onChange={handleChange}
-            name="newPassword"
-          />
-          <TextField
-            value={contactInput.confirmNewPassword}
-            fullWidth
-            variant="filled"
-            label="Pakartoti naują slaptažodį"
-            type="password"
-            onChange={handleChange}
-            name="confirmNewPassword"
-          />
-          <Button
-            onClick={() => {
-              patchUser(selectedInterestIds, user["id"]);
-            }}
-            fullWidth
-            sx={{ p: 2 }}
-            variant="contained"
-          >
-            Atnaujinti
-          </Button>
-        </Grid>
-      </Paper>
-    </ProfileBox>
+              Atnaujinti
+            </Button>
+          </Grid>
+        </Paper>
+      </ProfileBox>
+    </ProtectedRoute>
   );
 };
 

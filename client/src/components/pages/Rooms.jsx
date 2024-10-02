@@ -26,6 +26,7 @@ import AddIcon from "@mui/icons-material/Add";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { RoomsContext } from "../../helper/RoomsContext";
 import { styled } from "@mui/system";
+import ProtectedRoute from "../ProtectedRoute.jsx";
 
 function Rooms() {
   const apiURL = "http://localhost:3000/api/v1/rooms";
@@ -96,7 +97,7 @@ function Rooms() {
   }, [rooms]);
 
   return (
-    <>
+    <ProtectedRoute>
       <RoomsBox>
         <Grid container spacing={2}>
           {rooms.map((room, _) => {
@@ -327,7 +328,7 @@ function Rooms() {
           </DialogActions>
         </Dialog>
       </RoomsBox>
-    </>
+    </ProtectedRoute>
   );
 }
 

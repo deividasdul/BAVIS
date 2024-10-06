@@ -23,20 +23,35 @@ const getDormRooms = async (req, res) => {
 
   try {
     const roomsList = await pool.query(
-      `SELECT room.id,
-      room.number, 
-      room.floor,
-      room.capacity,
-      room.price,
-      room.dormitory_id,
-      COUNT(stay.user_id) AS tenant_amount
-      FROM room
-      JOIN dormitory ON room.dormitory_id = dormitory.id
-      LEFT JOIN stay ON room.id = stay.room_id
-      LEFT JOIN "user" ON stay.user_id = "user".id
-      LEFT JOIN contact ON "user".id = contact.user_id
-      WHERE room.dormitory_id = $1
-      GROUP BY room.id`,
+      `SELECT 
+    room.id,
+    room.number,
+    room.floor,
+    room.capacity,
+    room.price,
+    room.dormitory_id,
+    COUNT(stay.user_id) AS tenant_amount,
+    json_agg(
+        json_build_object(
+            'user_id', "user".id,
+            'gender', contact.gender,
+            'arrival_date', stay.arrival_date,
+            'departure_date', stay.departure_date,
+            'interests', (
+                SELECT json_agg(interest.id)
+                FROM user_interest
+                JOIN interest ON user_interest.interest_id = interest.id
+                WHERE user_interest.user_id = "user".id
+            )
+        )
+    ) AS tenants
+    FROM room
+    JOIN dormitory ON room.dormitory_id = dormitory.id
+    LEFT JOIN stay ON room.id = stay.room_id
+    LEFT JOIN "user" ON stay.user_id = "user".id
+    LEFT JOIN contact ON "user".id = contact.user_id
+    WHERE room.dormitory_id = ($1)
+    GROUP BY room.id`,
       [id]
     );
     res.status(200).json(roomsList.rows);

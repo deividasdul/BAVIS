@@ -62,23 +62,6 @@ const putUser = async (req, res) => {
   }
 };
 
-// const patchUser = async (req, res) => {
-//   const interests = req.body;
-//   const { id } = req.params;
-
-//   interests.forEach(async (interest) => {
-//     try {
-//       await pool.query(
-//         `INSERT INTO user_interest (interest_id, user_id) VALUES ($1, $2) RETURNING *`,
-//         [interest, id]
-//       );
-//     } catch (e) {
-//       console.error(e);
-//       res.status(500).json({ message: "Internal server error" });
-//     }
-//   });
-// };
-
 const getUserInterests = async (req, res) => {
   const { id } = req.params;
   try {

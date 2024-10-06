@@ -23,7 +23,11 @@ const Register = () => {
   const [userInfo, setUserInfo] = useState({
     firstName: "",
     lastName: "",
+    phoneNumber: "",
     gender: "Vyras",
+    status: "Studentas",
+    faculty: "",
+    group: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -155,7 +159,13 @@ const Register = () => {
   }
 
   const insertUser = async () => {
-    const { email, password, firstName, lastName, gender } = userInfo;
+    const {
+      email,
+      password,
+      firstName,
+      lastName,
+      gender /*, number, status, faculty, group*/,
+    } = userInfo;
 
     const data = {
       email: email,
@@ -163,6 +173,10 @@ const Register = () => {
       firstName: firstName,
       lastName: lastName,
       gender: gender,
+      // phoneNumber: number
+      // status: status
+      // faculty: faculty
+      // group: group
     };
 
     try {
@@ -180,7 +194,7 @@ const Register = () => {
     <>
       {isError && <Error errorMessage={errorMessage} />}
       <RegisterBox>
-        <Paper sx={{ p: 5 }} elevation={12}>
+        <Paper sx={{ p: 8 }} elevation={12}>
           <FormTitle title="Registracija" />
           <form>
             <Grid maxWidth="sm" container spacing={4}>
@@ -202,14 +216,18 @@ const Register = () => {
                   name="lastName"
                 />
               </Grid>
+              <InputTextField
+                value={userInfo.phoneNumber}
+                label="Įveskite savo telefono numerį"
+                type="text"
+                onChange={handleInput}
+                name="phoneNumber"
+              />
               <Grid size={12}>
                 <FormControl>
-                  <FormLabel id="demo-row-radio-buttons-group-label">
-                    Lytis
-                  </FormLabel>
+                  <FormLabel>Lytis</FormLabel>
                   <RadioGroup
                     row
-                    aria-labelledby="demo-row-radio-buttons-group-label"
                     name="gender"
                     value={userInfo.gender}
                     onChange={handleInput}
@@ -226,6 +244,46 @@ const Register = () => {
                     />
                   </RadioGroup>
                 </FormControl>
+              </Grid>
+              <Grid size={12}>
+                <FormControl>
+                  <FormLabel>Statusas</FormLabel>
+                  <RadioGroup
+                    row
+                    name="status"
+                    value={userInfo.status}
+                    onChange={handleInput}
+                  >
+                    <FormControlLabel
+                      value="Studentas"
+                      control={<Radio />}
+                      label="Studentas"
+                    />
+                    <FormControlLabel
+                      value="Dėstytojas"
+                      control={<Radio />}
+                      label="Dėstytojas"
+                    />
+                  </RadioGroup>
+                </FormControl>
+              </Grid>
+              <Grid size={6}>
+                <InputTextField
+                  value={userInfo.faculty}
+                  label="Įveskite savo fakultetą"
+                  type="text"
+                  onChange={handleInput}
+                  name="faculty"
+                />
+              </Grid>
+              <Grid size={6}>
+                <InputTextField
+                  value={userInfo.group}
+                  label="Įveskite savo grupę"
+                  type="text"
+                  onChange={handleInput}
+                  name="group"
+                />
               </Grid>
               <InputTextField
                 value={userInfo.email}
@@ -288,6 +346,7 @@ const RegisterBox = styled(Box)(({ theme }) => ({
   justifyContent: "center",
   alignItems: "center",
   minHeight: "100vh",
+  padding: 20,
   backgroundColor: theme.palette.background.default,
   color: theme.palette.text.primary,
 }));

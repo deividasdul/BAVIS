@@ -10,48 +10,174 @@ import {
   Button,
   CardActions,
   Typography,
-  TextField,
-  ButtonGroup,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  DialogContentText,
+  TextField,
+  ButtonGroup,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { RoomsContext } from "../../helper/RoomsContext";
 import { styled } from "@mui/system";
 import ProtectedRoute from "../ProtectedRoute";
+import { useAuth } from "../../helper/AuthContext";
+import axios from "axios";
+import StarRateIcon from "@mui/icons-material/StarRate";
 
 function RoomsList() {
-  const { rooms, fetchRooms, insertRoom, putRoom, deleteRoom } =
-    useContext(RoomsContext);
+  const { user } = useAuth();
+
+  const [dates, setDates] = useState({
+    arrival_date: new Date().toISOString().split("T")[0].replace(/-/g, "-"),
+    departure_date: new Date().toISOString().split("T")[0].replace(/-/g, "-"),
+  });
+
+  const [isRequested, setIsRequested] = useState(false);
+
+  const handleRequest = () => {
+    setIsRequested(!isRequested);
+  };
+
+  const handleChange = () => {
+    return;
+  };
 
   // Dorm id
   const { id } = useParams();
 
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [roomId, setRoomId] = useState(0);
+  const { rooms, fetchRooms } = useContext(RoomsContext);
+  const [userInterests, setUserInterests] = useState([]);
+  const [contact, setContact] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleConfirm = () => {
-    setConfirmOpen(!confirmOpen);
+  const fetchContact = async () => {
+    if (user && user.id) {
+      try {
+        const result = await axios.get(
+          `http://localhost:3000/api/v1/users/${user.id}`
+        );
+        setContact(result.data);
+        setIsLoading(false);
+      } catch (e) {
+        console.error(e);
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const fetchUserInterests = async () => {
+    if (user && user.id) {
+      try {
+        const result = await axios.get(
+          `http://localhost:3000/api/v1/users/${user.id}/interests`
+        );
+        setUserInterests(result.data);
+        setIsLoading(false);
+      } catch (e) {
+        console.error(e);
+        setIsLoading(false);
+      }
+    }
   };
 
   useEffect(() => {
     fetchRooms(id);
-  }, [rooms]);
+    fetchContact();
+    fetchUserInterests();
+  }, [id, user]);
+
+  const checkOppositeGender = (tenants) => {
+    if (!tenants || tenants.length === 0) return false;
+    return tenants.some((tenant) => tenant.gender !== contact?.gender);
+  };
+
+  const checkInterestMatch = (tenantInterests, userInterests) => {
+    if (!tenantInterests || !userInterests) return false;
+
+    const userInterestIds = userInterests.map(
+      (userInterest) => userInterest.interest_id
+    );
+
+    return tenantInterests.some((interestId) =>
+      userInterestIds.includes(interestId)
+    );
+  };
+
+  const defaultRooms = rooms.filter((room) => {
+    if (room.tenant_amount == 0) return true;
+
+    return !checkOppositeGender(room.tenants);
+  });
+
+  const recommendedRooms = rooms.filter((room) => {
+    if (room.tenant_amount == 0) return false;
+
+    const hasOppositeGender = checkOppositeGender(room.tenants);
+
+    if (hasOppositeGender) return false;
+
+    const hasInterestMatch = room.tenants.some((tenant) => {
+      return checkInterestMatch(tenant.interests, userInterests);
+    });
+
+    return hasInterestMatch;
+  });
 
   return (
     <ProtectedRoute>
       <RoomsBox>
-        <Typography variant="h2">Rekomenduojama</Typography>
+        <Typography align="center" sx={{ pt: 2 }} gutterBottom variant="h2">
+          <StarRateIcon sx={{ color: "yellow" }} fontSize="large" />
+          Rekomenduojama
+          <StarRateIcon sx={{ color: "yellow" }} fontSize="large" />
+        </Typography>
         <Grid container spacing={2}>
-          {rooms.map((room, _) => {
+          {recommendedRooms.map((room) => (
+            <Grid key={room.id} size={3}>
+              <Card sx={{ m: 2 }} raised={true}>
+                <CardActionArea>
+                  <CardHeader title={`Kambario nr. ` + room.number} />
+                </CardActionArea>
+                <Divider />
+                <CardContent>
+                  <Typography gutterBottom>Aukštas: {room.floor}</Typography>
+                  <Typography gutterBottom>
+                    Maksimalus žmonių skaičius: {room.capacity}
+                  </Typography>
+                  <Typography gutterBottom>
+                    Nuomojančių žmonių skaičius: {room.tenant_amount} /{" "}
+                    {room.capacity}
+                  </Typography>
+                  <Typography>
+                    Kaina: {room.price}€ <br />
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button
+                    size="large"
+                    sx={{ p: 1, m: 2 }}
+                    variant="contained"
+                    disabled={isLoading}
+                  >
+                    Pateikti paraišką
+                  </Button>
+                </CardActions>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+
+        <Typography align="center" sx={{ pt: 4 }} gutterBottom variant="h3">
+          Visi kambariai
+        </Typography>
+        <Grid container spacing={2}>
+          {defaultRooms.map((room) => {
             return (
               <Grid key={room.id} size={3}>
                 <Card sx={{ m: 2 }} raised={true}>
                   <CardActionArea>
-                    <CardHeader title={"Kambario nr. " + room.number} />
+                    <CardHeader title={`Kambario nr. ` + room.number} />
                   </CardActionArea>
                   <Divider />
                   <CardContent>
@@ -60,19 +186,21 @@ function RoomsList() {
                       Maksimalus žmonių skaičius: {room.capacity}
                     </Typography>
                     <Typography gutterBottom>
-                      Nuomojančių žmonių skaičius: {room.tenant_amount} /{" "}
+                      Nuomojančių žmonių skaičius: {room.tenant_amount} /
                       {room.capacity}
                     </Typography>
                     <Typography>
                       Kaina: {room.price}€ <br />
                     </Typography>
                   </CardContent>
-
                   <CardActions>
                     <Button
                       size="large"
                       sx={{ p: 1, m: 2 }}
                       variant="contained"
+                      onClick={() => {
+                        handleRequest();
+                      }}
                     >
                       Pateikti paraišką
                     </Button>
@@ -82,92 +210,89 @@ function RoomsList() {
             );
           })}
         </Grid>
-        <Grid container spacing={2}>
-          {rooms.map((room, _) => {
-            return (
-              <Grid key={room.id} size={3}>
-                <Card sx={{ m: 2 }} raised={true}>
-                  <CardActionArea>
-                    <CardHeader title={"Kambario nr. " + room.number} />
-                  </CardActionArea>
-                  <Divider />
-                  <CardContent>
-                    <Typography gutterBottom>Aukštas: {room.floor}</Typography>
-                    <Typography gutterBottom>
-                      Maksimalus žmonių skaičius: {room.capacity}
-                    </Typography>
-                    <Typography gutterBottom>
-                      Nuomojančių žmonių skaičius: {room.tenant_amount} /{" "}
-                      {room.capacity}
-                    </Typography>
-                    <Typography>
-                      Kaina: {room.price}€ <br />
-                    </Typography>
-                  </CardContent>
-
-                  <CardActions>
-                    <Button
-                      size="large"
-                      sx={{ p: 1, m: 2 }}
-                      variant="contained"
-                    >
-                      Pateikti paraišką
-                    </Button>
-                  </CardActions>
-                </Card>
+      </RoomsBox>
+      <form>
+        <Dialog fullWidth={true} open={isRequested} onClose={handleRequest}>
+          <DialogTitle>Kambario užklausos forma</DialogTitle>
+          <DialogContent dividers={true}>
+            <Grid container spacing={2}>
+              <Grid size={6}>
+                <TextField
+                  value={contact && contact.first_name}
+                  variant="outlined"
+                  label="Vardas"
+                  type="text"
+                  name="address"
+                  fullWidth
+                  disabled
+                ></TextField>
               </Grid>
-            );
-          })}
-        </Grid>
-        <Dialog
-          open={confirmOpen}
-          onClose={handleConfirm}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle id="alert-dialog-title">
-            {"Ištrinti šį kambarį?"}
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              Paspaudus, pasirinktas kambarys bus ištrintas iš sistemos.
-            </DialogContentText>
+              <Grid size={6}>
+                <TextField
+                  value={contact && contact.last_name}
+                  variant="outlined"
+                  label="Pavardė"
+                  type="text"
+                  name="address"
+                  fullWidth
+                  disabled
+                ></TextField>
+              </Grid>
+              <TextField
+                value={user && user.email}
+                variant="outlined"
+                label="Pavardė"
+                type="text"
+                name="address"
+                fullWidth
+                disabled
+              ></TextField>
+              <TextField
+                value={dates.arrival_date || new Date().getFullYear}
+                variant="outlined"
+                label="Atvykimo data"
+                type="date"
+                name="address"
+                fullWidth
+              ></TextField>
+              <TextField
+                value={dates.departure_date || new Date().getFullYear}
+                variant="outlined"
+                label="Išvykimo data"
+                type="date"
+                name="address"
+                fullWidth
+              ></TextField>
+            </Grid>
           </DialogContent>
+
           <DialogActions>
-            <Button onClick={handleConfirm}>Atšaukti</Button>
-            <Button
+            <ButtonGroup
               variant="contained"
-              color="error"
-              onClick={() => {
-                deleteRoom(roomId);
-                handleConfirm();
-              }}
-              autoFocus
+              size="large"
+              sx={{ gap: 1 }}
+              disableElevation
             >
-              Patvirtinti
-            </Button>
+              <Button color="info" onClick={handleRequest}>
+                Uždaryti
+              </Button>
+              <Button
+                color="success"
+                onClick={() => {
+                  // insertDorm(inputAddress);
+                  handleRequest();
+                }}
+                type="submit"
+              >
+                Pateikti
+              </Button>
+            </ButtonGroup>
           </DialogActions>
         </Dialog>
-      </RoomsBox>
+      </form>
     </ProtectedRoute>
   );
 }
-
-const InputTextField = ({ value, onChange, label, name, isDisabled }) => {
-  return (
-    <TextField
-      value={value}
-      onChange={onChange}
-      fullWidth
-      variant="outlined"
-      label={label}
-      type="number"
-      required
-      name={name}
-      disabled={isDisabled}
-    ></TextField>
-  );
-};
 
 const RoomsBox = styled(Box)(({ theme }) => ({
   minHeight: "100vh",

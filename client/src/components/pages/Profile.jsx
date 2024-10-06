@@ -63,6 +63,7 @@ const Profile = () => {
   const [contactInput, setContactInput] = useState({
     firstName: "",
     lastName: "",
+    phoneNumber: "",
     oldPassword: "",
     newPassword: "",
     confirmNewPassword: "",
@@ -203,6 +204,15 @@ const Profile = () => {
               </Select>
             </FormControl>
             <TextField
+              value={contactInput.phoneNumber}
+              fullWidth
+              variant="filled"
+              label="Telefono numeris"
+              type="text"
+              onChange={handleChange}
+              name="phoneNumber"
+            />
+            <TextField
               value={contactInput.oldPassword}
               fullWidth
               variant="filled"
@@ -211,24 +221,52 @@ const Profile = () => {
               onChange={handleChange}
               name="oldPassword"
             />
-            <TextField
-              value={contactInput.newPassword}
-              fullWidth
-              variant="filled"
-              label="Naujas slaptažodis"
-              type="password"
-              onChange={handleChange}
-              name="newPassword"
-            />
-            <TextField
-              value={contactInput.confirmNewPassword}
-              fullWidth
-              variant="filled"
-              label="Pakartoti naują slaptažodį"
-              type="password"
-              onChange={handleChange}
-              name="confirmNewPassword"
-            />
+            <Grid size={6}>
+              <TextField
+                value={contactInput.newPassword}
+                fullWidth
+                variant="filled"
+                label="Naujas slaptažodis"
+                type="password"
+                onChange={handleChange}
+                name="newPassword"
+              />
+            </Grid>
+            <Grid size={6}>
+              <TextField
+                value={contactInput.confirmNewPassword}
+                fullWidth
+                variant="filled"
+                label="Pakartoti naują slaptažodį"
+                type="password"
+                onChange={handleChange}
+                name="confirmNewPassword"
+              />
+            </Grid>
+            <Grid size={4}>
+              <TextField
+                value={contactInput.status}
+                variant="filled"
+                label="Statusas"
+                disabled
+              />
+            </Grid>
+            <Grid size={4}>
+              <TextField
+                value={contactInput.faculty}
+                variant="filled"
+                label="Fakultetas"
+                disabled
+              />
+            </Grid>
+            <Grid size={4}>
+              <TextField
+                value={contactInput.group}
+                variant="filled"
+                label="Grupė"
+                disabled
+              />
+            </Grid>
             <Button
               onClick={() => {
                 patchUser(selectedInterestIds, user["id"]);
@@ -251,6 +289,7 @@ const ProfileBox = styled(Box)(({ theme }) => ({
   justifyContent: "center",
   alignItems: "center",
   minHeight: "100vh",
+  padding: 20,
   backgroundColor: theme.palette.background.default,
   color: theme.palette.text.primary,
 }));

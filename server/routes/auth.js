@@ -118,7 +118,7 @@ passport.use(
 );
 
 router.post("/forgot-password", async (req, res) => {
-  const { recipient, subject, text, html } = req.body;
+  const { recipient } = req.body;
 
   try {
     const findUser = await pool.query(
@@ -138,9 +138,6 @@ router.post("/forgot-password", async (req, res) => {
       secret,
       { expiresIn: "5m" }
     );
-    // res.json(
-    //   `http://localhost:3000/auth/reset-password/${findUser.rows[0].id}/${token}`
-    // );
 
     const link = `http://localhost:3000/auth/reset-password/${findUser.rows[0].id}/${token}`;
 

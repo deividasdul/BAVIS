@@ -24,9 +24,13 @@ import ProtectedRoute from "../ProtectedRoute";
 import { useAuth } from "../../helper/AuthContext";
 import axios from "axios";
 import StarRateIcon from "@mui/icons-material/StarRate";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 function RoomsList() {
   const { user } = useAuth();
+  const currentYear = new Date().getFullYear();
 
   const [dates, setDates] = useState({
     arrival_date: new Date().toISOString().split("T")[0].replace(/-/g, "-"),
@@ -241,28 +245,34 @@ function RoomsList() {
               <TextField
                 value={user && user.email}
                 variant="outlined"
-                label="Pavardė"
+                label="El. paštas"
                 type="text"
                 name="address"
                 fullWidth
                 disabled
               ></TextField>
-              <TextField
-                value={dates.arrival_date || new Date().getFullYear}
-                variant="outlined"
-                label="Atvykimo data"
-                type="date"
-                name="address"
-                fullWidth
-              ></TextField>
-              <TextField
-                value={dates.departure_date || new Date().getFullYear}
-                variant="outlined"
-                label="Išvykimo data"
-                type="date"
-                name="address"
-                fullWidth
-              ></TextField>
+              <Grid size={6}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    sx={{ width: "100%" }}
+                    fullWidth={true}
+                    disablePast={true}
+                    name="arrivalDate"
+                    label="Atvykimo data"
+                  />
+                </LocalizationProvider>
+              </Grid>
+              <Grid size={6}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    sx={{ width: "100%" }}
+                    fullWidth={true}
+                    disablePast={true}
+                    name="arrivalDate"
+                    label="Išvykimo data"
+                  />
+                </LocalizationProvider>
+              </Grid>
             </Grid>
           </DialogContent>
 

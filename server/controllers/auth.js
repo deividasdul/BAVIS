@@ -7,7 +7,17 @@ env.config();
 const saltRounds = parseInt(process.env.SALT_ROUNDS, 10);
 
 const register = async (req, res) => {
-  const { email, password, firstName, lastName, gender } = req.body;
+  const {
+    email,
+    password,
+    firstName,
+    lastName,
+    gender,
+    phoneNumber,
+    userStatus,
+    faculty,
+    userGroup,
+  } = req.body;
 
   const fixedFirstName =
     firstName.slice(0, 1).toUpperCase() +
@@ -36,9 +46,18 @@ const register = async (req, res) => {
             );
 
             const user = result.rows[0];
-            const result1 = await pool.query(
-              `INSERT INTO contact (first_name, last_name, gender, user_id) VALUES ($1, $2, $3, $4) RETURNING *`,
-              [fixedFirstName, fixedLastName, gender, user.id]
+            await pool.query(
+              `INSERT INTO contact (first_name, last_name, gender, phone_number, status, faculty, "group") 
+              VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+              [
+                fixedFirstName,
+                fixedLastName,
+                gender,
+                phoneNumber,
+                userStatus,
+                faculty,
+                userGroup,
+              ]
             );
 
             req.login(user, (e) => {

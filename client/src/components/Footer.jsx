@@ -1,25 +1,29 @@
 import React from "react";
-import { Container, Typography } from "@mui/material";
+import { AppBar, Toolbar, Typography } from "@mui/material";
+import { useTheme } from "@emotion/react";
 
 const Footer = () => {
+  const theme = useTheme();
+
   return (
-    <>
-      <Container
-        maxWidth={false}
-        sx={{
-          bgcolor: "primary.dark",
-          height: "5vh",
-          color: "white",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Typography variant="h6">
+    <AppBar
+      position="static"
+      sx={{
+        top: "auto",
+        bottom: 0,
+        backgroundColor:
+          theme.palette.mode === "dark"
+            ? theme.palette.background.default
+            : theme.palette.primary.main,
+        color: "white",
+      }}
+    >
+      <Toolbar>
+        <Typography variant="h6" sx={{ flexGrow: 1, textAlign: "center" }}>
           © {new Date().getFullYear()} Deividas Dulinskas
         </Typography>
-      </Container>
-    </>
+      </Toolbar>
+    </AppBar>
   );
 };
 

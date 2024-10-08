@@ -4,5 +4,6 @@
     "rules": {
       "react/prop-types": "off"
     }
-  }
+  },
+  "eslint.codeActionsOnSave.rules": null
 }

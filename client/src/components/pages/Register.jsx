@@ -1,51 +1,85 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import {
-  Box,
   Paper,
   Typography,
   Button,
-  TextField,
   RadioGroup,
   FormControl,
   FormLabel,
   FormControlLabel,
   Radio,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import Error from "../Error";
-import { styled } from "@mui/system";
+import PageBox from "../styles/PageBox";
+import CustomTextField from "../ui/CustomTextField";
+
+const groupList = ["AKRV", "ERP", "VAK", "IPU", "KT", "PS"];
+const statusList = ["Studentas", "Dėstytojas", "Svečias"];
+const facultyList = [
+  "Alytaus",
+  "Menų ir ugdymo",
+  "Informatikos, inžinerijos ir technologijų",
+  "Verslo",
+  "Medicinos",
+];
 
 const Register = () => {
   const navigate = useNavigate();
+
+  const [isStudent, setIsStudent] = useState(true);
 
   const [userInfo, setUserInfo] = useState({
     firstName: "",
     lastName: "",
     phoneNumber: "",
     gender: "Vyras",
-    status: "Studentas",
-    faculty: "",
-    group: "",
+    userStatus: statusList[0],
+    faculty: facultyList[0],
+    userGroup: groupList[0],
     email: "",
     password: "",
     confirmPassword: "",
   });
 
-  const [isError, setIsError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  useEffect(() => {
+    setIsStudent(userInfo.userStatus === "Studentas");
+
+    if (userInfo.userStatus !== "Studentas") {
+      setUserInfo((prev) => ({
+        ...prev,
+        faculty: "",
+        userGroup: "",
+      }));
+    } else {
+      setUserInfo((prev) => ({
+        ...prev,
+        faculty: facultyList[0],
+        userGroup: groupList[0],
+      }));
+    }
+  }, [userInfo.userStatus]);
 
   const [isInputError, setIsInputError] = useState({
-    emailInput: false,
-    passwordInput: false,
-    confirmPasswordInput: false,
+    firstName: false,
+    lastName: false,
+    phoneNumber: false,
+    email: false,
+    password: false,
+    confirmPassword: false,
   });
 
   const [inputErrorMessage, setInputErrorMessage] = useState({
-    emailHelperText: "",
-    passwordHelperText: "",
-    confirmPasswordHelperText: "",
+    firstName: "",
+    lastName: "",
+    phoneNumber: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
 
   const handleInput = (e) => {
@@ -57,99 +91,115 @@ const Register = () => {
     });
   };
 
+  const clearError = (fieldType) => {
+    setIsInputError((prevState) => ({
+      ...prevState,
+      [fieldType]: false,
+    }));
+    setInputErrorMessage((prevValue) => ({
+      ...prevValue,
+      [fieldType]: "",
+    }));
+  };
+
+  const setError = (fieldType, errorMessage) => {
+    setIsInputError((prevState) => ({
+      ...prevState,
+      [fieldType]: true,
+    }));
+
+    setInputErrorMessage((prevValue) => ({
+      ...prevValue,
+      [fieldType]: errorMessage,
+    }));
+  };
+
   const registerUser = async () => {
-    const { email, password, confirmPassword } = userInfo;
+    const {
+      firstName,
+      lastName,
+      phoneNumber,
+      email,
+      password,
+      confirmPassword,
+    } = userInfo;
 
-    if (!validateEmail(email)) {
-      setIsInputError((prevState) => ({
-        ...prevState,
-        emailInput: true,
-      }));
-      setInputErrorMessage((prevState) => ({
-        ...prevState,
-        emailHelperText: "Neteisingas el. pašto formatas",
-      }));
-      setIsError(true);
-      setErrorMessage("Neteisingas el. pašto formatas");
-      return;
+    var isError = false;
+
+    if (firstName.length <= 0) {
+      setError("firstName", "Vardo laukas negali būti tuščias");
+      isError = true;
+    } else {
+      clearError("firstName");
     }
 
-    setIsInputError((prevState) => ({
-      ...prevState,
-      emailInput: false,
-    }));
-
-    if (password.length <= 8 || confirmPassword.length <= 8) {
-      setIsError(true);
-      setErrorMessage("Slaptažodis turi būti ilgesnis nei 8 simboliai");
-
-      if (password.length <= 8 && confirmPassword.length <= 8) {
-        setIsInputError((prevState) => ({
-          ...prevState,
-          passwordInput: true,
-          confirmPasswordInput: true,
-        }));
-        setInputErrorMessage((prevState) => ({
-          ...prevState,
-          passwordHelperText: "Slaptažodis turi būti ilgesnis nei 8 simboliai",
-          confirmPasswordHelperText:
-            "Slaptažodis turi būti ilgesnis nei 8 simboliai",
-        }));
-      } else {
-        if (confirmPassword.length <= 8) {
-          setIsInputError((prevState) => ({
-            ...prevState,
-            confirmPasswordInput: true,
-          }));
-          setInputErrorMessage((prevState) => ({
-            ...prevState,
-            confirmPasswordHelperText:
-              "Slaptažodis turi būti ilgesnis nei 8 simboliai",
-          }));
-        }
-        if (password.length <= 8) {
-          setIsInputError((prevState) => ({
-            ...prevState,
-            passwordInput: true,
-          }));
-        }
-      }
-      return;
+    if (lastName.length <= 0) {
+      setError("lastName", "Pavardės laukas negali būti tuščias");
+    } else {
+      clearError("lastName");
     }
 
-    setIsInputError((prevState) => ({
-      ...prevState,
-      passwordInput: false,
-      confirmPasswordInput: false,
-    }));
-
-    if (password !== confirmPassword) {
-      setIsError(true);
-      setIsInputError((prevState) => ({
-        ...prevState,
-        passwordInput: true,
-        confirmPasswordInput: true,
-      }));
-      setInputErrorMessage(() => ({
-        passwordHelperText: "Abu slaptažodžiai turi sutapti",
-        confirmPasswordHelperText: "Abu slaptažodžiai turi sutapti",
-      }));
-      setErrorMessage("Abu slaptažodžiai turi sutapti");
-      return;
+    if (phoneNumber.length <= 0) {
+      setError("phoneNumber", "Telefono numerio laukas negali būti tuščias");
+      isError = true;
+    } else {
+      clearError("phoneNumber");
     }
+
+    if (email.length <= 0) {
+      setError("email", "El. pašto laukas negali būti tuščias");
+      isError = true;
+    } else if (!validateEmail(email)) {
+      setError("email", "Neteisingas el. pašto formatas");
+      isError = true;
+    } else {
+      clearError("email");
+    }
+
+    if (password.length === 0) {
+      setError("password", "Slaptažodžio laukas negali būti tuščias");
+      isError = true;
+    } else if (password.length <= 8) {
+      setError("password", "Slaptažodis turi būti ilgesnis nei 8 simboliai");
+      isError = true;
+    } else {
+      clearError("password");
+    }
+
+    if (confirmPassword.length == 0) {
+      setError("confirmPassword", "Slaptažodžio laukas negali būti tuščias");
+      isError = true;
+    } else if (confirmPassword.length <= 8) {
+      setError(
+        "confirmPassword",
+        "Slaptažodis turi būti ilgesnis nei 8 simboliai"
+      );
+      isError = true;
+    } else {
+      clearError("confirmPassword");
+    }
+
+    if (isError) return;
 
     try {
-      const response = await insertUser();
-      if (response.message === "Email address is already in use") {
-        setIsError(true);
-        setErrorMessage("El. pašto adresas jau naudojamas");
-      } else if (response.message === "User registered successfully") {
-        navigate("/login");
+      if (password !== confirmPassword) {
+        setError("password", "Abu slaptažodžiai turi sutapti");
+        setError("confirmPassword", "Abu slaptažodžiai turi sutapti");
+        return;
+      } else {
+        clearError("password");
+        clearError("confirmPassword");
+
+        const response = await insertUser();
+        if (response.message === "Email address is already in use") {
+          setError("email", "El. pašto adresas jau naudojamas");
+          return;
+        } else if (response.message === "User registered successfully") {
+          navigate("/login");
+        }
       }
     } catch (e) {
       console.error(e);
-      setIsError(true);
-      setErrorMessage(e.message);
     }
   };
 
@@ -164,7 +214,11 @@ const Register = () => {
       password,
       firstName,
       lastName,
-      gender /*, number, status, faculty, group*/,
+      gender,
+      phoneNumber,
+      userStatus,
+      faculty,
+      userGroup,
     } = userInfo;
 
     const data = {
@@ -173,10 +227,10 @@ const Register = () => {
       firstName: firstName,
       lastName: lastName,
       gender: gender,
-      // phoneNumber: number
-      // status: status
-      // faculty: faculty
-      // group: group
+      phoneNumber: phoneNumber,
+      userStatus: userStatus,
+      faculty: faculty,
+      userGroup: userGroup,
     };
 
     try {
@@ -192,36 +246,54 @@ const Register = () => {
 
   return (
     <>
-      {isError && <Error errorMessage={errorMessage} />}
-      <RegisterBox>
+      <PageBox>
         <Paper sx={{ p: 8 }} elevation={12}>
-          <FormTitle title="Registracija" />
+          <Typography
+            color="primary.main"
+            align="center"
+            variant="h2"
+            gutterBottom
+          >
+            Registracija
+          </Typography>
           <form>
             <Grid maxWidth="sm" container spacing={4}>
               <Grid size={6}>
-                <InputTextField
+                <CustomTextField
                   value={userInfo.firstName}
                   label="Įveskite savo vardą"
                   type="text"
                   onChange={handleInput}
                   name="firstName"
+                  isError={isInputError.firstName}
+                  helperText={
+                    isInputError.firstName && inputErrorMessage.firstName
+                  }
                 />
               </Grid>
               <Grid size={6}>
-                <InputTextField
+                <CustomTextField
                   value={userInfo.lastName}
                   label="Įveskite savo pavardę"
                   type="text"
                   onChange={handleInput}
                   name="lastName"
+                  isError={isInputError.lastName}
+                  helperText={
+                    isInputError.lastName && inputErrorMessage.lastName
+                  }
                 />
               </Grid>
-              <InputTextField
+              <CustomTextField
                 value={userInfo.phoneNumber}
                 label="Įveskite savo telefono numerį"
                 type="text"
                 onChange={handleInput}
                 name="phoneNumber"
+                isError={isInputError.phoneNumber}
+                helperText={
+                  isInputError.phoneNumber && inputErrorMessage.phoneNumber
+                }
               />
               <Grid size={12}>
                 <FormControl>
@@ -245,88 +317,76 @@ const Register = () => {
                   </RadioGroup>
                 </FormControl>
               </Grid>
-              <Grid size={12}>
-                <FormControl>
-                  <FormLabel>Statusas</FormLabel>
-                  <RadioGroup
-                    row
-                    name="status"
-                    value={userInfo.status}
-                    onChange={handleInput}
-                  >
-                    <FormControlLabel
-                      value="Studentas"
-                      control={<Radio />}
-                      label="Studentas"
-                    />
-                    <FormControlLabel
-                      value="Dėstytojas"
-                      control={<Radio />}
-                      label="Dėstytojas"
-                    />
-                  </RadioGroup>
-                </FormControl>
-              </Grid>
-              <Grid size={6}>
-                <InputTextField
-                  value={userInfo.faculty}
-                  label="Įveskite savo fakultetą"
-                  type="text"
+              <Grid size={4}>
+                <CustomFormControl
+                  inputLabel="Statusas"
+                  name="userStatus"
+                  value={userInfo.userStatus}
                   onChange={handleInput}
+                  items={statusList}
+                />
+              </Grid>
+              <Grid size={4}>
+                <CustomFormControl
+                  inputLabel="Fakultetas"
                   name="faculty"
-                />
-              </Grid>
-              <Grid size={6}>
-                <InputTextField
-                  value={userInfo.group}
-                  label="Įveskite savo grupę"
-                  type="text"
+                  value={userInfo.faculty}
                   onChange={handleInput}
-                  name="group"
+                  items={facultyList}
+                  disabled={!isStudent}
                 />
               </Grid>
-              <InputTextField
+              <Grid size={4}>
+                <CustomFormControl
+                  inputLabel="Grupė"
+                  name="userGroup"
+                  value={userInfo.userGroup}
+                  onChange={handleInput}
+                  items={groupList}
+                  disabled={!isStudent}
+                />
+              </Grid>
+              <CustomTextField
                 value={userInfo.email}
                 label="Įveskite savo el. pašto adresą"
                 type="email"
                 onChange={handleInput}
                 name="email"
-                error={isInputError.emailInput}
-                errorMessage={
-                  isInputError.emailInput && inputErrorMessage.emailHelperText
-                }
+                isError={isInputError.email}
+                helperText={isInputError.email && inputErrorMessage.email}
               />
-              <InputTextField
+              <CustomTextField
                 value={userInfo.password}
                 label="Įveskite slaptažodį"
                 type="password"
                 onChange={handleInput}
                 name="password"
-                error={isInputError.passwordInput}
-                errorMessage={
-                  isInputError.passwordInput &&
-                  inputErrorMessage.passwordHelperText
-                }
+                isError={isInputError.password}
+                helperText={isInputError.password && inputErrorMessage.password}
               />
-              <InputTextField
+              <CustomTextField
                 value={userInfo.confirmPassword}
                 label="Patvirtinkite slaptažodį"
                 type="password"
                 onChange={handleInput}
                 name="confirmPassword"
-                error={isInputError.confirmPasswordInput}
-                errorMessage={
-                  isInputError.confirmPasswordInput &&
-                  inputErrorMessage.confirmPasswordHelperText
+                isError={isInputError.confirmPassword}
+                helperText={
+                  isInputError.confirmPassword &&
+                  inputErrorMessage.confirmPassword
                 }
               />
-              <FormButton
-                onClick={(e) => {
-                  e.preventDefault();
+              <Button
+                onClick={() => {
                   registerUser();
                 }}
-                text="Užsiregistruoti"
-              />
+                size="large"
+                fullWidth
+                variant="contained"
+                sx={{ p: 2 }}
+              >
+                Užsiregistruoti
+              </Button>
               <Grid size={12}>
                 <Typography align="center" variant="subtitle1">
                   Spausdamas UŽSIREGISTRUOTI patvirtinu, kad perskaičiau ir
@@ -336,65 +396,30 @@ const Register = () => {
             </Grid>
           </form>
         </Paper>
-      </RegisterBox>
+      </PageBox>
     </>
   );
 };
 
-const RegisterBox = styled(Box)(({ theme }) => ({
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  minHeight: "100vh",
-  padding: 20,
-  backgroundColor: theme.palette.background.default,
-  color: theme.palette.text.primary,
-}));
-
-const InputTextField = ({
-  value,
-  label,
-  type,
-  onChange,
+const CustomFormControl = ({
+  inputLabel,
   name,
-  error,
-  errorMessage,
+  value,
+  onChange,
+  items,
+  disabled = false,
 }) => {
   return (
-    <TextField
-      value={value}
-      fullWidth
-      variant="filled"
-      label={label}
-      type={type}
-      required
-      onChange={onChange}
-      name={name}
-      error={error}
-      helperText={error && errorMessage}
-    />
-  );
-};
-
-const FormTitle = ({ title }) => {
-  return (
-    <Typography color="primary.main" align="center" variant="h2" gutterBottom>
-      {title}
-    </Typography>
-  );
-};
-
-const FormButton = ({ text, onClick }) => {
-  return (
-    <Button
-      onClick={onClick}
-      size="large"
-      fullWidth
-      variant="contained"
-      sx={{ p: 2 }}
-    >
-      {text}
-    </Button>
+    <FormControl variant="filled" sx={{ minWidth: "100%", maxWidth: "100%" }}>
+      <InputLabel>{inputLabel}</InputLabel>
+      <Select disabled={disabled} name={name} value={value} onChange={onChange}>
+        {items.map((item, index) => (
+          <MenuItem key={index} value={item}>
+            {item}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
   );
 };
 

@@ -4,8 +4,6 @@ import {
   Paper,
   Typography,
   Button,
-  TextField,
-  Link,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -14,9 +12,10 @@ import {
   CircularProgress,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import { styled } from "@mui/system";
 import { useAuth } from "../../helper/AuthContext";
 import { useNavigate } from "react-router-dom";
+import CustomTextField from "../ui/CustomTextField";
+import PageBox from "../styles/PageBox";
 
 import axios from "axios";
 
@@ -25,15 +24,12 @@ const Login = () => {
 
   const { login } = useAuth();
 
-  // Show forgot password Dialog component if it's open
+  // forgot password Dialog component state
   const [open, setOpen] = useState(false);
 
   const handleDialog = () => {
     setOpen(!open);
   };
-
-  // Forgot password email address input
-  const [emailAddress, setEmailAddress] = useState("");
 
   const [isInputError, setIsInputError] = useState({
     emailInput: false,
@@ -53,83 +49,66 @@ const Login = () => {
   const [userInfo, setUserInfo] = useState({
     email: "",
     password: "",
+    forgotEmail: "",
   });
 
-  const handleChange = (e) => {
-    setEmailAddress(e.target.value);
-  };
-
   const sendRecoveryEmail = async () => {
-    if (emailAddress <= 0) {
-      setIsInputError((prevState) => ({
-        ...prevState,
-        forgotPasswordEmailInput: true,
-      }));
-      setInputErrorMessage((prevValue) => ({
-        ...prevValue,
-        forgotPasswordEmailInput: "El. pašto laukas negali būti tuščias",
-      }));
+    const { forgotEmail } = userInfo;
+
+    if (forgotEmail <= 0) {
+      setError(
+        "forgotPasswordEmailInput",
+        "El. pašto laukas negali būti tuščias"
+      );
       return;
     }
 
-    clearEmailError();
-
-    if (!isValidEmail(emailAddress)) {
-      setIsInputError((prevState) => ({
-        ...prevState,
-        forgotPasswordEmailInput: true,
-      }));
-      setInputErrorMessage((prevValue) => ({
-        ...prevValue,
-        forgotPasswordEmailInput: "Neteisingas el. pašto formatas",
-      }));
+    if (!isValidEmail(forgotEmail)) {
+      setError("forgotPasswordEmailInput", "Neteisingas el. pašto formatas");
       return;
     }
-
-    clearEmailError();
 
     try {
       setIsSending(true);
+
       const data = {
-        recipient: emailAddress,
+        recipient: forgotEmail,
       };
+
       await axios.post("http://localhost:3000/auth/forgot-password", data);
+
       setIsSending(false);
+      clearError("forgotPasswordEmailInput");
       handleDialog();
     } catch (e) {
       setIsSending(false);
-      setIsInputError((prevState) => ({
-        ...prevState,
-        forgotPasswordEmailInput: true,
-      }));
-      setInputErrorMessage((prevValue) => ({
-        ...prevValue,
-        forgotPasswordEmailInput: "Šis el. paštas mūsų sistemoje neegzistuoja",
-      }));
+      setError(
+        "forgotPasswordEmailInput",
+        "Šis el. paštas mūsų sistemoje neegzistuoja"
+      );
     }
   };
 
-  const clearEmailError = () => {
+  const clearError = (fieldType) => {
     setIsInputError((prevState) => ({
       ...prevState,
-      emailInput: false,
-      forgotPasswordEmailInput: false,
+      [fieldType]: false,
     }));
     setInputErrorMessage((prevValue) => ({
       ...prevValue,
-      emailInput: "",
-      forgotPasswordEmailInput: "",
+      [fieldType]: "",
     }));
   };
 
-  const clearPasswordError = () => {
+  const setError = (fieldType, errorMessage) => {
     setIsInputError((prevState) => ({
       ...prevState,
-      passwordInput: false,
+      [fieldType]: true,
     }));
+
     setInputErrorMessage((prevValue) => ({
       ...prevValue,
-      passwordInput: "",
+      [fieldType]: errorMessage,
     }));
   };
 
@@ -141,68 +120,42 @@ const Login = () => {
   const handleLogin = async () => {
     const { email, password } = userInfo;
 
+    var isError = false;
+
     if (email.length <= 0) {
-      clearPasswordError();
-      setIsInputError((prevState) => ({
-        ...prevState,
-        emailInput: true,
-      }));
-      setInputErrorMessage((prevValue) => ({
-        ...prevValue,
-        emailInput: "El. pašto laukas negali būti tuščias",
-      }));
-      return;
+      setError("emailInput", "El. pašto laukas negali būti tuščias");
+      isError = true;
+    } else if (!isValidEmail(email)) {
+      setError("emailInput", "Neteisingas el. pašto formatas");
+      isError = true;
+    } else {
+      clearError("emailInput");
     }
-
-    clearEmailError();
-
-    if (!isValidEmail(email)) {
-      clearPasswordError();
-      setIsInputError((prevState) => ({
-        ...prevState,
-        emailInput: true,
-      }));
-      setInputErrorMessage((prevValue) => ({
-        ...prevValue,
-        emailInput: "Neteisingas el. pašto formatas",
-      }));
-      return;
-    }
-
-    clearEmailError();
 
     if (password.length <= 0) {
-      setIsInputError((prevState) => ({
-        ...prevState,
-        passwordInput: true,
-      }));
-      setInputErrorMessage((prevValue) => ({
-        ...prevValue,
-        passwordInput: "Slaptažodžio laukas negali būti tuščias",
-      }));
-      return;
+      setError("passwordInput", "Slaptažodžio laukas negali būti tuščias");
+      isError = true;
+    } else {
+      clearError("passwordInput");
     }
 
-    clearPasswordError();
+    if (isError) return;
 
     try {
       setIsLoading(true);
-      clearEmailError();
-      clearPasswordError();
       await login(userInfo);
       setIsLoading(false);
       navigate("/profile");
     } catch (e) {
       setIsLoading(false);
-      setIsInputError({
-        emailInput: true,
-        passwordInput: true,
-      });
-      setInputErrorMessage({
-        emailInput: "Neteisingas el. pašto adresas ir (arba) slaptažodis",
-        passwordInput: "Neteisingas el. pašto adresas ir (arba) slaptažodis",
-      });
-      console.log(e);
+      setError(
+        "emailInput",
+        "Neteisingas el. pašto adresas ir (arba) slaptažodis"
+      );
+      setError(
+        "passwordInput",
+        "Neteisingas el. pašto adresas ir (arba) slaptažodis"
+      );
     }
   };
 
@@ -218,11 +171,11 @@ const Login = () => {
   return (
     <>
       {isLoading ? (
-        <LoginBox>
+        <PageBox>
           <CircularProgress disableShrink={false} size={"25%"} />
-        </LoginBox>
+        </PageBox>
       ) : (
-        <LoginBox>
+        <PageBox>
           <Paper sx={{ p: 5 }} elevation={12}>
             <Typography
               color="primary.main"
@@ -232,59 +185,55 @@ const Login = () => {
             >
               Prisijungimas
             </Typography>
-            <form>
-              <Grid maxWidth="sm" container spacing={4}>
-                <CustomTextField
-                  value={userInfo.email}
-                  label="Įveskite el. paštą"
-                  type="email"
-                  onChange={handleInput}
-                  name="email"
-                  isError={isInputError.emailInput}
-                  helperText={
-                    isInputError.emailInput && inputErrorMessage.emailInput
-                  }
-                />
-                <CustomTextField
-                  value={userInfo.password}
-                  label="Įveskite slaptažodį"
-                  type="password"
-                  onChange={handleInput}
-                  name="password"
-                  isError={isInputError.passwordInput}
-                  helperText={
-                    isInputError.passwordInput &&
-                    inputErrorMessage.passwordInput
-                  }
-                />
-                <Button
-                  onClick={() => {
-                    handleLogin();
-                  }}
-                  size="large"
-                  fullWidth
-                  variant="contained"
-                  sx={{ p: 2 }}
-                >
-                  Prisijungti
-                </Button>
-                <Grid size={12}>
-                  <Typography align="center" variant="subtitle2">
-                    <Link
-                      onClick={() => {
-                        clearEmailError();
-                        handleDialog();
-                      }}
-                      variant="button"
-                    >
-                      Pamirsau slaptažodį
-                    </Link>
-                  </Typography>
-                </Grid>
+            <Grid maxWidth="sm" container spacing={4}>
+              <CustomTextField
+                value={userInfo.email}
+                label="Įveskite el. paštą"
+                type="email"
+                onChange={handleInput}
+                name="email"
+                isError={isInputError.emailInput}
+                helperText={
+                  isInputError.emailInput && inputErrorMessage.emailInput
+                }
+              />
+              <CustomTextField
+                value={userInfo.password}
+                label="Įveskite slaptažodį"
+                type="password"
+                onChange={handleInput}
+                name="password"
+                isError={isInputError.passwordInput}
+                helperText={
+                  isInputError.passwordInput && inputErrorMessage.passwordInput
+                }
+              />
+              <Button
+                onClick={() => {
+                  handleLogin();
+                }}
+                size="large"
+                fullWidth
+                variant="contained"
+                sx={{ p: 2 }}
+              >
+                Prisijungti
+              </Button>
+              <Grid size={12}>
+                <Typography align="center">
+                  <Button
+                    onClick={() => {
+                      handleDialog();
+                    }}
+                    variant="outlined"
+                  >
+                    Pamirsau slaptažodį
+                  </Button>
+                </Typography>
               </Grid>
-            </form>
+            </Grid>
           </Paper>
-        </LoginBox>
+        </PageBox>
       )}
 
       <Dialog fullWidth={true} open={open} onClose={handleDialog}>
@@ -300,19 +249,18 @@ const Login = () => {
               <CircularProgress disableShrink={true} size={"50%"} />
             </Box>
           ) : (
-            <TextField
-              value={emailAddress}
-              onChange={handleChange}
-              fullWidth
-              variant="outlined"
+            <CustomTextField
+              value={userInfo.forgotEmail}
               label="Įveskite savo el. pašto adresą"
-              type="text"
-              name="address"
-              error={isInputError.forgotPasswordEmailInput}
+              type="email"
+              onChange={handleInput}
+              name="forgotEmail"
+              isError={isInputError.forgotPasswordEmailInput}
               helperText={
                 isInputError.forgotPasswordEmailInput &&
                 inputErrorMessage.forgotPasswordEmailInput
               }
+              variant="outlined"
             />
           )}
         </DialogContent>
@@ -337,38 +285,4 @@ const Login = () => {
   );
 };
 
-const LoginBox = styled(Box)(({ theme }) => ({
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  minHeight: "100vh",
-  padding: 20,
-  backgroundColor: theme.palette.background.default,
-  color: theme.palette.text.primary,
-}));
-
 export default Login;
-
-function CustomTextField({
-  value,
-  label,
-  type,
-  onChange,
-  name,
-  isError,
-  helperText,
-}) {
-  return (
-    <TextField
-      value={value}
-      fullWidth
-      variant="filled"
-      label={label}
-      type={type}
-      onChange={onChange}
-      name={name}
-      error={isError}
-      helperText={isError && helperText}
-    />
-  );
-}

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useAuth } from "../../helper/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import {
   Box,
   Chip,
@@ -16,8 +16,9 @@ import {
 import Grid from "@mui/material/Grid2";
 import axios from "axios";
 import { styled } from "@mui/system";
-import { UsersContext } from "../../helper/UsersContext";
-import ProtectedRoute from "../../components/ProtectedRoute";
+
+import { UsersContext } from "../context/UsersContext";
+import ProtectedRoute from "../components/ProtectedRoute";
 
 const Profile = () => {
   const [selectedInterestIds, setSelectedInterestIds] = useState([]);
@@ -27,7 +28,7 @@ const Profile = () => {
   const fetchContact = async (id) => {
     try {
       const result = await axios.get(
-        `http://localhost:3000/api/v1/users/${id}`
+        `http://localhost:3000/api/v1/users/${id}`,
       );
       setContact(result.data);
     } catch (e) {
@@ -38,7 +39,7 @@ const Profile = () => {
   const fetchUserInterests = async (id) => {
     try {
       const result = await axios.get(
-        `http://localhost:3000/api/v1/users/${id}/interests`
+        `http://localhost:3000/api/v1/users/${id}/interests`,
       );
       const interestIds = result.data.map((interest) => interest.interest_id);
       const interestNames = result.data.map((interest) => interest.interest);
@@ -169,7 +170,7 @@ const Profile = () => {
                   <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                     {selectedInterestIds.map((id) => {
                       const interest = interests.find(
-                        (interest) => interest.id === id
+                        (interest) => interest.id === id,
                       );
                       return (
                         <Chip
@@ -204,7 +205,7 @@ const Profile = () => {
               </Select>
             </FormControl>
             <TextField
-              value={contactInput.phoneNumber}
+              value={contact.phone_number || ""}
               fullWidth
               variant="filled"
               label="Telefono numeris"
@@ -245,7 +246,7 @@ const Profile = () => {
             </Grid>
             <Grid size={4}>
               <TextField
-                value={contactInput.status}
+                value={contact.status || ""}
                 variant="filled"
                 label="Statusas"
                 disabled
@@ -253,7 +254,7 @@ const Profile = () => {
             </Grid>
             <Grid size={4}>
               <TextField
-                value={contactInput.faculty}
+                value={contact.faculty || ""}
                 variant="filled"
                 label="Fakultetas"
                 disabled
@@ -261,7 +262,7 @@ const Profile = () => {
             </Grid>
             <Grid size={4}>
               <TextField
-                value={contactInput.group}
+                value={contact.group || ""}
                 variant="filled"
                 label="Grupė"
                 disabled

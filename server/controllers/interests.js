@@ -1,5 +1,6 @@
 import pool from "../db/db.js";
 
+// Get all interests
 const getInterests = async (_, res) => {
   try {
     const result = await pool.query(

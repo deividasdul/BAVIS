@@ -1,5 +1,4 @@
 import React, { useContext } from "react";
-import { DormsContext } from "../../helper/DormsContext";
 import {
   Card,
   CardActionArea,
@@ -14,7 +13,9 @@ import Grid from "@mui/material/Grid2";
 import PlaceIcon from "@mui/icons-material/Place";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import { styled } from "@mui/system";
-import ProtectedRoute from "../ProtectedRoute";
+
+import ProtectedRoute from "../components/ProtectedRoute";
+import { DormsContext } from "../context/DormsContext";
 
 const DormsList = () => {
   const { dorms } = useContext(DormsContext);

@@ -47,9 +47,10 @@ const register = async (req, res) => {
 
             const user = result.rows[0];
             await pool.query(
-              `INSERT INTO contact (first_name, last_name, gender, phone_number, status, faculty, "group") 
-              VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+              `INSERT INTO contact (id, first_name, last_name, gender, phone_number, status, faculty, "group") 
+              VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
               [
+                user.id,
                 fixedFirstName,
                 fixedLastName,
                 gender,

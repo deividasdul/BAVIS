@@ -3,15 +3,15 @@ import pool from "../db/db.js";
 // Get all rooms
 const getRooms = async (_, res) => {
   try {
-    const roomData = await pool.query(`SELECT * FROM room ORDER BY id ASC`);
-    res.status(200).json(roomData.rows);
+    const roomsList = await pool.query(`SELECT * FROM room ORDER BY id ASC`);
+    res.status(200).json(roomsList.rows);
   } catch (e) {
     console.error(e.message);
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
-// Get single room
+// Get one room
 const getRoom = async (req, res) => {
   const { id } = req.params;
 

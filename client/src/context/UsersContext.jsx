@@ -17,10 +17,20 @@ export const UsersProvider = ({ children }) => {
     }
   };
 
+  const capitalizeInput = (input) => {
+    return (
+      input.slice(0, 1).toUpperCase() +
+      input.slice(1, input.length).toLowerCase()
+    );
+  };
+
   const putUser = async ({ firstName, lastName }, id) => {
+    const fixedFirstName = capitalizeInput(firstName);
+    const fixedLastName = capitalizeInput(lastName);
+
     const data = {
-      first_name: firstName,
-      last_name: lastName,
+      first_name: fixedFirstName,
+      last_name: fixedLastName,
     };
 
     try {
@@ -53,7 +63,7 @@ export const UsersProvider = ({ children }) => {
 
   return (
     <UsersContext.Provider
-      value={{ users, putUser, deleteUser, isLoading, patchUser }}
+      value={{ users, putUser, deleteUser, isLoading, patchUser, fetchUsers }}
     >
       {children}
     </UsersContext.Provider>

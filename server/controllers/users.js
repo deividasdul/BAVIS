@@ -6,7 +6,9 @@ const getUsers = async (_, res) => {
     const result = await pool.query(`SELECT 
           "user".id, "user".email, "user".role, contact.first_name, contact.last_name
           FROM "user"
-          LEFT JOIN contact ON "user".id = contact.id;`);
+          LEFT JOIN contact ON "user".id = contact.id
+          ORDER BY "user".id ASC
+          `);
     res.status(200).json(result.rows);
   } catch (e) {
     console.error(e);
@@ -17,7 +19,6 @@ const getUsers = async (_, res) => {
 // Delete user
 const deleteUser = async (req, res) => {
   const { id } = req.params;
-  console.log(id);
 
   try {
     const result = await pool.query(

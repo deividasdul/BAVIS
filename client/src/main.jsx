@@ -1,12 +1,12 @@
 import { StrictMode, useContext } from "react";
 import { createRoot } from "react-dom/client";
-import App from "./components/App/App.jsx";
+import App from "./App.jsx";
 import { CssBaseline } from "@mui/material";
-import { AuthProvider } from "./helper/AuthContext.jsx";
-import { DormsProvider } from "./helper/DormsContext.jsx";
-import { RoomsProvider } from "./helper/RoomsContext.jsx";
-import { ModeProvider } from "./helper/ModeContext.jsx";
-import { UsersProvider } from "./helper/UsersContext.jsx";
+import { AuthProvider } from "./context/AuthContext.jsx";
+import { DormsProvider } from "./context/DormsContext.jsx";
+import { RoomsProvider } from "./context/RoomsContext.jsx";
+import { ModeProvider } from "./context/ModeContext.jsx";
+import { UsersProvider } from "./context/UsersContext.jsx";
 
 const root = createRoot(document.getElementById("root"));
 root.render(
@@ -23,5 +23,5 @@ root.render(
         </RoomsProvider>
       </DormsProvider>
     </AuthProvider>
-  </StrictMode>
+  </StrictMode>,
 );

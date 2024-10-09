@@ -1,14 +1,25 @@
 import React from "react";
-import { useAuth } from "../helper/AuthContext";
-import { Typography, CircularProgress } from "@mui/material";
+import { useAuth } from "../context/AuthContext";
+import { Typography, CircularProgress, Skeleton } from "@mui/material";
 import { Box } from "@mui/system";
 import { styled } from "@mui/system";
+import PageBox from "./styles/PageBox";
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <CircularProgress />;
+    return (
+      <PageBox>
+        <Skeleton
+          sx={{ bgcolor: "grey.900", minHeight: "100vh", minWidth: "100vh" }}
+          variant="rectangular"
+          width={210}
+          height={118}
+        />
+        {/* <CircularProgress variant="determinate" value={25} size={"25%"} /> */}
+      </PageBox>
+    );
   }
 
   if (!user) {

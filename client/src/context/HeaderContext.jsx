@@ -18,12 +18,14 @@ export const HeaderProvider = ({ children }) => {
   const userPanelPaths = ["/profile", "/payment-history"];
 
   useEffect(() => {
+    const isRoomPath = /^\/rooms\/\d+$/.test(location.pathname);
+
     setIsSelected({
       home: location.pathname === "/",
       login: location.pathname === "/login",
       register: location.pathname === "/register",
       dormsList: location.pathname === "/dorms-list",
-      adminPanel: adminPanelPaths.includes(location.pathname),
+      adminPanel: adminPanelPaths.includes(location.pathname) || isRoomPath,
       userPanel: userPanelPaths.includes(location.pathname),
     });
   }, [location.pathname]);

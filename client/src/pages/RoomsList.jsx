@@ -18,15 +18,17 @@ import {
   ButtonGroup,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import { RoomsContext } from "../../helper/RoomsContext";
+
 import { styled } from "@mui/system";
-import ProtectedRoute from "../ProtectedRoute";
-import { useAuth } from "../../helper/AuthContext";
 import axios from "axios";
 import StarRateIcon from "@mui/icons-material/StarRate";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+
+import { RoomsContext } from "../context/RoomsContext";
+import ProtectedRoute from "../components/ProtectedRoute";
+import { useAuth } from "../context/AuthContext";
 
 function RoomsList() {
   const { user } = useAuth();
@@ -59,7 +61,7 @@ function RoomsList() {
     if (user && user.id) {
       try {
         const result = await axios.get(
-          `http://localhost:3000/api/v1/users/${user.id}`
+          `http://localhost:3000/api/v1/users/${user.id}`,
         );
         setContact(result.data);
         setIsLoading(false);
@@ -74,7 +76,7 @@ function RoomsList() {
     if (user && user.id) {
       try {
         const result = await axios.get(
-          `http://localhost:3000/api/v1/users/${user.id}/interests`
+          `http://localhost:3000/api/v1/users/${user.id}/interests`,
         );
         setUserInterests(result.data);
         setIsLoading(false);
@@ -100,11 +102,11 @@ function RoomsList() {
     if (!tenantInterests || !userInterests) return false;
 
     const userInterestIds = userInterests.map(
-      (userInterest) => userInterest.interest_id
+      (userInterest) => userInterest.interest_id,
     );
 
     return tenantInterests.some((interestId) =>
-      userInterestIds.includes(interestId)
+      userInterestIds.includes(interestId),
     );
   };
 

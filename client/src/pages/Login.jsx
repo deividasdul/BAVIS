@@ -8,14 +8,16 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  ButtonGroup,
   CircularProgress,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import { useAuth } from "../../helper/AuthContext";
 import { useNavigate } from "react-router-dom";
-import CustomTextField from "../ui/CustomTextField";
-import PageBox from "../styles/PageBox";
+
+import SuccessButton from "../components/ui/SuccessButton";
+import CloseButton from "../components/ui/CloseButton";
+import PageBox from "../components/styles/PageBox";
+import CustomTextField from "../components/ui/CustomTextField";
+import { useAuth } from "../context/AuthContext";
 
 import axios from "axios";
 
@@ -58,7 +60,7 @@ const Login = () => {
     if (forgotEmail <= 0) {
       setError(
         "forgotPasswordEmailInput",
-        "El. pašto laukas negali būti tuščias"
+        "El. pašto laukas negali būti tuščias",
       );
       return;
     }
@@ -84,7 +86,7 @@ const Login = () => {
       setIsSending(false);
       setError(
         "forgotPasswordEmailInput",
-        "Šis el. paštas mūsų sistemoje neegzistuoja"
+        "Šis el. paštas mūsų sistemoje neegzistuoja",
       );
     }
   };
@@ -143,18 +145,20 @@ const Login = () => {
 
     try {
       setIsLoading(true);
-      await login(userInfo);
+      const result = await login(userInfo);
       setIsLoading(false);
-      navigate("/profile");
+      console.log(result.user.role);
+      if (result.user.role === "User") navigate("/profile");
+      else navigate("/dashboard");
     } catch (e) {
       setIsLoading(false);
       setError(
         "emailInput",
-        "Neteisingas el. pašto adresas ir (arba) slaptažodis"
+        "Neteisingas el. pašto adresas ir (arba) slaptažodis",
       );
       setError(
         "passwordInput",
-        "Neteisingas el. pašto adresas ir (arba) slaptažodis"
+        "Neteisingas el. pašto adresas ir (arba) slaptažodis",
       );
     }
   };
@@ -208,17 +212,12 @@ const Login = () => {
                   isInputError.passwordInput && inputErrorMessage.passwordInput
                 }
               />
-              <Button
-                onClick={() => {
-                  handleLogin();
-                }}
-                size="large"
-                fullWidth
-                variant="contained"
-                sx={{ p: 2 }}
-              >
-                Prisijungti
-              </Button>
+              <SuccessButton
+                label="Prisijungti"
+                onClick={handleLogin}
+                isFullWidth={true}
+                sx
+              />
               <Grid size={12}>
                 <Typography align="center">
                   <Button
@@ -226,6 +225,7 @@ const Login = () => {
                       handleDialog();
                     }}
                     variant="outlined"
+                    size="large"
                   >
                     Pamirsau slaptažodį
                   </Button>
@@ -266,18 +266,10 @@ const Login = () => {
         </DialogContent>
         <DialogActions>
           {!isSending && (
-            <ButtonGroup variant="contained" size="large" sx={{ gap: 1 }}>
-              <Button onClick={handleDialog}>Uždaryti</Button>
-              <Button
-                color="success"
-                onClick={() => {
-                  sendRecoveryEmail();
-                }}
-                type="submit"
-              >
-                Atkurti
-              </Button>
-            </ButtonGroup>
+            <>
+              <CloseButton label="Uždaryti" onClick={handleDialog} />
+              <SuccessButton label="Atkurti" onClick={sendRecoveryEmail} />
+            </>
           )}
         </DialogActions>
       </Dialog>

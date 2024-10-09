@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Paper,
   Box,
@@ -9,21 +9,28 @@ import {
   DialogActions,
   DialogContentText,
   Button,
-  TextField,
-  ButtonGroup,
-  Stack,
-  Skeleton,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 import { styled } from "@mui/system";
 import Grid from "@mui/material/Grid2";
-import { UsersContext } from "../../helper/UsersContext";
-import ProtectedRoute from "../ProtectedRoute";
+
+import { UsersContext } from "../context/UsersContext";
+import ProtectedRoute from "../components/ProtectedRoute";
+import CustomTextField from "../components/ui/CustomTextField";
+import SuccessButton from "../components/ui/SuccessButton";
+import CloseButton from "../components/ui/CloseButton";
 
 function Users() {
-  const { users, putUser, deleteUser, isLoading } = useContext(UsersContext);
+  const { users, putUser, deleteUser, isLoading, fetchUsers } =
+    useContext(UsersContext);
+
+  const [isPageLoading, setIsPageLoading] = useState(true);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [users]);
 
   const [userId, setUserId] = useState(0);
   const [isConfirmRequired, setConfirmedRequired] = useState(false);
@@ -33,6 +40,61 @@ function Users() {
     firstName: "",
     lastName: "",
   });
+
+  const [isInputError, setIsInputError] = useState({
+    firstName: false,
+    lastName: false,
+  });
+
+  const [inputErrorMessage, setInputErrorMessage] = useState({
+    firstName: "",
+    lastName: "",
+  });
+
+  const clearError = (fieldType) => {
+    setIsInputError((prevState) => ({
+      ...prevState,
+      [fieldType]: false,
+    }));
+    setInputErrorMessage((prevValue) => ({
+      ...prevValue,
+      [fieldType]: "",
+    }));
+  };
+
+  const setError = (fieldType, errorMessage) => {
+    setIsInputError((prevState) => ({
+      ...prevState,
+      [fieldType]: true,
+    }));
+    setInputErrorMessage((prevValue) => ({
+      ...prevValue,
+      [fieldType]: errorMessage,
+    }));
+  };
+
+  const editUser = ({ firstName, lastName }, userId) => {
+    var isError = false;
+
+    if (firstName.length <= 0) {
+      setError("firstName", "Vardo laukas negali būti tuščias");
+      isError = true;
+    } else {
+      clearError("firstName");
+    }
+
+    if (lastName.length <= 0) {
+      setError("lastName", "Pavardės laukas negali būti tuščias");
+      isError = true;
+    } else {
+      clearError("lastName");
+    }
+
+    if (isError) return;
+
+    putUser(input, userId);
+    handleEditClose();
+  };
 
   const handleConfirm = () => {
     setConfirmedRequired(!isConfirmRequired);
@@ -63,13 +125,13 @@ function Users() {
       field: "first_name",
       headerName: "Vardas",
       width: 150,
-      editable: true,
+      editable: false,
     },
     {
       field: "last_name",
       headerName: "Pavardė",
       width: 150,
-      editable: true,
+      editable: false,
     },
     {
       field: "email",
@@ -81,7 +143,7 @@ function Users() {
       field: "role",
       headerName: "Rolė",
       width: 110,
-      editable: true,
+      editable: false,
     },
     {
       field: "fullName",
@@ -103,6 +165,8 @@ function Users() {
           <>
             <ActionButton
               onClick={() => {
+                clearError("firstName");
+                clearError("lastName");
                 handleEditOpen(row);
                 setUserId(row.id);
               }}
@@ -126,13 +190,6 @@ function Users() {
   return (
     <ProtectedRoute>
       <UsersBox>
-        {isLoading && (
-          <Stack spacing={1}>
-            <Skeleton animation="wave" />
-            <Skeleton animation="wave" />
-            <Skeleton animation="wave" />
-          </Stack>
-        )}
         <Paper elevation={24}>
           <DataGrid
             density="comfortable"
@@ -185,36 +242,39 @@ function Users() {
         <Dialog fullWidth={true} open={isEditOpen} onClose={handleEditClose}>
           <DialogTitle>Vartotojo redagavimas</DialogTitle>
           <DialogContent dividers={true}>
-            <form>
-              <Grid container spacing={2}>
-                <CustomTextField
-                  value={input.firstName}
-                  onChange={handleChange}
-                  label="Įveskite vartotojo vardą"
-                  name="firstName"
-                />
-                <CustomTextField
-                  value={input.lastName}
-                  onChange={handleChange}
-                  label="Įveskite vartotojo pavardę"
-                  name="lastName"
-                />
-              </Grid>
-            </form>
+            <Grid container spacing={2}>
+              <CustomTextField
+                value={input.firstName}
+                label="Įveskite vartotojo vardą"
+                type="text"
+                onChange={handleChange}
+                name="firstName"
+                isError={isInputError.firstName}
+                helperText={
+                  isInputError.firstName && inputErrorMessage.firstName
+                }
+                variant="outlined"
+              />
+              <CustomTextField
+                value={input.lastName}
+                label="Įveskite vartotojo pavardę"
+                type="text"
+                onChange={handleChange}
+                name="lastName"
+                isError={isInputError.lastName}
+                helperText={isInputError.lastName && inputErrorMessage.lastName}
+                variant="outlined"
+              />
+            </Grid>
           </DialogContent>
           <DialogActions>
-            <ButtonGroup variant="contained" size="large" sx={{ gap: 1 }}>
-              <Button onClick={handleEditClose}>Uždaryti</Button>
-              <Button
-                onClick={() => {
-                  putUser(input, userId);
-                  handleEditClose();
-                }}
-                type="submit"
-              >
-                Redaguoti
-              </Button>
-            </ButtonGroup>
+            <CloseButton label="Uždaryti" onClick={handleEditClose} />
+            <SuccessButton
+              label="Redaguoti"
+              onClick={() => {
+                editUser(input, userId);
+              }}
+            />
           </DialogActions>
         </Dialog>
       </UsersBox>
@@ -227,20 +287,6 @@ const ActionButton = ({ icon, color, onClick }) => {
     <IconButton onClick={onClick} color={color}>
       {icon}
     </IconButton>
-  );
-};
-
-const CustomTextField = ({ value, onChange, label, name }) => {
-  return (
-    <TextField
-      value={value}
-      onChange={onChange}
-      fullWidth
-      variant="outlined"
-      label={label}
-      type="text"
-      name={name}
-    ></TextField>
   );
 };
 

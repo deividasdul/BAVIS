@@ -9,8 +9,6 @@ import {
   CardContent,
   IconButton,
   Divider,
-  TextField,
-  ButtonGroup,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -23,9 +21,13 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import PlaceIcon from "@mui/icons-material/Place";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
-import { DormsContext } from "../../helper/DormsContext";
 import { styled } from "@mui/system";
-import ProtectedRoute from "../ProtectedRoute";
+
+import { DormsContext } from "../context/DormsContext";
+import ProtectedRoute from "../components/ProtectedRoute";
+import SuccessButton from "../components/ui/SuccessButton";
+import CloseButton from "../components/ui/CloseButton";
+import CustomTextField from "../components/ui/CustomTextField";
 
 const Dorms = () => {
   const { dorms, insertDorm, putDorm, deleteDorm } = useContext(DormsContext);
@@ -36,6 +38,63 @@ const Dorms = () => {
   const [editOpen, setEditOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const [isInputError, setIsInputError] = useState({
+    editAddress: false,
+    addAddress: false,
+  });
+
+  const [inputErrorMessage, setInputErrorMessage] = useState({
+    editAddress: "",
+    addAddress: "",
+  });
+
+  const setError = (fieldType, errorMessage) => {
+    setIsInputError((prevState) => ({
+      ...prevState,
+      [fieldType]: true,
+    }));
+
+    setInputErrorMessage((prevValue) => ({
+      ...prevValue,
+      [fieldType]: errorMessage,
+    }));
+  };
+
+  const clearError = (fieldType) => {
+    setIsInputError((prevState) => ({
+      ...prevState,
+      [fieldType]: false,
+    }));
+
+    setInputErrorMessage((prevValue) => ({
+      ...prevValue,
+      [fieldType]: "",
+    }));
+  };
+
+  const editDorm = (dormId, address) => {
+    if (address.length <= 0) {
+      setError("editAddress", "Bendrabučio adreso laukas negali būti tuščias");
+      return;
+    } else {
+      clearError("editAddress");
+      putDorm(dormId, address);
+      handleEdit();
+    }
+  };
+
+  const addDorm = (inputAddress) => {
+    if (inputAddress.length <= 0) {
+      setError("addAddress", "Bendrabučio adreso laukas negali būti tuščias");
+      return;
+    } else {
+      clearError("addAddress");
+      insertDorm(inputAddress);
+      setInputAddress("");
+      handleAdd();
+    }
+  };
 
   const handleChange = (e) => {
     setAddress(e.target.value);
@@ -64,7 +123,7 @@ const Dorms = () => {
           {dorms.map((dorm) => {
             return (
               <Grid key={dorm.id} size={3}>
-                <Card key={dorm.id} sx={{ m: 2 }} raised={true}>
+                <Card sx={{ m: 1 }} raised={true}>
                   <CardActionArea>
                     <CardHeader
                       avatar={<PlaceIcon fontSize="large" />}
@@ -87,7 +146,8 @@ const Dorms = () => {
                     <Button
                       href={"/rooms/" + dorm.id}
                       size="large"
-                      sx={{ p: 1, m: 2 }}
+                      color="info"
+                      sx={{ p: 1, m: 1, flex: 1 }}
                       variant="contained"
                       startIcon={<RemoveRedEyeIcon />}
                     >
@@ -99,7 +159,7 @@ const Dorms = () => {
                         setAddress(dorm.address);
                         setDormId(dorm.id);
                       }}
-                      color="info"
+                      color="primary"
                     >
                       <EditIcon fontSize="large" />
                     </IconButton>
@@ -120,30 +180,27 @@ const Dorms = () => {
           <Dialog fullWidth={true} open={editOpen} onClose={handleEdit}>
             <DialogTitle>Bendrabučio redagavimas</DialogTitle>
             <DialogContent dividers={true}>
-              <TextField
+              <CustomTextField
                 value={address}
-                onChange={handleChange}
-                fullWidth
-                variant="outlined"
                 label="Įveskite bendrabučio adresą"
-                type="text"
-                required
+                type="email"
+                onChange={handleChange}
                 name="address"
-              ></TextField>
+                isError={isInputError.editAddress}
+                helperText={
+                  isInputError.editAddress && inputErrorMessage.editAddress
+                }
+                variant="outlined"
+              />
             </DialogContent>
             <DialogActions>
-              <ButtonGroup variant="contained" size="large" sx={{ gap: 1 }}>
-                <Button onClick={handleEdit}>Uždaryti</Button>
-                <Button
-                  onClick={() => {
-                    putDorm(dormId, address);
-                    handleEdit();
-                  }}
-                  type="submit"
-                >
-                  Redaguoti
-                </Button>
-              </ButtonGroup>
+              <CloseButton label="Uždaryti" onClick={handleEdit} />
+              <SuccessButton
+                label="Redaguoti"
+                onClick={() => {
+                  editDorm(dormId, address);
+                }}
+              />
             </DialogActions>
           </Dialog>
           <Grid
@@ -159,64 +216,49 @@ const Dorms = () => {
               color="success"
               size="large"
               startIcon={<AddIcon />}
-              onClick={handleAdd}
+              onClick={() => {
+                setInputAddress("");
+                handleAdd();
+              }}
             >
               Pridėti
             </Button>
           </Grid>
         </Grid>
-        <form method="POST" action="">
-          <Dialog fullWidth={true} open={addOpen} onClose={handleAdd}>
-            <DialogTitle>Bendrabučio pridėjimas</DialogTitle>
+        <Dialog fullWidth={true} open={addOpen} onClose={handleAdd}>
+          <DialogTitle>Bendrabučio pridėjimas</DialogTitle>
 
-            <DialogContent dividers={true}>
-              <TextField
-                value={inputAddress}
-                onChange={handleAddChange}
-                fullWidth
-                variant="outlined"
-                label="Įveskite bendrabučio adresą"
-                type="text"
-                required
-                name="address"
-              ></TextField>
-            </DialogContent>
+          <DialogContent dividers={true}>
+            <CustomTextField
+              value={inputAddress}
+              label="Įveskite bendrabučio adresą"
+              type="email"
+              onChange={handleAddChange}
+              name="address"
+              isError={isInputError.addAddress}
+              helperText={
+                isInputError.addAddress && inputErrorMessage.addAddress
+              }
+              variant="outlined"
+            />
+          </DialogContent>
 
-            <DialogActions>
-              <ButtonGroup
-                variant="contained"
-                size="large"
-                sx={{ gap: 1 }}
-                disableElevation
-              >
-                <Button color="info" onClick={handleAdd}>
-                  Uždaryti
-                </Button>
-                <Button
-                  color="success"
-                  onClick={() => {
-                    insertDorm(inputAddress);
-                    handleAdd();
-                  }}
-                  type="submit"
-                >
-                  Pridėti
-                </Button>
-              </ButtonGroup>
-            </DialogActions>
-          </Dialog>
-        </form>
-        <Dialog
-          open={confirmOpen}
-          onClose={handleConfirm}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
+          <DialogActions>
+            <CloseButton label="Uždaryti" onClick={handleAdd} />
+            <SuccessButton
+              label="Pridėti"
+              onClick={() => {
+                addDorm(inputAddress);
+              }}
+            />
+          </DialogActions>
+        </Dialog>
+        <Dialog open={confirmOpen} onClose={handleConfirm}>
           <DialogTitle id="alert-dialog-title">
             {"Ištrinti šį bendrabutį?"}
           </DialogTitle>
           <DialogContent>
-            <DialogContentText id="alert-dialog-description">
+            <DialogContentText>
               Paspaudus, pasirinktas bendrabutis bus ištrintas iš sistemos.
             </DialogContentText>
           </DialogContent>

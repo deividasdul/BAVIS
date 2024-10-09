@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import {
   Paper,
   Typography,
-  Button,
   RadioGroup,
   FormControl,
   FormLabel,
@@ -15,8 +14,10 @@ import {
   MenuItem,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import PageBox from "../styles/PageBox";
-import CustomTextField from "../ui/CustomTextField";
+
+import PageBox from "../components/styles/PageBox";
+import CustomTextField from "../components/ui/CustomTextField";
+import SuccessButton from "../components/ui/SuccessButton";
 
 const groupList = ["AKRV", "ERP", "VAK", "IPU", "KT", "PS"];
 const statusList = ["Studentas", "Dėstytojas", "Svečias"];
@@ -172,7 +173,7 @@ const Register = () => {
     } else if (confirmPassword.length <= 8) {
       setError(
         "confirmPassword",
-        "Slaptažodis turi būti ilgesnis nei 8 simboliai"
+        "Slaptažodis turi būti ilgesnis nei 8 simboliai",
       );
       isError = true;
     } else {
@@ -236,7 +237,7 @@ const Register = () => {
     try {
       const result = await axios.post(
         "http://localhost:3000/auth/register",
-        data
+        data,
       );
       return result.data;
     } catch (e) {
@@ -355,38 +356,39 @@ const Register = () => {
                 isError={isInputError.email}
                 helperText={isInputError.email && inputErrorMessage.email}
               />
-              <CustomTextField
-                value={userInfo.password}
-                label="Įveskite slaptažodį"
-                type="password"
-                onChange={handleInput}
-                name="password"
-                isError={isInputError.password}
-                helperText={isInputError.password && inputErrorMessage.password}
+              <Grid size={6}>
+                <CustomTextField
+                  value={userInfo.password}
+                  label="Įveskite slaptažodį"
+                  type="password"
+                  onChange={handleInput}
+                  name="password"
+                  isError={isInputError.password}
+                  helperText={
+                    isInputError.password && inputErrorMessage.password
+                  }
+                />
+              </Grid>
+              <Grid size={6}>
+                <CustomTextField
+                  value={userInfo.confirmPassword}
+                  label="Patvirtinkite slaptažodį"
+                  type="password"
+                  onChange={handleInput}
+                  name="confirmPassword"
+                  isError={isInputError.confirmPassword}
+                  helperText={
+                    isInputError.confirmPassword &&
+                    inputErrorMessage.confirmPassword
+                  }
+                />
+              </Grid>
+              <SuccessButton
+                label="Užsiregistruoti"
+                onClick={registerUser}
+                isFullWidth
+                sx
               />
-              <CustomTextField
-                value={userInfo.confirmPassword}
-                label="Patvirtinkite slaptažodį"
-                type="password"
-                onChange={handleInput}
-                name="confirmPassword"
-                isError={isInputError.confirmPassword}
-                helperText={
-                  isInputError.confirmPassword &&
-                  inputErrorMessage.confirmPassword
-                }
-              />
-              <Button
-                onClick={() => {
-                  registerUser();
-                }}
-                size="large"
-                fullWidth
-                variant="contained"
-                sx={{ p: 2 }}
-              >
-                Užsiregistruoti
-              </Button>
               <Grid size={12}>
                 <Typography align="center" variant="subtitle1">
                   Spausdamas UŽSIREGISTRUOTI patvirtinu, kad perskaičiau ir

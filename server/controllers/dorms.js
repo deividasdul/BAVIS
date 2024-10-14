@@ -1,4 +1,20 @@
-import pool from "../db/db.js";
+import { pool } from "../config.js";
+
+// Get single dormitory
+const getDorm = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const singleDorm = await pool.query(
+      `
+      SELECT * FROM dormitory WHERE id = ($1)`,
+      [id]
+    );
+    res.status(200).json(singleDorm.rows[0]);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 // Get all dormitories
 const getDorms = async (_, res) => {
@@ -115,4 +131,4 @@ const deleteDorm = async (req, res) => {
   }
 };
 
-export { getDorms, getDormRooms, postDorm, putDorm, deleteDorm };
+export { getDorms, getDormRooms, postDorm, putDorm, deleteDorm, getDorm };

@@ -16,7 +16,11 @@ import DormsList from "./pages/DormsList.jsx";
 import RoomsList from "./pages/RoomsList.jsx";
 import Notifications from "./pages/Notifications.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
+import PrivacyPolicy from "./pages/PrivacyPolicy.jsx";
 import { HeaderProvider } from "./context/HeaderContext.jsx";
+import CookieConsent from "./components/CookieConsent.jsx";
+
+import { useCookies } from "react-cookie";
 
 const App = () => {
   const { isDarkMode } = useContext(ModeContext);
@@ -27,6 +31,8 @@ const App = () => {
       },
     });
   }, [isDarkMode]);
+
+  const [cookies] = useCookies(["cookieConsent"]);
 
   const location = useLocation();
   const isDashboard = location.pathname === "/dashboard";
@@ -48,9 +54,11 @@ const App = () => {
           <Route path="/rooms-list/:id" element={<RoomsList />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         {!isDashboard && <Footer />}
+        {!cookies.cookieConsent && <CookieConsent />}
       </HeaderProvider>
     </ThemeProvider>
   );

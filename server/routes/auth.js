@@ -5,25 +5,14 @@ import { Strategy } from "passport-local";
 import env from "dotenv";
 import cors from "cors";
 import { logout, register } from "../controllers/auth.js";
-import pool from "../db/db.js";
 import bcrypt from "bcrypt";
 import ejs from "ejs";
 
 import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
+import { pool } from "../config.js";
+import { sendMail } from "../utils/sendMail.js";
 
 env.config();
-
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false, // true for port 465, false for other ports
-  auth: {
-    user: process.env.GMAIL_ADDRESS,
-    pass: process.env.GMAIL_APP_PASSWORD,
-  },
-});
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -158,16 +147,8 @@ router.post("/forgot-password", async (req, res) => {
              </html>`,
     };
 
-    const sendMail = async (mailOptions) => {
-      try {
-        await transporter.sendMail(mailOptions);
-        res.status(200).json({ message: "Sent" });
-      } catch (e) {
-        console.error(e);
-      }
-    };
-
     sendMail(mailOptions);
+    res.status(200).json({ message: "Sent" });
   } catch (e) {
     console.error(e);
   }

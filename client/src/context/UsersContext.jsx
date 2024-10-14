@@ -5,6 +5,11 @@ export const UsersContext = createContext();
 
 export const UsersProvider = ({ children }) => {
   const [users, setUsers] = useState([]);
+
+  const [contact, setContact] = useState({});
+  const [selectedInterestIds, setSelectedInterestIds] = useState([]);
+  const [selectedInterestNames, setSelectedInterestNames] = useState([]);
+
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchUsers = async () => {
@@ -17,25 +22,27 @@ export const UsersProvider = ({ children }) => {
     }
   };
 
-  const capitalizeInput = (input) => {
-    return (
-      input.slice(0, 1).toUpperCase() +
-      input.slice(1, input.length).toLowerCase()
-    );
+  const fetchContact = async (id) => {
+    try {
+      const result = await axios.get(
+        `http://localhost:3000/api/v1/users/${id}`
+      );
+      setContact(result.data);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
-  const putUser = async ({ firstName, lastName }, id) => {
-    const fixedFirstName = capitalizeInput(firstName);
-    const fixedLastName = capitalizeInput(lastName);
-
-    const data = {
-      first_name: fixedFirstName,
-      last_name: fixedLastName,
-    };
-
+  const fetchUserInterests = async (id) => {
     try {
-      await axios.put(`http://localhost:3000/api/v1/users/${id}`, data);
-      fetchUsers();
+      const result = await axios.get(
+        `http://localhost:3000/api/v1/users/${id}/interests`
+      );
+      const interestIds = result.data.map((interest) => interest.interest_id);
+      const interestNames = result.data.map((interest) => interest.interest);
+
+      setSelectedInterestIds(interestIds);
+      setSelectedInterestNames(interestNames);
     } catch (e) {
       console.error(e);
     }
@@ -63,7 +70,18 @@ export const UsersProvider = ({ children }) => {
 
   return (
     <UsersContext.Provider
-      value={{ users, putUser, deleteUser, isLoading, patchUser, fetchUsers }}
+      value={{
+        users,
+        deleteUser,
+        isLoading,
+        patchUser,
+        fetchUsers,
+        fetchContact,
+        contact,
+        fetchUserInterests,
+        selectedInterestIds,
+        setSelectedInterestIds,
+      }}
     >
       {children}
     </UsersContext.Provider>

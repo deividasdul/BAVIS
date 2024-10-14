@@ -1,4 +1,4 @@
-import pool from "../db/db.js";
+import { pool } from "../config.js";
 
 // Get all users
 const getUsers = async (_, res) => {
@@ -78,10 +78,22 @@ const getUserInterests = async (req, res) => {
 };
 
 const patchUser = async (req, res) => {
-  const interests = req.body;
   const { id } = req.params;
 
+  const {
+    phoneNumber,
+    oldPassword,
+    newPassword,
+    confirmNewPassword,
+    interests,
+  } = req.body;
+
   try {
+    await pool.query(
+      `UPDATE contact SET phone_number = ($1) WHERE id = ($2) RETURNING *`,
+      [phoneNumber, id]
+    );
+
     const interestsResult = await pool.query(
       `SELECT interest_id FROM user_interest WHERE contact_id = $1`,
       [id]
@@ -113,7 +125,10 @@ const patchUser = async (req, res) => {
         );
       }
     }
-    res.status(200).json({ message: "Interests updated successfully" });
+
+    res
+      .status(200)
+      .json({ message: "User and interests updated successfully" });
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: "Internal server error" });

@@ -9,74 +9,59 @@ import {
   OutlinedInput,
   MenuItem,
   Typography,
-  Button,
-  TextField,
   Paper,
+  Button,
+  Avatar,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import axios from "axios";
 import { styled } from "@mui/system";
 
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+
+import PageBox from "../components/styles/PageBox";
+import CustomTextField from "../components/ui/CustomTextField";
+import SuccessButton from "../components/ui/SuccessButton";
+
 import { UsersContext } from "../context/UsersContext";
+import { InterestsContext } from "../context/InterestsContext";
 import ProtectedRoute from "../components/ProtectedRoute";
 
+const VisuallyHiddenInput = styled("input")({
+  clip: "rect(0 0 0 0)",
+  clipPath: "inset(50%)",
+  height: 1,
+  overflow: "hidden",
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  whiteSpace: "nowrap",
+  width: 1,
+});
+
 const Profile = () => {
-  const [selectedInterestIds, setSelectedInterestIds] = useState([]);
-  const [selectedInterestNames, setSelectedInterestNames] = useState([]);
-  const { patchUser } = useContext(UsersContext);
-
-  const fetchContact = async (id) => {
-    try {
-      const result = await axios.get(
-        `http://localhost:3000/api/v1/users/${id}`,
-      );
-      setContact(result.data);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const fetchUserInterests = async (id) => {
-    try {
-      const result = await axios.get(
-        `http://localhost:3000/api/v1/users/${id}/interests`,
-      );
-      const interestIds = result.data.map((interest) => interest.interest_id);
-      const interestNames = result.data.map((interest) => interest.interest);
-
-      setSelectedInterestIds(interestIds);
-      setSelectedInterestNames(interestNames);
-    } catch (e) {
-      console.error(e);
-    }
-  };
+  const {
+    patchUser,
+    fetchContact,
+    contact,
+    fetchUserInterests,
+    selectedInterestIds,
+    setSelectedInterestIds,
+  } = useContext(UsersContext);
 
   const { user } = useAuth();
+  const { interests } = useContext(InterestsContext);
 
-  useEffect(() => {
-    if (user && user.id) {
-      fetchContact(user.id);
-      fetchUserInterests(user.id);
-    }
-  }, [user]);
-
-  const [contact, setContact] = useState({});
   const [contactInput, setContactInput] = useState({
-    firstName: "",
-    lastName: "",
-    phoneNumber: "",
+    phoneNumber: contact.phone_number || "",
     oldPassword: "",
     newPassword: "",
     confirmNewPassword: "",
   });
 
-  useEffect(() => {
-    setContactInput((prevValue) => ({
-      ...prevValue,
-      firstName: contact.first_name,
-      lastName: contact.last_name,
-    }));
-  }, [contact]);
+  const handleInterests = (e) => {
+    const { value } = e.target;
+    setSelectedInterestIds(value);
+  };
 
   const handleChange = (e) => {
     const { value, name } = e.target;
@@ -86,77 +71,85 @@ const Profile = () => {
     }));
   };
 
-  const [interests, setInterests] = useState([]);
-
-  const fetchInterests = async () => {
-    try {
-      const result = await axios.get("http://localhost:3000/api/v1/interests");
-      setInterests(result.data);
-    } catch (e) {
-      console.error(e);
+  useEffect(() => {
+    if (user && user.id) {
+      fetchContact(user.id);
+      fetchUserInterests(user.id);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
-    fetchInterests();
-  }, []);
-
-  const handleInterests = (e) => {
-    const { value } = e.target;
-
-    const names = value.map((id) => {
-      const foundInterest = interests.find((interest) => interest.id === id);
-      if (foundInterest) {
-        return foundInterest.interest;
-      } else {
-        return "";
-      }
-    });
-
-    setSelectedInterestIds(value);
-    setSelectedInterestNames(names);
-  };
+    setContactInput((prevValue) => ({
+      ...prevValue,
+      phoneNumber: contact.phone_number || "",
+    }));
+  }, [contact]);
 
   if (!user) {
     return (
-      <ProfileBox>
+      <PageBox>
         <Typography variant="h2">Neteisėta prieiga</Typography>
-      </ProfileBox>
+      </PageBox>
     );
   }
 
   return (
     <ProtectedRoute>
-      <ProfileBox>
+      <PageBox>
         <Paper elevation={12} sx={{ p: 5 }}>
-          <Typography gutterBottom variant="h4">
-            Sveiki, {user.email}
-          </Typography>
           <Grid maxWidth="sm" container spacing={4}>
+            <Grid
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              size={12}
+            >
+              <Avatar
+                sx={{ width: 240, height: 240 }}
+                src={contact?.avatar_url}
+                alt="Avatar"
+              ></Avatar>
+            </Grid>
+            <Grid
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              size={12}
+            >
+              <Button
+                variant="contained"
+                role={undefined}
+                component="label"
+                startIcon={<CloudUploadIcon />}
+              >
+                Įkelti nuotrauką
+                <VisuallyHiddenInput
+                  type="file"
+                  name="avatar"
+                  onChange={(event) => console.log(event.target.files[0].name)}
+                  multiple={false}
+                />
+              </Button>
+            </Grid>
+
             <Grid size={6}>
-              <TextField
-                fullWidth
-                value={contactInput.firstName || ""}
-                variant="filled"
+              <CustomTextField
+                value={contact.first_name || ""}
                 label="Vardas"
                 type="text"
-                required
-                onChange={handleChange}
-                name="firstName"
-                disabled
+                isDisabled={true}
               />
             </Grid>
             <Grid size={6}>
-              <TextField
-                fullWidth
-                value={contactInput.lastName || ""}
-                variant="filled"
+              <CustomTextField
+                value={contact.last_name || ""}
                 label="Pavardė"
                 type="text"
-                required
-                onChange={handleChange}
-                name="lastName"
-                disabled
+                isDisabled={true}
               />
             </Grid>
             <FormControl sx={{ width: "100%" }}>
@@ -170,7 +163,7 @@ const Profile = () => {
                   <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                     {selectedInterestIds.map((id) => {
                       const interest = interests.find(
-                        (interest) => interest.id === id,
+                        (interest) => interest.id === id
                       );
                       return (
                         <Chip
@@ -204,29 +197,23 @@ const Profile = () => {
                 ))}
               </Select>
             </FormControl>
-            <TextField
-              value={contact.phone_number || ""}
-              fullWidth
-              variant="filled"
+            <CustomTextField
+              value={contactInput.phoneNumber || ""}
               label="Telefono numeris"
               type="text"
               onChange={handleChange}
               name="phoneNumber"
             />
-            <TextField
+            <CustomTextField
               value={contactInput.oldPassword}
-              fullWidth
-              variant="filled"
               label="Senas slaptažodis"
               type="password"
               onChange={handleChange}
               name="oldPassword"
             />
             <Grid size={6}>
-              <TextField
+              <CustomTextField
                 value={contactInput.newPassword}
-                fullWidth
-                variant="filled"
                 label="Naujas slaptažodis"
                 type="password"
                 onChange={handleChange}
@@ -234,10 +221,8 @@ const Profile = () => {
               />
             </Grid>
             <Grid size={6}>
-              <TextField
+              <CustomTextField
                 value={contactInput.confirmNewPassword}
-                fullWidth
-                variant="filled"
                 label="Pakartoti naują slaptažodį"
                 type="password"
                 onChange={handleChange}
@@ -245,54 +230,42 @@ const Profile = () => {
               />
             </Grid>
             <Grid size={4}>
-              <TextField
+              <CustomTextField
                 value={contact.status || ""}
-                variant="filled"
                 label="Statusas"
-                disabled
+                isDisabled={true}
               />
             </Grid>
             <Grid size={4}>
-              <TextField
+              <CustomTextField
                 value={contact.faculty || ""}
-                variant="filled"
                 label="Fakultetas"
-                disabled
+                isDisabled={true}
               />
             </Grid>
             <Grid size={4}>
-              <TextField
+              <CustomTextField
                 value={contact.group || ""}
-                variant="filled"
                 label="Grupė"
-                disabled
+                isDisabled={true}
               />
             </Grid>
-            <Button
+            <SuccessButton
               onClick={() => {
-                patchUser(selectedInterestIds, user["id"]);
+                patchUser(
+                  { ...contactInput, interests: selectedInterestIds },
+                  user["id"]
+                );
               }}
-              fullWidth
-              sx={{ p: 2 }}
-              variant="contained"
-            >
-              Atnaujinti
-            </Button>
+              label="Atnaujinti"
+              isFullWidth={true}
+              sx
+            />
           </Grid>
         </Paper>
-      </ProfileBox>
+      </PageBox>
     </ProtectedRoute>
   );
 };
-
-const ProfileBox = styled(Box)(({ theme }) => ({
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  minHeight: "100vh",
-  padding: 20,
-  backgroundColor: theme.palette.background.default,
-  color: theme.palette.text.primary,
-}));
 
 export default Profile;

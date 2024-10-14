@@ -9,6 +9,7 @@ export default function CustomTextField({
   isError,
   helperText,
   variant = "filled",
+  isDisabled = false,
 }) {
   return (
     <TextField
@@ -21,6 +22,7 @@ export default function CustomTextField({
       name={name}
       error={isError}
       helperText={isError && helperText}
+      disabled={isDisabled}
     />
   );
 }

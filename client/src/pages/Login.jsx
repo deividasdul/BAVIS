@@ -60,7 +60,7 @@ const Login = () => {
     if (forgotEmail <= 0) {
       setError(
         "forgotPasswordEmailInput",
-        "El. pašto laukas negali būti tuščias",
+        "El. pašto laukas negali būti tuščias"
       );
       return;
     }
@@ -79,14 +79,17 @@ const Login = () => {
 
       await axios.post("http://localhost:3000/auth/forgot-password", data);
 
-      setIsSending(false);
+      setTimeout(() => {
+        setIsSending(false);
+      }, 5000);
+
       clearError("forgotPasswordEmailInput");
       handleDialog();
     } catch (e) {
       setIsSending(false);
       setError(
         "forgotPasswordEmailInput",
-        "Šis el. paštas mūsų sistemoje neegzistuoja",
+        "Šis el. paštas mūsų sistemoje neegzistuoja"
       );
     }
   };
@@ -154,11 +157,11 @@ const Login = () => {
       setIsLoading(false);
       setError(
         "emailInput",
-        "Neteisingas el. pašto adresas ir (arba) slaptažodis",
+        "Neteisingas el. pašto adresas ir (arba) slaptažodis"
       );
       setError(
         "passwordInput",
-        "Neteisingas el. pašto adresas ir (arba) slaptažodis",
+        "Neteisingas el. pašto adresas ir (arba) slaptažodis"
       );
     }
   };

@@ -7,6 +7,7 @@ import { DormsProvider } from "./context/DormsContext.jsx";
 import { RoomsProvider } from "./context/RoomsContext.jsx";
 import { ModeProvider } from "./context/ModeContext.jsx";
 import { UsersProvider } from "./context/UsersContext.jsx";
+import { InterestsProvider } from "./context/InterestsContext.jsx";
 
 const root = createRoot(document.getElementById("root"));
 root.render(
@@ -17,11 +18,13 @@ root.render(
         <RoomsProvider>
           <ModeProvider>
             <UsersProvider>
-              <App />
+              <InterestsProvider>
+                <App />
+              </InterestsProvider>
             </UsersProvider>
           </ModeProvider>
         </RoomsProvider>
       </DormsProvider>
     </AuthProvider>
-  </StrictMode>,
+  </StrictMode>
 );

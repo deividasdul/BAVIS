@@ -14,8 +14,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
-  ButtonGroup,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 
@@ -25,43 +23,49 @@ import StarRateIcon from "@mui/icons-material/StarRate";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
 
 import { RoomsContext } from "../context/RoomsContext";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { useAuth } from "../context/AuthContext";
+import SuccessButton from "../components/ui/SuccessButton";
+import CloseButton from "../components/ui/CloseButton";
+import CustomTextField from "../components/ui/CustomTextField";
 
 function RoomsList() {
   const { user } = useAuth();
-  const currentYear = new Date().getFullYear();
 
-  const [dates, setDates] = useState({
-    arrival_date: new Date().toISOString().split("T")[0].replace(/-/g, "-"),
-    departure_date: new Date().toISOString().split("T")[0].replace(/-/g, "-"),
-  });
+  const [arrivalDate, setArrivalDate] = useState(dayjs("2024-10-10"));
+  const [departureDate, setDepartureDate] = useState(dayjs("2024-10-10"));
 
+  // Form Dialog component
   const [isRequested, setIsRequested] = useState(false);
 
   const handleRequest = () => {
     setIsRequested(!isRequested);
   };
 
-  const handleChange = () => {
-    return;
-  };
-
   // Dorm id
   const { id } = useParams();
 
+  const [roomId, setRoomId] = useState(0);
+  const [roomNumber, setRoomNumber] = useState(0);
+  const [roomFloor, setRoomFloor] = useState(0);
+  const [roomPrice, setRoomPrice] = useState(0);
+  const [dormAddress, setDormAddress] = useState("");
+
   const { rooms, fetchRooms } = useContext(RoomsContext);
+
   const [userInterests, setUserInterests] = useState([]);
   const [contact, setContact] = useState(null);
+
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchContact = async () => {
     if (user && user.id) {
       try {
         const result = await axios.get(
-          `http://localhost:3000/api/v1/users/${user.id}`,
+          `http://localhost:3000/api/v1/users/${user.id}`
         );
         setContact(result.data);
         setIsLoading(false);
@@ -76,7 +80,7 @@ function RoomsList() {
     if (user && user.id) {
       try {
         const result = await axios.get(
-          `http://localhost:3000/api/v1/users/${user.id}/interests`,
+          `http://localhost:3000/api/v1/users/${user.id}/interests`
         );
         setUserInterests(result.data);
         setIsLoading(false);
@@ -87,11 +91,26 @@ function RoomsList() {
     }
   };
 
+  const fetchDorm = async () => {
+    try {
+      const result = await axios.get(
+        `http://localhost:3000/api/v1/dorms/dorm/${id}`
+      );
+      setDormAddress(result.data.address);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   useEffect(() => {
     fetchRooms(id);
     fetchContact();
     fetchUserInterests();
   }, [id, user]);
+
+  useEffect(() => {
+    fetchDorm(id);
+  }, []);
 
   const checkOppositeGender = (tenants) => {
     if (!tenants || tenants.length === 0) return false;
@@ -102,11 +121,11 @@ function RoomsList() {
     if (!tenantInterests || !userInterests) return false;
 
     const userInterestIds = userInterests.map(
-      (userInterest) => userInterest.interest_id,
+      (userInterest) => userInterest.interest_id
     );
 
     return tenantInterests.some((interestId) =>
-      userInterestIds.includes(interestId),
+      userInterestIds.includes(interestId)
     );
   };
 
@@ -129,6 +148,29 @@ function RoomsList() {
 
     return hasInterestMatch;
   });
+
+  const postRoomReservation = async () => {
+    const data = {
+      userId: contact.id,
+      roomId: roomId,
+      plannedArrivalDate: arrivalDate,
+      plannedDepartureDate: departureDate,
+      recipient: user.email,
+      address: dormAddress,
+      number: roomNumber,
+      floor: roomFloor,
+      price: roomPrice,
+    };
+
+    try {
+      const result = await axios.post(
+        "http://localhost:3000/api/v1/reservation",
+        data
+      );
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return (
     <ProtectedRoute>
@@ -165,6 +207,13 @@ function RoomsList() {
                     sx={{ p: 1, m: 2 }}
                     variant="contained"
                     disabled={isLoading}
+                    onClick={() => {
+                      setRoomId(room.id);
+                      setRoomNumber(room.number);
+                      setRoomFloor(room.floor);
+                      setRoomPrice(room.price);
+                      handleRequest();
+                    }}
                   >
                     Pateikti paraišką
                   </Button>
@@ -205,6 +254,10 @@ function RoomsList() {
                       sx={{ p: 1, m: 2 }}
                       variant="contained"
                       onClick={() => {
+                        setRoomId(room.id);
+                        setRoomNumber(room.number);
+                        setRoomFloor(room.floor);
+                        setRoomPrice(room.price);
                         handleRequest();
                       }}
                     >
@@ -217,91 +270,89 @@ function RoomsList() {
           })}
         </Grid>
       </RoomsBox>
-      <form>
-        <Dialog fullWidth={true} open={isRequested} onClose={handleRequest}>
-          <DialogTitle>Kambario užklausos forma</DialogTitle>
-          <DialogContent dividers={true}>
-            <Grid container spacing={2}>
-              <Grid size={6}>
-                <TextField
-                  value={contact && contact.first_name}
-                  variant="outlined"
-                  label="Vardas"
-                  type="text"
-                  name="address"
-                  fullWidth
-                  disabled
-                ></TextField>
-              </Grid>
-              <Grid size={6}>
-                <TextField
-                  value={contact && contact.last_name}
-                  variant="outlined"
-                  label="Pavardė"
-                  type="text"
-                  name="address"
-                  fullWidth
-                  disabled
-                ></TextField>
-              </Grid>
-              <TextField
-                value={user && user.email}
-                variant="outlined"
-                label="El. paštas"
+      <Dialog fullWidth={true} open={isRequested} onClose={handleRequest}>
+        <DialogTitle>Kambario užklausos forma</DialogTitle>
+        <DialogContent dividers={true}>
+          <Grid container spacing={2}>
+            <Grid size={6}>
+              <CustomTextField
+                value={contact && contact.first_name}
+                label="Vardas"
                 type="text"
                 name="address"
-                fullWidth
-                disabled
-              ></TextField>
-              <Grid size={6}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    sx={{ width: "100%" }}
-                    fullWidth={true}
-                    disablePast={true}
-                    name="arrivalDate"
-                    label="Atvykimo data"
-                  />
-                </LocalizationProvider>
-              </Grid>
-              <Grid size={6}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    sx={{ width: "100%" }}
-                    fullWidth={true}
-                    disablePast={true}
-                    name="arrivalDate"
-                    label="Išvykimo data"
-                  />
-                </LocalizationProvider>
-              </Grid>
+                variant="outlined"
+                isDisabled={true}
+              />
             </Grid>
-          </DialogContent>
+            <Grid size={6}>
+              <CustomTextField
+                value={contact && contact.last_name}
+                label="Pavardė"
+                type="text"
+                name="address"
+                variant="outlined"
+                isDisabled={true}
+              />
+            </Grid>
+            <CustomTextField
+              value={user && user.email}
+              label="El. paštas"
+              type="text"
+              name="address"
+              variant="outlined"
+              isDisabled={true}
+            />
+            <Grid size={6}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  value={arrivalDate}
+                  sx={{ width: "100%" }}
+                  fullWidth={true}
+                  disablePast={true}
+                  name="arrivalDate"
+                  label="Atvykimo data"
+                  onChange={(date) => {
+                    // const date = arrivalDate.format("YYYY-MM-DD");
+                    setArrivalDate(date);
+                  }}
+                />
+              </LocalizationProvider>
+            </Grid>
+            <Grid size={6}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  value={departureDate}
+                  sx={{ width: "100%" }}
+                  fullWidth={true}
+                  disablePast={true}
+                  name="departure"
+                  label="Išvykimo data"
+                  onChange={(date) => {
+                    // const date = arrivalDate.format("YYYY-MM-DD");
+                    setDepartureDate(date);
+                  }}
+                />
+              </LocalizationProvider>
+            </Grid>
+          </Grid>
+        </DialogContent>
 
-          <DialogActions>
-            <ButtonGroup
-              variant="contained"
-              size="large"
-              sx={{ gap: 1 }}
-              disableElevation
-            >
-              <Button color="info" onClick={handleRequest}>
-                Uždaryti
-              </Button>
-              <Button
-                color="success"
-                onClick={() => {
-                  // insertDorm(inputAddress);
-                  handleRequest();
-                }}
-                type="submit"
-              >
-                Pateikti
-              </Button>
-            </ButtonGroup>
-          </DialogActions>
-        </Dialog>
-      </form>
+        <DialogActions>
+          <CloseButton
+            label="Uždaryti"
+            onClick={() => {
+              handleRequest();
+            }}
+          />
+          <SuccessButton
+            label="Pateikti"
+            onClick={() => {
+              handleRequest();
+              postRoomReservation();
+            }}
+          />
+        </DialogActions>
+      </Dialog>
     </ProtectedRoute>
   );
 }

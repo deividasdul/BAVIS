@@ -1,4 +1,4 @@
-import pool from "../db/db.js";
+import { pool } from "../config.js";
 
 // Get all rooms
 const getRooms = async (_, res) => {

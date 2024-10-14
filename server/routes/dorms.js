@@ -6,6 +6,7 @@ import {
   postDorm,
   putDorm,
   deleteDorm,
+  getDorm,
 } from "../controllers/dorms.js";
 
 const router = express.Router();
@@ -17,5 +18,6 @@ router.get("/:id", getDormRooms);
 router.post("/", postDorm);
 router.put("/:id", putDorm);
 router.delete("/:id", deleteDorm);
+router.get("/dorm/:id", getDorm);
 
 export default router;

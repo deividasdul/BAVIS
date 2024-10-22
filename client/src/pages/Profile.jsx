@@ -8,13 +8,13 @@ import {
   Select,
   OutlinedInput,
   MenuItem,
-  Typography,
   Paper,
   Button,
   Avatar,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { styled } from "@mui/system";
+import axios from "axios";
 
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
@@ -46,6 +46,9 @@ const Profile = () => {
     fetchUserInterests,
     selectedInterestIds,
     setSelectedInterestIds,
+    uploadAvatar,
+    avatarUrl,
+    setAvatarUrl,
   } = useContext(UsersContext);
 
   const { user } = useAuth();
@@ -83,15 +86,9 @@ const Profile = () => {
       ...prevValue,
       phoneNumber: contact.phone_number || "",
     }));
-  }, [contact]);
 
-  if (!user) {
-    return (
-      <PageBox>
-        <Typography variant="h2">Neteisėta prieiga</Typography>
-      </PageBox>
-    );
-  }
+    setAvatarUrl(contact?.avatar_url);
+  }, [contact]);
 
   return (
     <ProtectedRoute>
@@ -108,7 +105,7 @@ const Profile = () => {
             >
               <Avatar
                 sx={{ width: 240, height: 240 }}
-                src={contact?.avatar_url}
+                src={avatarUrl}
                 alt="Avatar"
               ></Avatar>
             </Grid>
@@ -130,8 +127,9 @@ const Profile = () => {
                 <VisuallyHiddenInput
                   type="file"
                   name="avatar"
-                  onChange={(event) => console.log(event.target.files[0].name)}
+                  onChange={(event) => uploadAvatar(event, user.id)}
                   multiple={false}
+                  accept=".jpg,.jpeg,.png"
                 />
               </Button>
             </Grid>

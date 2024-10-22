@@ -1,5 +1,5 @@
 import React from "react";
-import { AppBar, Toolbar, Typography } from "@mui/material";
+import { AppBar, Toolbar, Typography, Box, Link } from "@mui/material";
 import { useTheme } from "@emotion/react";
 
 const Footer = () => {
@@ -19,9 +19,25 @@ const Footer = () => {
       }}
     >
       <Toolbar>
-        <Typography variant="h6" sx={{ flexGrow: 1, textAlign: "center" }}>
-          © {new Date().getFullYear()} Deividas Dulinskas
-        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            width: "100%",
+            textAlign: "center",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="h6">
+            © {new Date().getFullYear()} Deividas Dulinskas
+          </Typography>
+          <Typography>
+            <Link href="/privacy-policy" underline="hover">
+              Terminai ir sąlygos
+            </Link>
+          </Typography>
+        </Box>
       </Toolbar>
     </AppBar>
   );

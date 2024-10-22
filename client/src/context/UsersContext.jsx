@@ -11,6 +11,7 @@ export const UsersProvider = ({ children }) => {
   const [selectedInterestNames, setSelectedInterestNames] = useState([]);
 
   const [isLoading, setIsLoading] = useState(true);
+  const [avatarUrl, setAvatarUrl] = useState();
 
   const fetchUsers = async () => {
     try {
@@ -19,6 +20,42 @@ export const UsersProvider = ({ children }) => {
       setIsLoading(false);
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  const uploadAvatar = async (event, id) => {
+    const file = event.target.files[0];
+
+    const validImageTypes = ["image/jpeg", "image/png", "image/jpg"];
+    if (!validImageTypes.includes(file.type)) {
+      return;
+    }
+
+    const fileUrl = URL.createObjectURL(file);
+    setAvatarUrl(fileUrl);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const result = await axios.post(
+        `http://localhost:3000/upload/${id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      const newAvatarUrl = `/images/profile-images/${result.data.filename}`;
+
+      setAvatarUrl(newAvatarUrl);
+      setContact((prevContact) => ({
+        ...prevContact,
+        avatar_url: newAvatarUrl,
+      }));
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -81,6 +118,9 @@ export const UsersProvider = ({ children }) => {
         fetchUserInterests,
         selectedInterestIds,
         setSelectedInterestIds,
+        uploadAvatar,
+        setAvatarUrl,
+        avatarUrl,
       }}
     >
       {children}

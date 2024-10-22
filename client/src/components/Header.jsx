@@ -37,7 +37,18 @@ const Header = () => {
 
   const { user, logout } = useAuth();
   const { handleThemeChange, isDarkMode } = useContext(ModeContext);
-  const { contact } = useContext(UsersContext);
+  const { contact, avatarUrl, setAvatarUrl, fetchContact } =
+    useContext(UsersContext);
+
+  useEffect(() => {
+    if (user && user.id) {
+      fetchContact(user.id);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    setAvatarUrl(contact?.avatar_url);
+  }, [contact]);
 
   const [anchorEl, setAnchorEl] = useState();
   const open = Boolean(anchorEl);
@@ -146,7 +157,7 @@ const Header = () => {
                   <StyledButton
                     sx={isSelected.userPanel && activeButtonStyle}
                     startIcon={
-                      <Avatar alt="Avatar" src={contact.avatar_url}>
+                      <Avatar alt="Avatar" src={avatarUrl}>
                         {contact?.first_name?.[0] + contact?.last_name?.[0]}
                       </Avatar>
                     }

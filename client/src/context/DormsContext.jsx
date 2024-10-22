@@ -49,7 +49,7 @@ export const DormsProvider = ({ children }) => {
 
   useEffect(() => {
     fetchDorms();
-  }, [dorms]);
+  }, []);
 
   return (
     <DormsContext.Provider value={{ dorms, insertDorm, putDorm, deleteDorm }}>

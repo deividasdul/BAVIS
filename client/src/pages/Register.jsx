@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import {
@@ -12,12 +12,16 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Link,
 } from "@mui/material";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 import Grid from "@mui/material/Grid2";
 
 import PageBox from "../components/styles/PageBox";
 import CustomTextField from "../components/ui/CustomTextField";
 import SuccessButton from "../components/ui/SuccessButton";
+import { ModeContext } from "../context/ModeContext";
 
 const groupList = ["AKRV", "ERP", "VAK", "IPU", "KT", "PS"];
 const statusList = ["Studentas", "Dėstytojas", "Svečias"];
@@ -31,6 +35,8 @@ const facultyList = [
 
 const Register = () => {
   const navigate = useNavigate();
+
+  const { isDarkMode } = useContext(ModeContext);
 
   const [isStudent, setIsStudent] = useState(true);
 
@@ -173,7 +179,7 @@ const Register = () => {
     } else if (confirmPassword.length <= 8) {
       setError(
         "confirmPassword",
-        "Slaptažodis turi būti ilgesnis nei 8 simboliai",
+        "Slaptažodis turi būti ilgesnis nei 8 simboliai"
       );
       isError = true;
     } else {
@@ -237,7 +243,7 @@ const Register = () => {
     try {
       const result = await axios.post(
         "http://localhost:3000/auth/register",
-        data,
+        data
       );
       return result.data;
     } catch (e) {
@@ -285,16 +291,34 @@ const Register = () => {
                   }
                 />
               </Grid>
-              <CustomTextField
+              <PhoneInput
+                inputProps={{ required: true }}
                 value={userInfo.phoneNumber}
-                label="Įveskite savo telefono numerį"
-                type="text"
-                onChange={handleInput}
-                name="phoneNumber"
-                isError={isInputError.phoneNumber}
-                helperText={
-                  isInputError.phoneNumber && inputErrorMessage.phoneNumber
+                country={"lt"}
+                onChange={(phone) =>
+                  setUserInfo({ ...userInfo, phoneNumber: phone })
                 }
+                name="phoneNumber"
+                inputStyle={{
+                  width: "100%",
+                  backgroundColor: isDarkMode
+                    ? "rgb(77, 77, 77)"
+                    : "rgb(232, 232, 232)",
+                  fontSize: "1rem",
+                  border: "none",
+                  color: isDarkMode ? "white" : "black",
+                }}
+                dropdownStyle={{
+                  color: isDarkMode ? "white" : "black",
+                  backgroundColor: isDarkMode
+                    ? "rgb(77, 77, 77)"
+                    : "rgb(232, 232, 232)",
+                }}
+                buttonStyle={{
+                  backgroundColor: isDarkMode
+                    ? "rgb(77, 77, 77)"
+                    : "rgb(232, 232, 232)",
+                }}
               />
               <Grid size={12}>
                 <FormControl>
@@ -392,7 +416,11 @@ const Register = () => {
               <Grid size={12}>
                 <Typography align="center" variant="subtitle1">
                   Spausdamas UŽSIREGISTRUOTI patvirtinu, kad perskaičiau ir
-                  supratau terminus ir sąlygas.
+                  supratau{" "}
+                  <Link href="/privacy-policy" underline="hover">
+                    Terminai ir sąlygos
+                  </Link>
+                  .
                 </Typography>
               </Grid>
             </Grid>

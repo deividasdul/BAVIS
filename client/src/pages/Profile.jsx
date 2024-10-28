@@ -21,6 +21,8 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import PageBox from "../components/styles/PageBox";
 import CustomTextField from "../components/ui/CustomTextField";
 import SuccessButton from "../components/ui/SuccessButton";
+import PhoneInputField from "../components/ui/PhoneInput";
+import { setError, clearError } from "../utils/formValidation";
 
 import { UsersContext } from "../context/UsersContext";
 import { InterestsContext } from "../context/InterestsContext";
@@ -53,6 +55,87 @@ const Profile = () => {
 
   const { user } = useAuth();
   const { interests } = useContext(InterestsContext);
+
+  const [isInputError, setIsInputError] = useState({
+    oldPassword: false,
+    newPassword: false,
+    confirmNewPassword: false,
+  });
+
+  const [inputErrorMessage, setInputErrorMessage] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmNewPassword: "",
+  });
+
+  const handleSetError = (fieldType, errorMessage) => {
+    setError(setIsInputError, setInputErrorMessage, fieldType, errorMessage);
+  };
+
+  const handleClearError = (fieldType) => {
+    clearError(setIsInputError, setInputErrorMessage, fieldType);
+  };
+
+  const updatePassword = async () => {
+    var isError = false;
+
+    const { newPassword, confirmNewPassword } = contactInput;
+
+    if (newPassword.length <= 0) {
+      handleSetError("newPassword", "Slaptažodžio laukas negali būti tuščias");
+      isError = true;
+    } else if (newPassword.length <= 8) {
+      handleSetError(
+        "newPassword",
+        "Slaptažodis turi būti ilgesnis nei 8 simboliai"
+      );
+      isError = true;
+    } else {
+      handleClearError("newPassword");
+    }
+
+    if (confirmNewPassword.length <= 0) {
+      handleSetError(
+        "confirmNewPassword",
+        "Slaptažodžio laukas negali būti tuščias"
+      );
+      isError = true;
+    } else if (confirmNewPassword.length <= 8) {
+      handleSetError(
+        "confirmNewPassword",
+        "Slaptažodis turi būti ilgesnis nei 8 simboliai"
+      );
+      isError = true;
+    } else {
+      handleClearError("confirmNewPassword");
+    }
+
+    if (isError) return;
+
+    const data = {
+      oldPassword: contactInput.oldPassword,
+      newPassword: contactInput.newPassword,
+    };
+
+    try {
+      if (newPassword !== confirmNewPassword) {
+        handleSetError("newPassword", "Abu slaptažodžiai turi sutapti");
+        handleSetError("confirmNewPassword", "Abu slaptažodžiai turi sutapti");
+        return;
+      }
+
+      await axios.post(
+        `http://localhost:3000/api/v1/users/change-password/${user.id}`,
+        data
+      );
+      handleClearError("oldPassword");
+      window.location.reload();
+    } catch (e) {
+      if (e.response.data.message == "Wrong password") {
+        handleSetError("oldPassword", "Neteisingas senas slaptažodis");
+      }
+    }
+  };
 
   const [contactInput, setContactInput] = useState({
     phoneNumber: contact.phone_number || "",
@@ -195,12 +278,12 @@ const Profile = () => {
                 ))}
               </Select>
             </FormControl>
-            <CustomTextField
+            <PhoneInputField
               value={contactInput.phoneNumber || ""}
-              label="Telefono numeris"
-              type="text"
-              onChange={handleChange}
-              name="phoneNumber"
+              name={"phoneNumber"}
+              onChange={(phone) =>
+                setContactInput({ ...contactInput, phoneNumber: phone })
+              }
             />
             <CustomTextField
               value={contactInput.oldPassword}
@@ -208,6 +291,10 @@ const Profile = () => {
               type="password"
               onChange={handleChange}
               name="oldPassword"
+              isError={isInputError.oldPassword}
+              helperText={
+                isInputError.oldPassword && inputErrorMessage.oldPassword
+              }
             />
             <Grid size={6}>
               <CustomTextField
@@ -216,6 +303,10 @@ const Profile = () => {
                 type="password"
                 onChange={handleChange}
                 name="newPassword"
+                isError={isInputError.newPassword}
+                helperText={
+                  isInputError.newPassword && inputErrorMessage.newPassword
+                }
               />
             </Grid>
             <Grid size={6}>
@@ -225,6 +316,11 @@ const Profile = () => {
                 type="password"
                 onChange={handleChange}
                 name="confirmNewPassword"
+                isError={isInputError.confirmNewPassword}
+                helperText={
+                  isInputError.confirmNewPassword &&
+                  inputErrorMessage.confirmNewPassword
+                }
               />
             </Grid>
             <Grid size={4}>
@@ -249,11 +345,12 @@ const Profile = () => {
               />
             </Grid>
             <SuccessButton
-              onClick={() => {
+              onClick={(e) => {
                 patchUser(
                   { ...contactInput, interests: selectedInterestIds },
                   user["id"]
                 );
+                if (contactInput.oldPassword.length > 0) updatePassword(e);
               }}
               label="Atnaujinti"
               isFullWidth={true}

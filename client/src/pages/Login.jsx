@@ -13,6 +13,7 @@ import {
 import Grid from "@mui/material/Grid2";
 import { useNavigate } from "react-router-dom";
 
+import { setError, clearError } from "../utils/formValidation";
 import SuccessButton from "../components/ui/SuccessButton";
 import CloseButton from "../components/ui/CloseButton";
 import PageBox from "../components/styles/PageBox";
@@ -58,7 +59,7 @@ const Login = () => {
     const { forgotEmail } = userInfo;
 
     if (forgotEmail <= 0) {
-      setError(
+      handleSetError(
         "forgotPasswordEmailInput",
         "El. pašto laukas negali būti tuščias"
       );
@@ -66,7 +67,10 @@ const Login = () => {
     }
 
     if (!isValidEmail(forgotEmail)) {
-      setError("forgotPasswordEmailInput", "Neteisingas el. pašto formatas");
+      handleSetError(
+        "forgotPasswordEmailInput",
+        "Neteisingas el. pašto formatas"
+      );
       return;
     }
 
@@ -83,38 +87,23 @@ const Login = () => {
         setIsSending(false);
       }, 5000);
 
-      clearError("forgotPasswordEmailInput");
+      handleClearError("forgotPasswordEmailInput");
       handleDialog();
     } catch (e) {
       setIsSending(false);
-      setError(
+      handleSetError(
         "forgotPasswordEmailInput",
         "Šis el. paštas mūsų sistemoje neegzistuoja"
       );
     }
   };
 
-  const clearError = (fieldType) => {
-    setIsInputError((prevState) => ({
-      ...prevState,
-      [fieldType]: false,
-    }));
-    setInputErrorMessage((prevValue) => ({
-      ...prevValue,
-      [fieldType]: "",
-    }));
+  const handleSetError = (fieldType, errorMessage) => {
+    setError(setIsInputError, setInputErrorMessage, fieldType, errorMessage);
   };
 
-  const setError = (fieldType, errorMessage) => {
-    setIsInputError((prevState) => ({
-      ...prevState,
-      [fieldType]: true,
-    }));
-
-    setInputErrorMessage((prevValue) => ({
-      ...prevValue,
-      [fieldType]: errorMessage,
-    }));
+  const handleClearError = (fieldType) => {
+    clearError(setIsInputError, setInputErrorMessage, fieldType);
   };
 
   function isValidEmail(email) {
@@ -128,20 +117,23 @@ const Login = () => {
     var isError = false;
 
     if (email.length <= 0) {
-      setError("emailInput", "El. pašto laukas negali būti tuščias");
+      handleSetError("emailInput", "El. pašto laukas negali būti tuščias");
       isError = true;
     } else if (!isValidEmail(email)) {
-      setError("emailInput", "Neteisingas el. pašto formatas");
+      handleSetError("emailInput", "Neteisingas el. pašto formatas");
       isError = true;
     } else {
-      clearError("emailInput");
+      handleClearError("emailInput");
     }
 
     if (password.length <= 0) {
-      setError("passwordInput", "Slaptažodžio laukas negali būti tuščias");
+      handleSetError(
+        "passwordInput",
+        "Slaptažodžio laukas negali būti tuščias"
+      );
       isError = true;
     } else {
-      clearError("passwordInput");
+      handleClearError("passwordInput");
     }
 
     if (isError) return;
@@ -155,11 +147,11 @@ const Login = () => {
       else navigate("/dashboard");
     } catch (e) {
       setIsLoading(false);
-      setError(
+      handleSetError(
         "emailInput",
         "Neteisingas el. pašto adresas ir (arba) slaptažodis"
       );
-      setError(
+      handleSetError(
         "passwordInput",
         "Neteisingas el. pašto adresas ir (arba) slaptažodis"
       );

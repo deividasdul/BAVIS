@@ -2,6 +2,8 @@ import React from "react";
 import { DashboardLayout } from "@toolpad/core/DashboardLayout";
 import { AppProvider } from "@toolpad/core";
 
+import { Button } from "@mui/material";
+
 import PageBox from "../components/styles/PageBox";
 import ProtectedRoute from "../components/ProtectedRoute";
 
@@ -33,7 +35,11 @@ const Dashboard = () => {
     <ProtectedRoute>
       <AppProvider navigation={NAVIGATION} branding={BRANDING}>
         <PageBox>
-          <DashboardLayout></DashboardLayout>
+          <DashboardLayout>
+            {/* <Button size="large" variant="contained">
+              asd
+            </Button> */}
+          </DashboardLayout>
         </PageBox>
       </AppProvider>
     </ProtectedRoute>

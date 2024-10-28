@@ -45,6 +45,8 @@ const getDormRooms = async (req, res) => {
       json_agg(
         json_build_object(
           'user_id', "user".id,
+          'first_name', contact.first_name,
+          'last_name', contact.last_name,
           'gender', contact.gender,
           'planned_arrival_date', stay.planned_arrival_date,
           'planned_departure_date', stay.planned_departure_date,

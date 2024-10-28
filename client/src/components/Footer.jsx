@@ -33,7 +33,7 @@ const Footer = () => {
             © {new Date().getFullYear()} Deividas Dulinskas
           </Typography>
           <Typography>
-            <Link href="/privacy-policy" underline="hover">
+            <Link href="/privacy-policy" color="white" underline="hover">
               Terminai ir sąlygos
             </Link>
           </Typography>

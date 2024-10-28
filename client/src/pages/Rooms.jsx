@@ -30,11 +30,16 @@ import SuccessButton from "../components/ui/SuccessButton.jsx";
 import CloseButton from "../components/ui/CloseButton.jsx";
 import CustomTextField from "../components/ui/CustomTextField.jsx";
 
+import { useTheme } from "@emotion/react";
+
 function Rooms() {
   const { rooms, fetchRooms, insertRoom, putRoom, deleteRoom } =
     useContext(RoomsContext);
 
+  const theme = useTheme();
+
   const [currentNumber, setCurrentNumber] = useState(0);
+  const [tenants, setTenants] = useState([]);
 
   // Dorm id
   const { id } = useParams();
@@ -49,6 +54,7 @@ function Rooms() {
   const [editOpen, setEditOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [viewOpen, setViewOpen] = useState(false);
   const [roomId, setRoomId] = useState(0);
 
   const [isInputError, setIsInputError] = useState({
@@ -101,7 +107,7 @@ function Rooms() {
     if (number <= 0) {
       setError(
         "editNumber",
-        "Kambario numerio laukas negali būti tuščias ir turi būti didesnis nei 0",
+        "Kambario numerio laukas negali būti tuščias ir turi būti didesnis nei 0"
       );
       isError = true;
     } else if (number % 1 !== 0) {
@@ -120,7 +126,7 @@ function Rooms() {
     if (floor <= 0) {
       setError(
         "editFloor",
-        "Kambario aukšto laukas negali būti tuščias ir turi būti didesnis nei 0",
+        "Kambario aukšto laukas negali būti tuščias ir turi būti didesnis nei 0"
       );
       isError = true;
     } else if (floor % 1 !== 0) {
@@ -133,13 +139,13 @@ function Rooms() {
     if (capacity <= 0) {
       setError(
         "editCapacity",
-        "Kambario maksimalių žmonių skaičiaus laukas negali būti tuščias ir turi būti didesnis nei 0",
+        "Kambario maksimalių žmonių skaičiaus laukas negali būti tuščias ir turi būti didesnis nei 0"
       );
       isError = true;
     } else if (capacity % 1 !== 0) {
       setError(
         "editCapacity",
-        "Kambario maksimalių žmonių skaičiaus turi būti sveikasis skaičius",
+        "Kambario maksimalių žmonių skaičiaus turi būti sveikasis skaičius"
       );
       isError = true;
     } else {
@@ -149,7 +155,7 @@ function Rooms() {
     if (price <= 0) {
       setError(
         "editPrice",
-        "Kambario kainos laukas negali būti tuščias ir turi būti didesnis nei 0",
+        "Kambario kainos laukas negali būti tuščias ir turi būti didesnis nei 0"
       );
       isError = true;
     } else {
@@ -168,7 +174,7 @@ function Rooms() {
     if (number <= 0) {
       setError(
         "addNumber",
-        "Kambario numerio laukas negali būti tuščias ir turi būti didesnis nei 0",
+        "Kambario numerio laukas negali būti tuščias ir turi būti didesnis nei 0"
       );
       isError = true;
     } else if (number % 1 !== 0) {
@@ -187,7 +193,7 @@ function Rooms() {
     if (floor <= 0) {
       setError(
         "addFloor",
-        "Kambario aukšto laukas negali būti tuščias ir turi būti didesnis nei 0",
+        "Kambario aukšto laukas negali būti tuščias ir turi būti didesnis nei 0"
       );
       isError = true;
     } else if (floor % 1 !== 0) {
@@ -200,13 +206,13 @@ function Rooms() {
     if (capacity <= 0) {
       setError(
         "addCapacity",
-        "Kambario maksimalių žmonių skaičiaus laukas negali būti tuščias ir turi būti didesnis nei 0",
+        "Kambario maksimalių žmonių skaičiaus laukas negali būti tuščias ir turi būti didesnis nei 0"
       );
       isError = true;
     } else if (capacity % 1 !== 0) {
       setError(
         "addCapacity",
-        "Kambario maksimalių žmonių skaičiaus turi būti sveikasis skaičius",
+        "Kambario maksimalių žmonių skaičiaus turi būti sveikasis skaičius"
       );
       isError = true;
     } else {
@@ -216,7 +222,7 @@ function Rooms() {
     if (price <= 0) {
       setError(
         "addPrice",
-        "Kambario kainos laukas negali būti tuščias ir turi būti didesnis nei 0",
+        "Kambario kainos laukas negali būti tuščias ir turi būti didesnis nei 0"
       );
       isError = true;
     } else {
@@ -254,6 +260,11 @@ function Rooms() {
     setAddOpen(!addOpen);
   };
 
+  const handleView = (roomTenants) => {
+    setViewOpen(!viewOpen);
+    setTenants(roomTenants || []);
+  };
+
   const handleConfirm = () => {
     setConfirmOpen(!confirmOpen);
   };
@@ -275,7 +286,7 @@ function Rooms() {
 
   useEffect(() => {
     fetchRooms(id);
-  }, [rooms]);
+  }, []);
 
   return (
     <ProtectedRoute>
@@ -286,7 +297,15 @@ function Rooms() {
               <Grid key={room.id} size={3}>
                 <Card sx={{ m: 2 }} raised={true}>
                   <CardActionArea>
-                    <CardHeader title={"Kambario nr. " + room.number} />
+                    <CardHeader
+                      sx={{
+                        backgroundColor:
+                          Number(room.capacity) > Number(room.tenant_amount)
+                            ? theme.palette.success.light
+                            : theme.palette.error.light,
+                      }}
+                      title={"Kambario nr. " + room.number}
+                    />
                   </CardActionArea>
                   <Divider />
                   <CardContent>
@@ -310,6 +329,9 @@ function Rooms() {
                       sx={{ p: 1, m: 1, flex: 1 }}
                       variant="contained"
                       startIcon={<MoreHorizIcon />}
+                      onClick={() => {
+                        handleView(room.tenants);
+                      }}
                     >
                       Daugiau...
                     </Button>
@@ -514,6 +536,37 @@ function Rooms() {
             >
               Patvirtinti
             </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog open={viewOpen} onClose={handleView}>
+          <DialogTitle>Kambaryje esantys žmonės</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              {viewOpen && tenants.length != 0 ? (
+                tenants.map((tenant, index) => {
+                  return (
+                    <div key={index}>
+                      <CustomTextField
+                        value={tenant.first_name || ""}
+                        label={"Vardas"}
+                        isDisabled
+                      />
+                      <CustomTextField
+                        value={tenant.last_name || ""}
+                        label={"Vardas"}
+                        isDisabled
+                      />
+                    </div>
+                  );
+                })
+              ) : (
+                <div>asd</div>
+              )}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <CloseButton label="Uždaryti" onClick={handleView} />
           </DialogActions>
         </Dialog>
       </RoomsBox>

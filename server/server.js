@@ -9,6 +9,7 @@ import dorms from "./routes/dorms.js";
 import users from "./routes/users.js";
 import interests from "./routes/interests.js";
 import reservation from "./routes/reservation.js";
+import notifications from "./routes/notifications.js";
 
 import multer from "multer";
 import path from "path";
@@ -55,6 +56,7 @@ app.use("/api/v1/users", users);
 app.use("/api/v1/interests", interests);
 app.use("/auth", auth);
 app.use("/api/v1/reservation", reservation);
+app.use("/api/v1/notifications", notifications);
 
 app.post("/upload/:id", upload.single("file"), async (req, res) => {
   const { id } = req.params;

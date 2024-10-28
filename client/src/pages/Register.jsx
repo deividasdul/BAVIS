@@ -14,11 +14,10 @@ import {
   MenuItem,
   Link,
 } from "@mui/material";
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
 import Grid from "@mui/material/Grid2";
 
 import PageBox from "../components/styles/PageBox";
+import PhoneInputField from "../components/ui/PhoneInput";
 import CustomTextField from "../components/ui/CustomTextField";
 import SuccessButton from "../components/ui/SuccessButton";
 import { ModeContext } from "../context/ModeContext";
@@ -291,34 +290,12 @@ const Register = () => {
                   }
                 />
               </Grid>
-              <PhoneInput
-                inputProps={{ required: true }}
+              <PhoneInputField
                 value={userInfo.phoneNumber}
-                country={"lt"}
+                name={"phoneNumber"}
                 onChange={(phone) =>
                   setUserInfo({ ...userInfo, phoneNumber: phone })
                 }
-                name="phoneNumber"
-                inputStyle={{
-                  width: "100%",
-                  backgroundColor: isDarkMode
-                    ? "rgb(77, 77, 77)"
-                    : "rgb(232, 232, 232)",
-                  fontSize: "1rem",
-                  border: "none",
-                  color: isDarkMode ? "white" : "black",
-                }}
-                dropdownStyle={{
-                  color: isDarkMode ? "white" : "black",
-                  backgroundColor: isDarkMode
-                    ? "rgb(77, 77, 77)"
-                    : "rgb(232, 232, 232)",
-                }}
-                buttonStyle={{
-                  backgroundColor: isDarkMode
-                    ? "rgb(77, 77, 77)"
-                    : "rgb(232, 232, 232)",
-                }}
               />
               <Grid size={12}>
                 <FormControl>

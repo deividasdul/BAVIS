@@ -11,6 +11,8 @@ import {
   FormGroup,
   FormControlLabel,
   Avatar,
+  Alert,
+  Collapse,
 } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import LoginIcon from "@mui/icons-material/Login";
@@ -23,6 +25,9 @@ import { ModeContext } from "../context/ModeContext";
 import { useNavigate } from "react-router-dom";
 import { HeaderContext } from "../context/HeaderContext";
 import { UsersContext } from "../context/UsersContext";
+import { NotificationsContext } from "../context/NotificationsContext";
+import CloseIcon from "@mui/icons-material/Close";
+import IconButton from "@mui/material/IconButton";
 
 import { useAuth } from "../context/AuthContext";
 
@@ -30,6 +35,7 @@ const Header = () => {
   const navigate = useNavigate();
 
   const { isSelected } = useContext(HeaderContext);
+  const { notifications } = useContext(NotificationsContext);
 
   const activeButtonStyle = {
     backgroundColor: "#388e3c",
@@ -39,6 +45,8 @@ const Header = () => {
   const { handleThemeChange, isDarkMode } = useContext(ModeContext);
   const { contact, avatarUrl, setAvatarUrl, fetchContact } =
     useContext(UsersContext);
+
+  const [errorOpen, setErrorOpen] = useState(true);
 
   useEffect(() => {
     if (user && user.id) {
@@ -62,24 +70,24 @@ const Header = () => {
   };
 
   const adminMenuItems = [
-    { text: "Valdymo skydelis", href: "/dashboard" },
-    { text: "Bendrabučiai", href: "/dorms" },
-    { text: "Vartotojai", href: "/users" },
-    { text: "Pranešimai", href: "/notifications" },
-    { text: "Atsijungti", onClick: logout },
+    { id: 101, text: "Valdymo skydelis", href: "/dashboard" },
+    { id: 102, text: "Bendrabučiai", href: "/dorms" },
+    { id: 103, text: "Vartotojai", href: "/users" },
+    { id: 104, text: "Pranešimai", href: "/notifications" },
+    { id: 105, text: "Atsijungti", onClick: logout },
   ];
 
   const userMenuItems = [
-    { text: "Profilis", href: "/profile" },
-    { text: "Mokėjimų istorija", href: "/payment-history" },
-    { text: "Atsijungti", onClick: logout },
+    { id: 201, text: "Profilis", href: "/profile" },
+    { id: 202, text: "Mokėjimų istorija", href: "/payment-history" },
+    { id: 203, text: "Atsijungti", onClick: logout },
   ];
 
   const renderMenuItems = (items) => {
-    return items.map(({ text, href, onClick }) => {
+    return items.map(({ id, text, href, onClick }) => {
       return (
         <MenuItem
-          key={text}
+          key={id}
           onClick={() => {
             if (onClick) {
               onClick();
@@ -106,6 +114,7 @@ const Header = () => {
           <ButtonGroup sx={{ ml: 2, gap: 1 }} size="large" variant="container">
             <StyledButton
               sx={isSelected.home && activeButtonStyle}
+              key={"home"}
               href="/"
               startIcon={<HomeIcon />}
             >
@@ -114,6 +123,7 @@ const Header = () => {
             {isUserLoggedOut(user) && (
               <>
                 <StyledButton
+                  key={"login"}
                   sx={isSelected.login && activeButtonStyle}
                   href="/login"
                   startIcon={<LoginIcon />}
@@ -121,6 +131,7 @@ const Header = () => {
                   Prisijungti
                 </StyledButton>
                 <StyledButton
+                  key={"register"}
                   sx={isSelected.register && activeButtonStyle}
                   href="/register"
                   startIcon={<HowToRegIcon />}
@@ -131,6 +142,7 @@ const Header = () => {
             )}
             {isLoggedInAndUser(user) && (
               <StyledButton
+                key={"dorms-list"}
                 sx={isSelected.dormsList && activeButtonStyle}
                 href="/dorms-list"
                 startIcon={<ApartmentIcon />}
@@ -142,6 +154,7 @@ const Header = () => {
               <>
                 {user.role === "Admin" && (
                   <StyledButton
+                    key={"admin-panel"}
                     sx={isSelected.adminPanel && activeButtonStyle}
                     startIcon={<AdminPanelSettingsIcon />}
                     id="basic-button"
@@ -155,6 +168,7 @@ const Header = () => {
                 )}
                 {user.role === "User" && (
                   <StyledButton
+                    key={"profile"}
                     sx={isSelected.userPanel && activeButtonStyle}
                     startIcon={
                       <Avatar alt="Avatar" src={avatarUrl}>
@@ -209,6 +223,32 @@ const Header = () => {
           </FormGroup>
         </Toolbar>
       </AppBar>
+      {notifications.map((notification) => {
+        return (
+          <>
+            <Collapse in={errorOpen}>
+              <Alert
+                key={notification.id}
+                severity="error"
+                action={
+                  <IconButton
+                    aria-label="close"
+                    color="inherit"
+                    size="small"
+                    onClick={() => {
+                      setErrorOpen(false);
+                    }}
+                  >
+                    <CloseIcon fontSize="inherit" />
+                  </IconButton>
+                }
+              >
+                {notification.message}
+              </Alert>
+            </Collapse>
+          </>
+        );
+      })}
     </>
   );
 };

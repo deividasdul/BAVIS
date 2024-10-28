@@ -24,6 +24,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
+import { useTheme } from "@emotion/react";
 
 import { RoomsContext } from "../context/RoomsContext";
 import ProtectedRoute from "../components/ProtectedRoute";
@@ -34,6 +35,8 @@ import CustomTextField from "../components/ui/CustomTextField";
 
 function RoomsList() {
   const { user } = useAuth();
+
+  const theme = useTheme();
 
   const [arrivalDate, setArrivalDate] = useState(dayjs("2024-10-10"));
   const [departureDate, setDepartureDate] = useState(dayjs("2024-10-10"));
@@ -175,17 +178,34 @@ function RoomsList() {
   return (
     <ProtectedRoute>
       <RoomsBox>
-        <Typography align="center" sx={{ pt: 2 }} gutterBottom variant="h2">
+        {/* <Typography align="center" sx={{ pt: 2 }} gutterBottom variant="h2">
           <StarRateIcon sx={{ color: "yellow" }} fontSize="large" />
           Rekomenduojama
           <StarRateIcon sx={{ color: "yellow" }} fontSize="large" />
-        </Typography>
+        </Typography> */}
         <Grid container spacing={2}>
           {recommendedRooms.map((room) => (
             <Grid key={room.id} size={3}>
               <Card sx={{ m: 2 }} raised={true}>
                 <CardActionArea>
-                  <CardHeader title={`Kambario nr. ` + room.number} />
+                  <CardHeader
+                    sx={{ backgroundColor: theme.palette.warning.light }}
+                    title={
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="space-between"
+                      >
+                        <Typography variant="h5" component="span">
+                          {`Kambario nr. ` + room.number}
+                        </Typography>
+                        <StarRateIcon
+                          sx={{ color: "yellow" }}
+                          fontSize="large"
+                        />
+                      </Box>
+                    }
+                  />
                 </CardActionArea>
                 <Divider />
                 <CardContent>
@@ -223,16 +243,16 @@ function RoomsList() {
           ))}
         </Grid>
 
-        <Typography align="center" sx={{ pt: 4 }} gutterBottom variant="h3">
-          Visi kambariai
-        </Typography>
         <Grid container spacing={2}>
           {defaultRooms.map((room) => {
             return (
               <Grid key={room.id} size={3}>
                 <Card sx={{ m: 2 }} raised={true}>
                   <CardActionArea>
-                    <CardHeader title={`Kambario nr. ` + room.number} />
+                    <CardHeader
+                      sx={{ backgroundColor: theme.palette.success.light }}
+                      title={`Kambario nr. ` + room.number}
+                    />
                   </CardActionArea>
                   <Divider />
                   <CardContent>

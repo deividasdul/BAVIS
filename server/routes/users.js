@@ -7,6 +7,7 @@ import {
   putUser,
   patchUser,
   getUserInterests,
+  changePassword,
 } from "../controllers/users.js";
 
 const router = express.Router();
@@ -19,5 +20,6 @@ router.get("/:id", getUser);
 router.put("/:id", putUser);
 router.patch("/:id", patchUser);
 router.get("/:id/interests", getUserInterests);
+router.post("/change-password/:id", changePassword);
 
 export default router;

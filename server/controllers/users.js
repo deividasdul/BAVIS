@@ -1,4 +1,5 @@
 import { pool } from "../config.js";
+import bcrypt from "bcrypt";
 
 // Get all users
 const getUsers = async (_, res) => {
@@ -135,4 +136,57 @@ const patchUser = async (req, res) => {
   }
 };
 
-export { getUsers, deleteUser, getUser, putUser, patchUser, getUserInterests };
+const changePassword = async (req, res) => {
+  const { id } = req.params;
+  const { oldPassword, newPassword } = req.body;
+
+  try {
+    const selectedUser = await pool.query(
+      `SELECT * FROM "user" WHERE id = $1`,
+      [id]
+    );
+
+    bcrypt.compare(oldPassword, selectedUser.rows[0].password, (err, valid) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Server error" });
+      }
+
+      if (!valid) {
+        return res.status(400).json({ message: "Wrong password" });
+      }
+
+      bcrypt.hash(newPassword, 10, async (e, hash) => {
+        if (e) {
+          console.error(e);
+          return res.status(500).json({ message: "Internal server error" });
+        }
+
+        try {
+          await pool.query(`UPDATE "user" SET password = $1 WHERE id = $2`, [
+            hash,
+            id,
+          ]);
+          return res
+            .status(200)
+            .json({ message: "Password updated successfully" });
+        } catch (e) {
+          console.error(e);
+        }
+      });
+    });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export {
+  getUsers,
+  deleteUser,
+  getUser,
+  putUser,
+  patchUser,
+  getUserInterests,
+  changePassword,
+};

@@ -14,8 +14,10 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Alert,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
+import utc from "dayjs/plugin/utc";
 
 import { styled } from "@mui/system";
 import axios from "axios";
@@ -36,10 +38,14 @@ import CustomTextField from "../components/ui/CustomTextField";
 function RoomsList() {
   const { user } = useAuth();
 
+  dayjs.extend(utc);
+
+  const [hasReserved, setHasReserved] = useState(false);
+
   const theme = useTheme();
 
-  const [arrivalDate, setArrivalDate] = useState(dayjs("2024-10-10"));
-  const [departureDate, setDepartureDate] = useState(dayjs("2024-10-10"));
+  const [arrivalDate, setArrivalDate] = useState(dayjs());
+  const [departureDate, setDepartureDate] = useState(dayjs());
 
   // Form Dialog component
   const [isRequested, setIsRequested] = useState(false);
@@ -132,12 +138,6 @@ function RoomsList() {
     );
   };
 
-  const defaultRooms = rooms.filter((room) => {
-    if (room.tenant_amount == 0) return true;
-
-    return !checkOppositeGender(room.tenants);
-  });
-
   const recommendedRooms = rooms.filter((room) => {
     if (room.tenant_amount == 0) return false;
 
@@ -152,12 +152,20 @@ function RoomsList() {
     return hasInterestMatch;
   });
 
+  const defaultRooms = rooms.filter((room) => {
+    if (room.tenant_amount == 0) return true;
+
+    const isRecommended = recommendedRooms.includes(room);
+
+    return !checkOppositeGender(room.tenants) && !isRecommended;
+  });
+
   const postRoomReservation = async () => {
     const data = {
       userId: contact.id,
       roomId: roomId,
-      plannedArrivalDate: arrivalDate,
-      plannedDepartureDate: departureDate,
+      plannedArrivalDate: arrivalDate.utc().format("YYYY-MM-DD"),
+      plannedDepartureDate: departureDate.utc().format("YYYY-MM-DD"),
       recipient: user.email,
       address: dormAddress,
       number: roomNumber,
@@ -170,7 +178,9 @@ function RoomsList() {
         "http://localhost:3000/api/v1/reservation",
         data
       );
+      handleRequest();
     } catch (e) {
+      setHasReserved(true);
       console.error(e);
     }
   };
@@ -178,11 +188,6 @@ function RoomsList() {
   return (
     <ProtectedRoute>
       <RoomsBox>
-        {/* <Typography align="center" sx={{ pt: 2 }} gutterBottom variant="h2">
-          <StarRateIcon sx={{ color: "yellow" }} fontSize="large" />
-          Rekomenduojama
-          <StarRateIcon sx={{ color: "yellow" }} fontSize="large" />
-        </Typography> */}
         <Grid container spacing={2}>
           {recommendedRooms.map((room) => (
             <Grid key={room.id} size={3}>
@@ -292,6 +297,11 @@ function RoomsList() {
       </RoomsBox>
       <Dialog fullWidth={true} open={isRequested} onClose={handleRequest}>
         <DialogTitle>Kambario užklausos forma</DialogTitle>
+        {hasReserved && (
+          <Alert severity="error">
+            Jau turite rezervaciją, palaukite, kol ji bus patikrinta
+          </Alert>
+        )}
         <DialogContent dividers={true}>
           <Grid container spacing={2}>
             <Grid size={6}>
@@ -356,7 +366,6 @@ function RoomsList() {
             </Grid>
           </Grid>
         </DialogContent>
-
         <DialogActions>
           <CloseButton
             label="Uždaryti"
@@ -367,7 +376,6 @@ function RoomsList() {
           <SuccessButton
             label="Pateikti"
             onClick={() => {
-              handleRequest();
               postRoomReservation();
             }}
           />

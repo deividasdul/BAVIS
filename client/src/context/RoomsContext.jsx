@@ -28,7 +28,7 @@ export const RoomsProvider = ({ children }) => {
   const fetchRooms = async (id) => {
     try {
       const result = await axios.get(
-        `http://localhost:3000/api/v1/dorms/${id}`,
+        `http://localhost:3000/api/v1/dorms/${id}`
       );
       setRooms(result.data);
     } catch (e) {

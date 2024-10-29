@@ -16,6 +16,8 @@ import {
   DialogContent,
   DialogActions,
   DialogContentText,
+  Alert,
+  AlertTitle,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
@@ -35,6 +37,8 @@ import { useTheme } from "@emotion/react";
 function Rooms() {
   const { rooms, fetchRooms, insertRoom, putRoom, deleteRoom } =
     useContext(RoomsContext);
+
+  const [refresh, setRefresh] = useState(false);
 
   const theme = useTheme();
 
@@ -165,6 +169,7 @@ function Rooms() {
     if (isError) return;
 
     putRoom(input, roomId);
+    setRefresh(!refresh);
     handleEdit();
   };
 
@@ -232,6 +237,7 @@ function Rooms() {
     if (isError) return;
 
     insertRoom(input);
+    setRefresh(!refresh);
     handleAdd();
   };
 
@@ -286,7 +292,7 @@ function Rooms() {
 
   useEffect(() => {
     fetchRooms(id);
-  }, []);
+  }, [refresh]);
 
   return (
     <ProtectedRoute>
@@ -530,6 +536,7 @@ function Rooms() {
               color="error"
               onClick={() => {
                 deleteRoom(roomId);
+                setRefresh(!refresh);
                 handleConfirm();
               }}
               autoFocus
@@ -539,30 +546,53 @@ function Rooms() {
           </DialogActions>
         </Dialog>
 
-        <Dialog open={viewOpen} onClose={handleView}>
+        <Dialog fullScreen open={viewOpen} onClose={handleView}>
           <DialogTitle>Kambaryje esantys žmonės</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              {viewOpen && tenants.length != 0 ? (
-                tenants.map((tenant, index) => {
-                  return (
-                    <div key={index}>
-                      <CustomTextField
-                        value={tenant.first_name || ""}
-                        label={"Vardas"}
-                        isDisabled
-                      />
-                      <CustomTextField
-                        value={tenant.last_name || ""}
-                        label={"Vardas"}
-                        isDisabled
-                      />
-                    </div>
-                  );
-                })
-              ) : (
-                <div>asd</div>
-              )}
+              {viewOpen ? (
+                tenants.length > 0 ? (
+                  tenants.map((tenant, index) => {
+                    return (
+                      <div key={index}>
+                        <h2>{index + 1}. Nuomininkas</h2>
+                        {tenant.paid ? (
+                          <Alert severity="error">
+                            <AlertTitle>Mokėjimo būsena:</AlertTitle>
+                            Nesumokėta, skola
+                          </Alert>
+                        ) : (
+                          <Alert severity="success">
+                            <AlertTitle>Mokėjimo būsena:</AlertTitle> Apmokėta
+                          </Alert>
+                        )}
+                        <CustomTextField
+                          value={tenant.first_name || ""}
+                          label={"Vardas"}
+                          isDisabled
+                        />
+                        <CustomTextField
+                          value={tenant.last_name || ""}
+                          label={"Pavardė"}
+                          isDisabled
+                        />
+                        <CustomTextField
+                          value={tenant.planned_arrival_date || ""}
+                          label={"Atvykimo data"}
+                          isDisabled
+                        />
+                        <CustomTextField
+                          value={tenant.planned_departure_date || ""}
+                          label={"Išvykimo data"}
+                          isDisabled
+                        />
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div>Nėra žmonių kambaryje</div>
+                )
+              ) : null}
             </DialogContentText>
           </DialogContent>
           <DialogActions>

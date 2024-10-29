@@ -23,14 +23,9 @@ import SuccessButton from "../components/ui/SuccessButton";
 import CloseButton from "../components/ui/CloseButton";
 
 function Users() {
-  const { users, putUser, deleteUser, isLoading, fetchUsers } =
-    useContext(UsersContext);
+  const { users, putUser, deleteUser } = useContext(UsersContext);
 
   const [isPageLoading, setIsPageLoading] = useState(true);
-
-  useEffect(() => {
-    fetchUsers();
-  }, [users]);
 
   const [userId, setUserId] = useState(0);
   const [isConfirmRequired, setConfirmedRequired] = useState(false);
@@ -93,6 +88,7 @@ function Users() {
     if (isError) return;
 
     putUser(input, userId);
+
     handleEditClose();
   };
 

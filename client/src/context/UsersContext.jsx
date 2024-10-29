@@ -93,9 +93,24 @@ export const UsersProvider = ({ children }) => {
     }
   };
 
+  const putUser = async (input, id) => {
+    const data = {
+      first_name: input.firstName,
+      last_name: input.lastName,
+    };
+
+    try {
+      await axios.put(`http://localhost:3000/api/v1/users/${id}`, data);
+      fetchUsers();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const deleteUser = async (id) => {
     try {
       await axios.delete(`http://localhost:3000/api/v1/users/${id}`);
+      fetchUsers();
     } catch (e) {
       console.error(e);
     }
@@ -103,12 +118,14 @@ export const UsersProvider = ({ children }) => {
 
   useEffect(() => {
     fetchUsers();
+    // fetchContact();
   }, []);
 
   return (
     <UsersContext.Provider
       value={{
         users,
+        putUser,
         deleteUser,
         isLoading,
         patchUser,

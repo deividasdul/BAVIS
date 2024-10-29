@@ -50,6 +50,7 @@ const getDormRooms = async (req, res) => {
           'gender', contact.gender,
           'planned_arrival_date', stay.planned_arrival_date,
           'planned_departure_date', stay.planned_departure_date,
+          'paid', stay.paid,
           'interests', (
             SELECT json_agg(interest.id)
             FROM user_interest

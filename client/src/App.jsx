@@ -35,12 +35,11 @@ const App = () => {
   const [cookies] = useCookies(["cookieConsent"]);
 
   const location = useLocation();
-  const isDashboard = location.pathname === "/dashboard";
 
   return (
     <ThemeProvider theme={theme}>
       <HeaderProvider>
-        {!isDashboard && <Header />}
+        <Header />
         <Routes>
           <Route index element={<Home />} />
           <Route path="/home" element={<Home />} />
@@ -57,7 +56,7 @@ const App = () => {
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
-        {!isDashboard && <Footer />}
+        <Footer />
         {!cookies.cookieConsent && <CookieConsent />}
       </HeaderProvider>
     </ThemeProvider>

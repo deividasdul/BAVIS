@@ -2,17 +2,16 @@ import React, { useContext, useEffect, useState } from "react";
 import {
   AppBar,
   Toolbar,
-  Typography,
   Menu,
   MenuItem,
   Button,
-  ButtonGroup,
   Link,
   FormGroup,
   FormControlLabel,
   Avatar,
-  Alert,
-  Collapse,
+  Box,
+  Stack,
+  Drawer,
 } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import LoginIcon from "@mui/icons-material/Login";
@@ -25,9 +24,12 @@ import { ModeContext } from "../context/ModeContext";
 import { useNavigate } from "react-router-dom";
 import { HeaderContext } from "../context/HeaderContext";
 import { UsersContext } from "../context/UsersContext";
-import { NotificationsContext } from "../context/NotificationsContext";
-import CloseIcon from "@mui/icons-material/Close";
-import IconButton from "@mui/material/IconButton";
+import MenuIcon from "@mui/icons-material/Menu";
+
+import logo from "../assets/bavis-logo.png";
+import { NotificationBar } from "./NotificationBar";
+
+import { useTheme, useMediaQuery } from "@mui/system";
 
 import { useAuth } from "../context/AuthContext";
 
@@ -35,18 +37,18 @@ const Header = () => {
   const navigate = useNavigate();
 
   const { isSelected } = useContext(HeaderContext);
-  const { notifications } = useContext(NotificationsContext);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const activeButtonStyle = {
-    backgroundColor: "#388e3c",
+    backgroundColor: theme.palette.success.main,
   };
 
   const { user, logout } = useAuth();
   const { handleThemeChange, isDarkMode } = useContext(ModeContext);
   const { contact, avatarUrl, setAvatarUrl, fetchContact } =
     useContext(UsersContext);
-
-  const [errorOpen, setErrorOpen] = useState(true);
 
   useEffect(() => {
     if (user && user.id) {
@@ -67,6 +69,13 @@ const Header = () => {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  // const [open, setOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const toggleDrawer = (newOpen) => () => {
+    setIsDrawerOpen(newOpen);
   };
 
   const adminMenuItems = [
@@ -107,110 +116,125 @@ const Header = () => {
   return (
     <>
       <AppBar position="static" sx={{ p: 1 }}>
-        <Toolbar>
-          <Typography sx={{ flexGrow: 1 }} variant="h3">
-            BAVIS
-          </Typography>
-          <ButtonGroup sx={{ ml: 2, gap: 1 }} size="large" variant="container">
-            <StyledButton
-              sx={isSelected.home && activeButtonStyle}
-              key={"home"}
-              href="/"
-              startIcon={<HomeIcon />}
-            >
-              Pagrindinis
-            </StyledButton>
-            {isUserLoggedOut(user) && (
-              <>
-                <StyledButton
-                  key={"login"}
-                  sx={isSelected.login && activeButtonStyle}
-                  href="/login"
-                  startIcon={<LoginIcon />}
-                >
-                  Prisijungti
-                </StyledButton>
-                <StyledButton
-                  key={"register"}
-                  sx={isSelected.register && activeButtonStyle}
-                  href="/register"
-                  startIcon={<HowToRegIcon />}
-                >
-                  Užsiregistruoti
-                </StyledButton>
-              </>
-            )}
-            {isLoggedInAndUser(user) && (
-              <StyledButton
-                key={"dorms-list"}
-                sx={isSelected.dormsList && activeButtonStyle}
-                href="/dorms-list"
-                startIcon={<ApartmentIcon />}
+        <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Box
+            component="img"
+            sx={{
+              maxWidth: 64,
+              cursor: "pointer",
+            }}
+            alt="BAVIS logo"
+            src={logo}
+            onClick={() => navigate("/")}
+          />
+          {isMobile ? (
+            <>
+              <MenuIcon onClick={() => setIsDrawerOpen(true)} />
+              <Drawer
+                open={isDrawerOpen}
+                onClose={() => setIsDrawerOpen(false)}
               >
-                Bendrabučio nuoma
-              </StyledButton>
-            )}
-            {user && (
-              <>
-                {user.role === "Admin" && (
-                  <StyledButton
-                    key={"admin-panel"}
-                    sx={isSelected.adminPanel && activeButtonStyle}
-                    startIcon={<AdminPanelSettingsIcon />}
-                    id="basic-button"
-                    aria-controls={open ? "basic-menu" : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={open ? "true" : undefined}
-                    onClick={handleClick}
-                  >
-                    Administratoriaus skydelis
-                  </StyledButton>
+                {user?.role === "Admin" && renderMenuItems(adminMenuItems)}
+                {user?.role === "User" && renderMenuItems(userMenuItems)}
+                {user === null && (
+                  <>
+                    <StyledButton
+                      variant="contained"
+                      sx={isSelected.home && activeButtonStyle}
+                      href="/"
+                      startIcon={<HomeIcon />}
+                    >
+                      Pagrindinis
+                    </StyledButton>
+                    <StyledButton
+                      variant="contained"
+                      sx={isSelected.login && activeButtonStyle}
+                      href="/login"
+                      startIcon={<LoginIcon />}
+                    >
+                      Prisijungti
+                    </StyledButton>
+                    <StyledButton
+                      variant="contained"
+                      sx={isSelected.register && activeButtonStyle}
+                      href="/register"
+                      startIcon={<HowToRegIcon />}
+                    >
+                      Užsiregistruoti
+                    </StyledButton>
+                  </>
                 )}
-                {user.role === "User" && (
-                  <StyledButton
-                    key={"profile"}
-                    sx={isSelected.userPanel && activeButtonStyle}
-                    startIcon={
-                      <Avatar alt="Avatar" src={avatarUrl}>
-                        {contact?.first_name?.[0] + contact?.last_name?.[0]}
-                      </Avatar>
-                    }
-                    id="basic-button"
-                    aria-controls={open ? "basic-menu" : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={open ? "true" : undefined}
-                    onClick={handleClick}
-                  >
-                    {user.email}
-                  </StyledButton>
-                )}
-              </>
-            )}
-          </ButtonGroup>
-          {isLoggedInAndAdmin(user) ? (
-            <Menu
-              id="basic-menu"
-              anchorEl={anchorEl}
-              open={open}
-              onClose={handleClose}
-              MenuListProps={{
-                "aria-labelledby": "basic-button",
-              }}
-            >
-              {renderMenuItems(adminMenuItems)}
-            </Menu>
+              </Drawer>
+            </>
           ) : (
-            <Menu
-              id="basic-menu"
-              anchorEl={anchorEl}
-              open={open}
-              onClose={handleClose}
-              MenuListProps={{
-                "aria-labelledby": "basic-button",
-              }}
-            >
-              {renderMenuItems(userMenuItems)}
-            </Menu>
+            <Stack gap={2} direction={"row"}>
+              <StyledButton
+                variant="contained"
+                sx={isSelected.home && activeButtonStyle}
+                href="/"
+                startIcon={<HomeIcon />}
+              >
+                Pagrindinis
+              </StyledButton>
+              {isUserLoggedOut(user) && (
+                <>
+                  <StyledButton
+                    variant="contained"
+                    sx={isSelected.login && activeButtonStyle}
+                    href="/login"
+                    startIcon={<LoginIcon />}
+                  >
+                    Prisijungti
+                  </StyledButton>
+                  <StyledButton
+                    variant="contained"
+                    sx={isSelected.register && activeButtonStyle}
+                    href="/register"
+                    startIcon={<HowToRegIcon />}
+                  >
+                    Užsiregistruoti
+                  </StyledButton>
+                </>
+              )}
+              {isLoggedInAndUser(user) && (
+                <StyledButton
+                  variant="contained"
+                  sx={isSelected.dormsList && activeButtonStyle}
+                  href="/dorms-list"
+                  startIcon={<ApartmentIcon />}
+                >
+                  Bendrabučio rezervacija
+                </StyledButton>
+              )}
+              {user && (
+                <>
+                  {user.role === "Admin" && (
+                    <StyledButton
+                      variant="contained"
+                      sx={isSelected.adminPanel && activeButtonStyle}
+                      startIcon={<AdminPanelSettingsIcon />}
+                      onClick={handleClick}
+                    >
+                      Administratoriaus skydelis
+                    </StyledButton>
+                  )}
+                  {user.role === "User" && (
+                    <StyledButton
+                      variant="contained"
+                      sx={isSelected.userPanel && activeButtonStyle}
+                      startIcon={
+                        <Avatar alt="Avatar" src={avatarUrl}>
+                          {contact?.first_name?.[0] + contact?.last_name?.[0]}
+                        </Avatar>
+                      }
+                      onClick={handleClick}
+                    >
+                      {user.email}
+                    </StyledButton>
+                  )}
+                </>
+              )}
+            </Stack>
           )}
           <FormGroup>
             <FormControlLabel
@@ -218,37 +242,22 @@ const Header = () => {
               onChange={() => {
                 handleThemeChange();
               }}
-              control={<MaterialUISwitch sx={{ ml: 2 }} />}
+              control={<MaterialUISwitch />}
             />
           </FormGroup>
+
+          {isLoggedInAndAdmin(user) ? (
+            <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+              {renderMenuItems(adminMenuItems)}
+            </Menu>
+          ) : (
+            <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+              {renderMenuItems(userMenuItems)}
+            </Menu>
+          )}
         </Toolbar>
       </AppBar>
-      {notifications.map((notification) => {
-        return (
-          <>
-            <Collapse in={errorOpen}>
-              <Alert
-                key={notification.id}
-                severity="error"
-                action={
-                  <IconButton
-                    aria-label="close"
-                    color="inherit"
-                    size="small"
-                    onClick={() => {
-                      setErrorOpen(false);
-                    }}
-                  >
-                    <CloseIcon fontSize="inherit" />
-                  </IconButton>
-                }
-              >
-                {notification.message}
-              </Alert>
-            </Collapse>
-          </>
-        );
-      })}
+      <NotificationBar />
     </>
   );
 };
@@ -259,7 +268,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
   flexDirection: "column",
 
   "&.MuiButton-root:hover": {
-    backgroundColor: theme.palette.info.dark,
+    backgroundColor: theme.palette.success.dark,
   },
 }));
 
@@ -320,6 +329,7 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
 }));
 
 export default Header;
+
 function isLoggedInAndAdmin(user) {
   return user && user.role === "Admin";
 }

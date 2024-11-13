@@ -32,6 +32,7 @@ const CookieConsent = () => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          borderRadius: 0,
         }}
         elevation={12}
       >

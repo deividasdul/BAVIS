@@ -53,17 +53,27 @@ const Notifications = () => {
             alignItems: "center",
           }}
         >
-          <Stack direction={"column"}>
+          <Stack
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            direction={"column"}
+          >
             {notifications.map((notification, index) => {
               return (
                 <Accordion
+                  sx={{ minWidth: "50%", maxWidth: "50%" }}
                   key={notification.id}
                   {...(index === 0 && { defaultExpanded: true })}
                 >
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     {index + 1}. Pranešimas
                   </AccordionSummary>
-                  <AccordionDetails>{notification.message}</AccordionDetails>
+                  <AccordionDetails sx={{ wordBreak: "break-word" }}>
+                    {notification.message}
+                  </AccordionDetails>
                   <AccordionActions>
                     <CloseButton
                       onClick={() => {

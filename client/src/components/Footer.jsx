@@ -11,6 +11,7 @@ const Footer = () => {
       sx={{
         top: "auto",
         bottom: 0,
+        padding: 1,
         backgroundColor:
           theme.palette.mode === "dark"
             ? theme.palette.background.default
@@ -30,7 +31,7 @@ const Footer = () => {
           }}
         >
           <Typography variant="h6">
-            © {new Date().getFullYear()} Deividas Dulinskas
+            © {new Date().getFullYear()} BAVIS | Deividas Dulinskas
           </Typography>
           <Typography>
             <Link href="/privacy-policy" color="white" underline="hover">

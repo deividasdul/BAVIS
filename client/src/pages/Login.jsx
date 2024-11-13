@@ -58,7 +58,7 @@ const Login = () => {
   const sendRecoveryEmail = async () => {
     const { forgotEmail } = userInfo;
 
-    if (forgotEmail <= 0) {
+    if (forgotEmail.length <= 0) {
       handleSetError(
         "forgotPasswordEmailInput",
         "El. pašto laukas negali būti tuščias"

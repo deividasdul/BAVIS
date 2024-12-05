@@ -26,7 +26,7 @@ const DormsList = () => {
         <Grid container spacing={2}>
           {dorms.map((dorm) => {
             return (
-              <Grid key={dorm.id} size={3}>
+              <Grid key={dorm.id} size={{ lg: 4, md: 6, sm: 12, xs: 12 }}>
                 <Card key={dorm.id} sx={{ m: 2 }} raised={true}>
                   <CardActionArea>
                     <CardHeader

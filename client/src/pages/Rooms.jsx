@@ -31,6 +31,7 @@ import ProtectedRoute from "../components/ProtectedRoute.jsx";
 import SuccessButton from "../components/ui/SuccessButton.jsx";
 import CloseButton from "../components/ui/CloseButton.jsx";
 import CustomTextField from "../components/ui/CustomTextField.jsx";
+import { ProtectedRouteAdmin } from "../components/ProtectedRouteAdmin.jsx";
 
 import { useTheme } from "@emotion/react";
 
@@ -295,12 +296,12 @@ function Rooms() {
   }, [refresh]);
 
   return (
-    <ProtectedRoute>
+    <ProtectedRouteAdmin>
       <RoomsBox>
         <Grid container spacing={2}>
           {rooms.map((room, _) => {
             return (
-              <Grid key={room.id} size={3}>
+              <Grid key={room.id} size={{ lg: 4, md: 6, sm: 12, xs: 12 }}>
                 <Card sx={{ m: 2 }} raised={true}>
                   <CardActionArea>
                     <CardHeader
@@ -600,7 +601,7 @@ function Rooms() {
           </DialogActions>
         </Dialog>
       </RoomsBox>
-    </ProtectedRoute>
+    </ProtectedRouteAdmin>
   );
 }
 

@@ -17,7 +17,7 @@ import { styled } from "@mui/system";
 import Grid from "@mui/material/Grid2";
 
 import { UsersContext } from "../context/UsersContext";
-import ProtectedRoute from "../components/ProtectedRoute";
+import { ProtectedRouteAdmin } from "../components/ProtectedRouteAdmin";
 import CustomTextField from "../components/ui/CustomTextField";
 import SuccessButton from "../components/ui/SuccessButton";
 import CloseButton from "../components/ui/CloseButton";
@@ -184,7 +184,7 @@ function Users() {
   ];
 
   return (
-    <ProtectedRoute>
+    <ProtectedRouteAdmin>
       <UsersBox>
         <Paper elevation={24}>
           <DataGrid
@@ -274,7 +274,7 @@ function Users() {
           </DialogActions>
         </Dialog>
       </UsersBox>
-    </ProtectedRoute>
+    </ProtectedRouteAdmin>
   );
 }
 

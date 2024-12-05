@@ -190,7 +190,7 @@ function RoomsList() {
       <RoomsBox>
         <Grid container spacing={2}>
           {recommendedRooms.map((room) => (
-            <Grid key={room.id} size={3}>
+            <Grid key={room.id} size={{ lg: 4, md: 6, sm: 12, xs: 12 }}>
               <Card sx={{ m: 2 }} raised={true}>
                 <CardActionArea>
                   <CardHeader
@@ -251,7 +251,7 @@ function RoomsList() {
         <Grid container spacing={2}>
           {defaultRooms.map((room) => {
             return (
-              <Grid key={room.id} size={3}>
+              <Grid key={room.id} size={{ lg: 4, md: 6, sm: 12, xs: 12 }}>
                 <Card sx={{ m: 2 }} raised={true}>
                   <CardActionArea>
                     <CardHeader

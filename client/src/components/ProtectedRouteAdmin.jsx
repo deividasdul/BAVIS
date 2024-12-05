@@ -1,12 +1,12 @@
 import React from "react";
 import { useAuth } from "../context/AuthContext";
-import { Typography } from "@mui/material";
 import PageBox from "./styles/PageBox";
+import { Typography } from "@mui/material";
 
-const ProtectedRoute = ({ children }) => {
+export const ProtectedRouteAdmin = ({ children }) => {
   const { user } = useAuth();
 
-  if (!user || user.role != "User") {
+  if (!user || user.role != "Admin") {
     return (
       <PageBox>
         <Typography variant="h2">Neteisėta prieiga</Typography>
@@ -16,5 +16,3 @@ const ProtectedRoute = ({ children }) => {
 
   return <>{children}</>;
 };
-
-export default ProtectedRoute;

@@ -24,7 +24,7 @@ import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import { styled } from "@mui/system";
 
 import { DormsContext } from "../context/DormsContext";
-import ProtectedRoute from "../components/ProtectedRoute";
+import { ProtectedRouteAdmin } from "../components/ProtectedRouteAdmin";
 import SuccessButton from "../components/ui/SuccessButton";
 import CloseButton from "../components/ui/CloseButton";
 import CustomTextField from "../components/ui/CustomTextField";
@@ -117,12 +117,12 @@ const Dorms = () => {
   };
 
   return (
-    <ProtectedRoute>
+    <ProtectedRouteAdmin>
       <DormsBox sx={{ minHeight: "100vh" }}>
         <Grid container spacing={2}>
           {dorms.map((dorm) => {
             return (
-              <Grid key={dorm.id} size={3}>
+              <Grid key={dorm.id} size={{ lg: 4, md: 6, sm: 12, xs: 12 }}>
                 <Card sx={{ m: 1 }} raised={true}>
                   <CardActionArea>
                     <CardHeader
@@ -279,7 +279,7 @@ const Dorms = () => {
           </DialogActions>
         </Dialog>
       </DormsBox>
-    </ProtectedRoute>
+    </ProtectedRouteAdmin>
   );
 };
 

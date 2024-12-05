@@ -1,6 +1,5 @@
 import React, { useContext, useState } from "react";
 
-import ProtectedRoute from "../components/ProtectedRoute";
 import {
   Box,
   Divider,
@@ -20,6 +19,7 @@ import SuccessButton from "../components/ui/SuccessButton";
 import CloseButton from "../components/ui/CloseButton";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { NotificationsContext } from "../context/NotificationsContext";
+import { ProtectedRouteAdmin } from "../components/ProtectedRouteAdmin";
 
 const Notifications = () => {
   const [addOpen, setAddOpen] = useState(false);
@@ -40,12 +40,11 @@ const Notifications = () => {
   };
 
   return (
-    <ProtectedRoute>
+    <ProtectedRouteAdmin>
       <NotificationBox>
         <Divider>Rezervacijos</Divider>
         <Divider sx={{ m: 2 }}>Vartotojo pranešimai</Divider>
         <Divider sx={{ m: 2 }}>Sistemos pranešimai</Divider>
-
         <Box
           sx={{
             display: "flex",
@@ -127,7 +126,7 @@ const Notifications = () => {
           />
         </DialogActions>
       </Dialog>
-    </ProtectedRoute>
+    </ProtectedRouteAdmin>
   );
 };
 

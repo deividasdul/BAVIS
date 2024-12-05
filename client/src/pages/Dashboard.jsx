@@ -1,12 +1,12 @@
 import React from "react";
 import PageBox from "../components/styles/PageBox";
-import ProtectedRoute from "../components/ProtectedRoute";
+import { ProtectedRouteAdmin } from "../components/ProtectedRouteAdmin";
 
 const Dashboard = () => {
   return (
-    <ProtectedRoute>
+    <ProtectedRouteAdmin>
       <PageBox></PageBox>
-    </ProtectedRoute>
+    </ProtectedRouteAdmin>
   );
 };
 

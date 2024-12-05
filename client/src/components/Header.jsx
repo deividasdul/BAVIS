@@ -88,6 +88,7 @@ const Header = () => {
 
   const userMenuItems = [
     { id: 201, text: "Profilis", href: "/profile" },
+    { id: 204, text: "Bendrabučio rezervacija", href: "/dorms-list" },
     { id: 202, text: "Mokėjimų istorija", href: "/payment-history" },
     { id: 203, text: "Atsijungti", onClick: logout },
   ];
@@ -107,6 +108,7 @@ const Header = () => {
         >
           <Link underline="none" variant="button" href={href}>
             {text}
+            <StyledButton></StyledButton>
           </Link>
         </MenuItem>
       );
@@ -137,7 +139,7 @@ const Header = () => {
                 {user?.role === "Admin" && renderMenuItems(adminMenuItems)}
                 {user?.role === "User" && renderMenuItems(userMenuItems)}
                 {user === null && (
-                  <>
+                  <Stack spacing={1} sx={{ p: 1 }}>
                     <StyledButton
                       variant="contained"
                       sx={isSelected.home && activeButtonStyle}
@@ -162,7 +164,7 @@ const Header = () => {
                     >
                       Užsiregistruoti
                     </StyledButton>
-                  </>
+                  </Stack>
                 )}
               </Drawer>
             </>
@@ -195,16 +197,6 @@ const Header = () => {
                     Užsiregistruoti
                   </StyledButton>
                 </>
-              )}
-              {isLoggedInAndUser(user) && (
-                <StyledButton
-                  variant="contained"
-                  sx={isSelected.dormsList && activeButtonStyle}
-                  href="/dorms-list"
-                  startIcon={<ApartmentIcon />}
-                >
-                  Bendrabučio rezervacija
-                </StyledButton>
               )}
               {user && (
                 <>

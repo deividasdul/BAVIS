@@ -26,6 +26,18 @@ const deleteUser = async (req, res) => {
       `DELETE FROM "user" WHERE id = ($1) RETURNING *`,
       [id]
     );
+
+    // Destroy the session on the server side (if you're using express-session)
+    if (req.session) {
+      req.session.destroy((err) => {
+        if (err) {
+          console.error("Failed to destroy session:", err);
+        }
+      });
+    }
+
+    // Clear the connect.sid cookie
+    res.clearCookie("connect.sid", { path: "/" });
     res.status(200).json(result.data);
   } catch (e) {
     console.error(e);

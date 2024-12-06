@@ -19,6 +19,7 @@ import CloseButton from "../components/ui/CloseButton";
 import PageBox from "../components/styles/PageBox";
 import CustomTextField from "../components/ui/CustomTextField";
 import { useAuth } from "../context/AuthContext";
+import { validateEmail, validateField } from "../utils/formValidation";
 
 import axios from "axios";
 
@@ -58,7 +59,7 @@ const Login = () => {
   const sendRecoveryEmail = async () => {
     const { forgotEmail } = userInfo;
 
-    if (forgotEmail.length <= 0) {
+    if (validateField(forgotEmail)) {
       handleSetError(
         "forgotPasswordEmailInput",
         "El. pašto laukas negali būti tuščias"
@@ -66,7 +67,7 @@ const Login = () => {
       return;
     }
 
-    if (!isValidEmail(forgotEmail)) {
+    if (!validateEmail(forgotEmail)) {
       handleSetError(
         "forgotPasswordEmailInput",
         "Neteisingas el. pašto formatas"
@@ -101,32 +102,26 @@ const Login = () => {
   const handleSetError = (fieldType, errorMessage) => {
     setError(setIsInputError, setInputErrorMessage, fieldType, errorMessage);
   };
-
   const handleClearError = (fieldType) => {
     clearError(setIsInputError, setInputErrorMessage, fieldType);
   };
-
-  function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  }
 
   const handleLogin = async () => {
     const { email, password } = userInfo;
 
     var isError = false;
 
-    if (email.length <= 0) {
+    if (validateField(email)) {
       handleSetError("emailInput", "El. pašto laukas negali būti tuščias");
       isError = true;
-    } else if (!isValidEmail(email)) {
+    } else if (!validateEmail(email)) {
       handleSetError("emailInput", "Neteisingas el. pašto formatas");
       isError = true;
     } else {
       handleClearError("emailInput");
     }
 
-    if (password.length <= 0) {
+    if (validateField(password)) {
       handleSetError(
         "passwordInput",
         "Slaptažodžio laukas negali būti tuščias"

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import ReCAPTCHA from "react-google-recaptcha";
 import {
   Paper,
   Typography,
@@ -13,14 +14,22 @@ import {
   Select,
   MenuItem,
   Link,
+  Stack,
+  LinearProgress,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-
 import PageBox from "../components/styles/PageBox";
 import PhoneInputField from "../components/ui/PhoneInput";
 import CustomTextField from "../components/ui/CustomTextField";
 import SuccessButton from "../components/ui/SuccessButton";
 import { ModeContext } from "../context/ModeContext";
+import {
+  validateEmail,
+  validateField,
+  validateName,
+  validatePassword,
+  validatePhone,
+} from "../utils/formValidation";
 
 const groupList = ["AKRV", "ERP", "VAK", "IPU", "KT", "PS"];
 const statusList = ["Studentas", "Dėstytojas", "Svečias"];
@@ -35,7 +44,15 @@ const facultyList = [
 const Register = () => {
   const navigate = useNavigate();
 
-  const { isDarkMode } = useContext(ModeContext);
+  // Password
+  const [value, setValue] = React.useState("");
+  const minLength = 12;
+
+  // Captcha
+  const key = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI";
+  const [isCaptchaChecked, setIsCaptchaChecked] = useState(false);
+
+  const [phoneErrorMessage, setPhoneErrorMessage] = useState("");
 
   const [isStudent, setIsStudent] = useState(true);
 
@@ -51,7 +68,6 @@ const Register = () => {
     password: "",
     confirmPassword: "",
   });
-
   useEffect(() => {
     setIsStudent(userInfo.userStatus === "Studentas");
 
@@ -78,7 +94,6 @@ const Register = () => {
     password: false,
     confirmPassword: false,
   });
-
   const [inputErrorMessage, setInputErrorMessage] = useState({
     firstName: "",
     lastName: "",
@@ -87,7 +102,6 @@ const Register = () => {
     password: "",
     confirmPassword: "",
   });
-
   const handleInput = (e) => {
     const { name, value } = e.target;
 
@@ -107,7 +121,6 @@ const Register = () => {
       [fieldType]: "",
     }));
   };
-
   const setError = (fieldType, errorMessage) => {
     setIsInputError((prevState) => ({
       ...prevState,
@@ -132,27 +145,30 @@ const Register = () => {
 
     var isError = false;
 
-    if (firstName.length <= 0) {
+    // First name validation
+    if (validateField(firstName)) {
       setError("firstName", "Vardo laukas negali būti tuščias");
+      isError = true;
+    } else if (!validateName(firstName)) {
+      setError("firstName", "Vardo lauke turi būti tik raidės");
       isError = true;
     } else {
       clearError("firstName");
     }
 
-    if (lastName.length <= 0) {
+    // Last name validation
+    if (validateField(lastName)) {
       setError("lastName", "Pavardės laukas negali būti tuščias");
+      isError = true;
+    } else if (!validateName(lastName)) {
+      setError("lastName", "Pavardės lauke turi būti tik raidės");
+      isError = true;
     } else {
       clearError("lastName");
     }
 
-    if (phoneNumber.length <= 0) {
-      setError("phoneNumber", "Telefono numerio laukas negali būti tuščias");
-      isError = true;
-    } else {
-      clearError("phoneNumber");
-    }
-
-    if (email.length <= 0) {
+    // Email validation
+    if (validateField(email)) {
       setError("email", "El. pašto laukas negali būti tuščias");
       isError = true;
     } else if (!validateEmail(email)) {
@@ -162,23 +178,41 @@ const Register = () => {
       clearError("email");
     }
 
-    if (password.length === 0) {
+    //   Phone validation
+    if (validateField(phoneNumber)) {
+      setPhoneErrorMessage("Telefono laukas negali būti tuščias");
+      isError = true;
+    } else if (validatePhone(phoneNumber)) {
+      setPhoneErrorMessage(
+        "Telefono laukelyje turi būti daugiau nei 7 skaičiai"
+      );
+      isError = true;
+    } else {
+      setPhoneErrorMessage("");
+    }
+
+    // Password validation
+    if (validateField(password)) {
       setError("password", "Slaptažodžio laukas negali būti tuščias");
       isError = true;
-    } else if (password.length <= 8) {
-      setError("password", "Slaptažodis turi būti ilgesnis nei 8 simboliai");
+    } else if (!validatePassword(password)) {
+      setError(
+        "password",
+        "Slaptažodyje turi būti: bent 1 didžioji, 1 mažoji raidė, 1 simbolis ir 1 skaičius"
+      );
       isError = true;
     } else {
       clearError("password");
     }
 
-    if (confirmPassword.length == 0) {
+    // Confirm password validation
+    if (validateField(confirmPassword)) {
       setError("confirmPassword", "Slaptažodžio laukas negali būti tuščias");
       isError = true;
-    } else if (confirmPassword.length <= 8) {
+    } else if (!validatePassword(confirmPassword)) {
       setError(
         "confirmPassword",
-        "Slaptažodis turi būti ilgesnis nei 8 simboliai"
+        "Slaptažodyje turi būti: bent 1 didžioji, 1 mažoji raidė, 1 simbolis ir 1 skaičius"
       );
       isError = true;
     } else {
@@ -208,12 +242,6 @@ const Register = () => {
       console.error(e);
     }
   };
-
-  function validateEmail() {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(userInfo.email);
-  }
-
   const insertUser = async () => {
     const {
       email,
@@ -264,7 +292,7 @@ const Register = () => {
           </Typography>
           <form>
             <Grid maxWidth="sm" container spacing={4}>
-              <Grid size={6}>
+              <Grid size={{ lg: 6, md: 6, sm: 6, xs: 12 }}>
                 <CustomTextField
                   value={userInfo.firstName}
                   label="Įveskite savo vardą"
@@ -277,7 +305,7 @@ const Register = () => {
                   }
                 />
               </Grid>
-              <Grid size={6}>
+              <Grid size={{ lg: 6, md: 6, sm: 6, xs: 12 }}>
                 <CustomTextField
                   value={userInfo.lastName}
                   label="Įveskite savo pavardę"
@@ -297,6 +325,13 @@ const Register = () => {
                   setUserInfo({ ...userInfo, phoneNumber: phone })
                 }
               />
+              <Typography
+                sx={{ mt: -3, mr: "14px", ml: "14px" }}
+                color="error"
+                variant="caption"
+              >
+                {phoneErrorMessage}
+              </Typography>
               <Grid size={12}>
                 <FormControl>
                   <FormLabel>Lytis</FormLabel>
@@ -319,7 +354,7 @@ const Register = () => {
                   </RadioGroup>
                 </FormControl>
               </Grid>
-              <Grid size={4}>
+              <Grid size={{ lg: 4, md: 4, sm: 4, xs: 12 }}>
                 <CustomFormControl
                   inputLabel="Statusas"
                   name="userStatus"
@@ -328,7 +363,7 @@ const Register = () => {
                   items={statusList}
                 />
               </Grid>
-              <Grid size={4}>
+              <Grid size={{ lg: 4, md: 4, sm: 4, xs: 12 }}>
                 <CustomFormControl
                   inputLabel="Fakultetas"
                   name="faculty"
@@ -338,7 +373,7 @@ const Register = () => {
                   disabled={!isStudent}
                 />
               </Grid>
-              <Grid size={4}>
+              <Grid size={{ lg: 4, md: 4, sm: 4, xs: 12 }}>
                 <CustomFormControl
                   inputLabel="Grupė"
                   name="userGroup"
@@ -348,29 +383,58 @@ const Register = () => {
                   disabled={!isStudent}
                 />
               </Grid>
-              <CustomTextField
-                value={userInfo.email}
-                label="Įveskite savo el. pašto adresą"
-                type="email"
-                onChange={handleInput}
-                name="email"
-                isError={isInputError.email}
-                helperText={isInputError.email && inputErrorMessage.email}
-              />
-              <Grid size={6}>
+              <Grid size={12}>
                 <CustomTextField
-                  value={userInfo.password}
-                  label="Įveskite slaptažodį"
-                  type="password"
+                  value={userInfo.email}
+                  label="Įveskite savo el. pašto adresą"
+                  type="email"
                   onChange={handleInput}
-                  name="password"
-                  isError={isInputError.password}
-                  helperText={
-                    isInputError.password && inputErrorMessage.password
-                  }
+                  name="email"
+                  isError={isInputError.email}
+                  helperText={isInputError.email && inputErrorMessage.email}
                 />
               </Grid>
-              <Grid size={6}>
+              <Grid size={{ md: 6, sm: 6, xs: 12 }}>
+                <Stack spacing={0.5}>
+                  <CustomTextField
+                    value={userInfo.password}
+                    label="Įveskite slaptažodį"
+                    type="password"
+                    onChange={(event) => {
+                      handleInput(event);
+                      setValue(event.target.value);
+                    }}
+                    name="password"
+                    isError={isInputError.password}
+                    helperText={
+                      isInputError.password && inputErrorMessage.password
+                    }
+                  />
+                  <LinearProgress
+                    variant="determinate"
+                    value={Math.min((value.length * 100) / minLength, 100)}
+                    sx={{
+                      bgcolor: "background.default",
+                      "& .MuiLinearProgress-bar": {
+                        bgcolor: `hsl(${Math.min(value.length * 10, 120)}, 80%, 40%)`,
+                      },
+                    }}
+                  />
+                  <Typography
+                    variant="subtitle1"
+                    align="right"
+                    sx={{
+                      color: `hsl(${Math.min(value.length * 10, 120)}, 80%, 60%)`,
+                    }}
+                  >
+                    {value.length < 3 && "Labai silpnas"}
+                    {value.length >= 3 && value.length < 6 && "Silpnas"}
+                    {value.length >= 6 && value.length < 10 && "Stiprus"}
+                    {value.length >= 10 && "Labai stiprus"}
+                  </Typography>
+                </Stack>
+              </Grid>
+              <Grid size={{ md: 6, sm: 6, xs: 12 }}>
                 <CustomTextField
                   value={userInfo.confirmPassword}
                   label="Patvirtinkite slaptažodį"
@@ -384,7 +448,14 @@ const Register = () => {
                   }
                 />
               </Grid>
+              <ReCAPTCHA
+                sitekey={key}
+                onChange={() => {
+                  setIsCaptchaChecked(true);
+                }}
+              />
               <SuccessButton
+                isDisabled={!isCaptchaChecked}
                 label="Užsiregistruoti"
                 onClick={registerUser}
                 isFullWidth

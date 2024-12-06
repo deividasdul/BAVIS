@@ -4,6 +4,7 @@ export default function SuccessButton({
   onClick,
   label,
   isFullWidth = false,
+  isDisabled = false,
   sx,
 }) {
   return (
@@ -11,6 +12,7 @@ export default function SuccessButton({
       sx={{ p: sx && 2 }}
       size="large"
       variant="contained"
+      disabled={isDisabled}
       fullWidth={isFullWidth}
       color="success"
       onClick={() => {

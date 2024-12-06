@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Alert, Collapse, Typography, Divider } from "@mui/material";
+import { Alert, Collapse, Typography } from "@mui/material";
 import { useContext } from "react";
 import { NotificationsContext } from "../context/NotificationsContext";
 
@@ -10,10 +10,9 @@ export const NotificationBar = () => {
 
   return notifications.map((notification) => {
     return (
-      <Collapse in={isOpen}>
+      <Collapse key={notification.id} in={isOpen}>
         <Alert
           sx={{ borderRadius: 0, border: 1, overflow: "hidden" }}
-          key={notification.id}
           severity="warning"
           onClose={() => {
             setIsOpen(false);

@@ -11,16 +11,23 @@ import {
   Paper,
   Button,
   Avatar,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { styled } from "@mui/system";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 import PageBox from "../components/styles/PageBox";
 import CustomTextField from "../components/ui/CustomTextField";
 import SuccessButton from "../components/ui/SuccessButton";
+import CloseButton from "../components/ui/CloseButton";
 import PhoneInputField from "../components/ui/PhoneInput";
 import { setError, clearError } from "../utils/formValidation";
 
@@ -41,6 +48,14 @@ const VisuallyHiddenInput = styled("input")({
 });
 
 const Profile = () => {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleConfirm = () => {
+    setConfirmOpen(!confirmOpen);
+  };
+
   const {
     patchUser,
     fetchContact,
@@ -51,9 +66,10 @@ const Profile = () => {
     uploadAvatar,
     avatarUrl,
     setAvatarUrl,
+    deleteUser,
   } = useContext(UsersContext);
 
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { interests } = useContext(InterestsContext);
 
   const [isInputError, setIsInputError] = useState({
@@ -216,8 +232,7 @@ const Profile = () => {
                 />
               </Button>
             </Grid>
-
-            <Grid size={6}>
+            <Grid size={{ lg: 6, md: 6, sm: 6, xs: 12 }}>
               <CustomTextField
                 value={contact.first_name || ""}
                 label="Vardas"
@@ -225,7 +240,7 @@ const Profile = () => {
                 isDisabled={true}
               />
             </Grid>
-            <Grid size={6}>
+            <Grid size={{ lg: 6, md: 6, sm: 6, xs: 12 }}>
               <CustomTextField
                 value={contact.last_name || ""}
                 label="Pavardė"
@@ -285,18 +300,20 @@ const Profile = () => {
                 setContactInput({ ...contactInput, phoneNumber: phone })
               }
             />
-            <CustomTextField
-              value={contactInput.oldPassword}
-              label="Senas slaptažodis"
-              type="password"
-              onChange={handleChange}
-              name="oldPassword"
-              isError={isInputError.oldPassword}
-              helperText={
-                isInputError.oldPassword && inputErrorMessage.oldPassword
-              }
-            />
-            <Grid size={6}>
+            <Grid size={12}>
+              <CustomTextField
+                value={contactInput.oldPassword}
+                label="Senas slaptažodis"
+                type="password"
+                onChange={handleChange}
+                name="oldPassword"
+                isError={isInputError.oldPassword}
+                helperText={
+                  isInputError.oldPassword && inputErrorMessage.oldPassword
+                }
+              />
+            </Grid>
+            <Grid size={{ lg: 6, md: 6, sm: 6, xs: 12 }}>
               <CustomTextField
                 value={contactInput.newPassword}
                 label="Naujas slaptažodis"
@@ -309,7 +326,7 @@ const Profile = () => {
                 }
               />
             </Grid>
-            <Grid size={6}>
+            <Grid size={{ lg: 6, md: 6, sm: 6, xs: 12 }}>
               <CustomTextField
                 value={contactInput.confirmNewPassword}
                 label="Pakartoti naują slaptažodį"
@@ -323,21 +340,21 @@ const Profile = () => {
                 }
               />
             </Grid>
-            <Grid size={4}>
+            <Grid size={{ lg: 4, md: 4, sm: 4, xs: 12 }}>
               <CustomTextField
                 value={contact.status || ""}
                 label="Statusas"
                 isDisabled={true}
               />
             </Grid>
-            <Grid size={4}>
+            <Grid size={{ lg: 4, md: 4, sm: 4, xs: 12 }}>
               <CustomTextField
                 value={contact.faculty || ""}
                 label="Fakultetas"
                 isDisabled={true}
               />
             </Grid>
-            <Grid size={4}>
+            <Grid size={{ lg: 4, md: 4, sm: 4, xs: 12 }}>
               <CustomTextField
                 value={contact.group || ""}
                 label="Grupė"
@@ -356,7 +373,46 @@ const Profile = () => {
               isFullWidth={true}
               sx
             />
+            <CloseButton
+              label={"Ištrinti paskyrą"}
+              onClick={() => {
+                handleConfirm();
+              }}
+              isFullWidth={true}
+            />
           </Grid>
+          <Dialog open={confirmOpen} onClose={handleConfirm}>
+            <DialogTitle id="alert-dialog-title">
+              {"Ištrinti šią paskyrą?"}
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Teisė būti pamirštam - tai teisė tam tikromis aplinkybėmis
+                pašalinti privačią informaciją apie asmenį iš interneto paieškos
+                ir kitų katalogų. Ši teisė suteikia asmeniui teisę reikalauti,
+                kad duomenys apie jį būtų ištrinti taip, kad jų nebegalėtų rasti
+                tretieji asmenys, ypač per paieškos sistemas. Paspaudus, paskyra
+                bus ištrinta iš sistemos.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleConfirm}>Atšaukti</Button>
+              <Button
+                variant="contained"
+                color="error"
+                disableElevation
+                onClick={() => {
+                  deleteUser(user.id);
+                  handleConfirm();
+                  logout();
+                  navigate("/");
+                }}
+                autoFocus
+              >
+                Patvirtinti
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Paper>
       </PageBox>
     </ProtectedRoute>

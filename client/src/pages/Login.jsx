@@ -21,10 +21,27 @@ import CustomTextField from "../components/ui/CustomTextField";
 import { useAuth } from "../context/AuthContext";
 import { validateEmail, validateField } from "../utils/formValidation";
 
+import SnackbarResponse from "../components/ui/SnackbarResponse";
+
 import axios from "axios";
 
 const Login = () => {
   const navigate = useNavigate();
+
+  const [isRecoveryError, setIsRecoveryError] = useState(null);
+  const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
+
+  const handleSnackbar = () => {
+    setIsSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setIsSnackbarOpen(false);
+  };
 
   const { login } = useAuth();
 
@@ -86,12 +103,18 @@ const Login = () => {
 
       setTimeout(() => {
         setIsSending(false);
-      }, 5000);
+      }, 1000);
 
+      setIsRecoveryError(false);
+      handleSnackbar();
       handleClearError("forgotPasswordEmailInput");
       handleDialog();
     } catch (e) {
-      setIsSending(false);
+      setIsRecoveryError(true);
+      handleSnackbar();
+      setTimeout(() => {
+        setIsSending(false);
+      }, 1000);
       handleSetError(
         "forgotPasswordEmailInput",
         "Šis el. paštas mūsų sistemoje neegzistuoja"
@@ -141,7 +164,10 @@ const Login = () => {
       if (result.user.role === "User") navigate("/profile");
       else navigate("/dashboard");
     } catch (e) {
-      setIsLoading(false);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
+
       handleSetError(
         "emailInput",
         "Neteisingas el. pašto adresas ir (arba) slaptažodis"
@@ -263,6 +289,22 @@ const Login = () => {
           )}
         </DialogActions>
       </Dialog>
+
+      {!isRecoveryError ? (
+        <SnackbarResponse
+          isOpen={isSnackbarOpen}
+          close={handleSnackbarClose}
+          severity={"success"}
+          message={"Prašymas pakeisti slaptažodį buvo išsiųstas el. paštu"}
+        />
+      ) : (
+        <SnackbarResponse
+          isOpen={isSnackbarOpen}
+          close={handleSnackbarClose}
+          severity={"error"}
+          message={"Nepavyko išsiųsti užklausos pakeisti slaptažodį"}
+        />
+      )}
     </>
   );
 };

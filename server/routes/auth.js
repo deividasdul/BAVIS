@@ -171,7 +171,7 @@ router.get("/reset-password/:id/:token", async (req, res) => {
       const verify = jwt.verify(token, secret);
       res.render("index.ejs");
     } catch (e) {
-      res.send("Not verified");
+      res.send("Neteisėta prieiga!");
       console.error(e);
     }
   } catch (e) {
@@ -187,10 +187,10 @@ router.post("/reset-password/:id/:token", async (req, res) => {
     return res.status(400).json({ message: "Passwords do not match" });
   }
 
-  if (password.length <= 8 || confirmPassword.length <= 8) {
-    return res
-      .status(400)
-      .json({ message: "Password length must be greater than 8" });
+  if (password.length < 12 || confirmPassword.length < 8) {
+    return res.status(400).json({
+      message: "Slaptažodžio ilgis turi būti didesnis nei 12 simbolių",
+    });
   }
 
   try {

@@ -9,7 +9,7 @@
       * {
         padding: 0;
         box-sizing: border-box;
-        font-size: 14px;
+        font-size: 28px;
         font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
           Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
           sans-serif;
@@ -28,6 +28,9 @@
         margin: auto;
         padding: 8px;
         width: 100%;
+        background-color: greenyellow;
+        border: none;
+        cursor: pointer;
       }
 
       label {
@@ -37,29 +40,44 @@
       input {
         padding: 4px;
         margin: 8px;
+        width: 100%;
+      }
+
+      div {
+        background-color: hsl(0, 0%, 80%);
+        padding: 10%;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
       }
     </style>
   </head>
 
   <body>
-    <form id="resetForm">
-      <label for="password">Slaptažodis</label>
-      <input
-        type="password"
-        placeholder="Įveskite slaptažodį"
-        name="password"
-        id="password"
-      />
-      <br />
-      <label for="confirmPassword">Patvirtinkite slaptažodį</label>
-      <input
-        placeholder="Pakartokite slaptažodį"
-        type="password"
-        name="confirmPassword"
-        id="confirmPassword"
-      />
-      <button type="submit">Atkurti</button>
-    </form>
+    <div>
+      <form id="resetForm">
+        <label for="password">Slaptažodis:</label>
+        <input
+          type="password"
+          placeholder="Įveskite slaptažodį"
+          name="password"
+          id="password"
+        />
+        <br />
+        <label for="confirmPassword">Patvirtinkite slaptažodį:</label>
+        <input
+          placeholder="Pakartokite slaptažodį"
+          type="password"
+          name="confirmPassword"
+          id="confirmPassword"
+        />
+        <button type="submit">ATKURTI</button>
+      </form>
+    </div>
 
     <script>
       document
@@ -72,10 +90,22 @@
             document.getElementById("confirmPassword").value;
 
           if (password !== confirmPassword) {
-            alert("Passwords do not match");
+            alert("Slaptažodžiai nesutampa");
             return;
           }
 
+          const passwordRegex =
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&_])[A-Za-z\d$@$!%*?&_]{12,36}$/;
+
+          if (
+            !passwordRegex.test(password) ||
+            !passwordRegex.test(confirmPassword)
+          ) {
+            alert(
+              "Slaptažodyje turi būti: bent 1 didžioji, 1 mažoji raidė, 1 simbolis ir 1 skaičius"
+            );
+            return;
+          }
           try {
             const response = await fetch(window.location.href, {
               method: "POST",

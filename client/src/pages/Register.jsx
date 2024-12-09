@@ -22,7 +22,6 @@ import PageBox from "../components/styles/PageBox";
 import PhoneInputField from "../components/ui/PhoneInput";
 import CustomTextField from "../components/ui/CustomTextField";
 import SuccessButton from "../components/ui/SuccessButton";
-import { ModeContext } from "../context/ModeContext";
 import {
   validateEmail,
   validateField,
@@ -30,6 +29,7 @@ import {
   validatePassword,
   validatePhone,
 } from "../utils/formValidation";
+import SnackbarResponse from "../components/ui/SnackbarResponse";
 
 const groupList = ["AKRV", "ERP", "VAK", "IPU", "KT", "PS"];
 const statusList = ["Studentas", "Dėstytojas", "Svečias"];
@@ -43,6 +43,21 @@ const facultyList = [
 
 const Register = () => {
   const navigate = useNavigate();
+
+  const [isRegisterError, setIsRegisterError] = useState(null);
+  const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
+
+  const handleSnackbar = () => {
+    setIsSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setIsSnackbarOpen(false);
+  };
 
   // Password
   const [value, setValue] = React.useState("");
@@ -233,6 +248,8 @@ const Register = () => {
         const response = await insertUser();
         if (response.message === "Email address is already in use") {
           setError("email", "El. pašto adresas jau naudojamas");
+          setIsRegisterError(true);
+          handleSnackbar();
           return;
         } else if (response.message === "User registered successfully") {
           navigate("/login");
@@ -473,6 +490,14 @@ const Register = () => {
               </Grid>
             </Grid>
           </form>
+          {isRegisterError && (
+            <SnackbarResponse
+              isOpen={isSnackbarOpen}
+              close={handleSnackbarClose}
+              severity={"error"}
+              message={"Nesėkmingas bandymas užsiregistruoti"}
+            />
+          )}
         </Paper>
       </PageBox>
     </>

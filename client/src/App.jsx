@@ -19,6 +19,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import PrivacyPolicy from "./pages/PrivacyPolicy.jsx";
 import { HeaderProvider } from "./context/HeaderContext.jsx";
 import CookieConsent from "./components/CookieConsent.jsx";
+import PaymentHistory from "./pages/PaymentHistory.jsx";
 
 import { useCookies } from "react-cookie";
 
@@ -54,6 +55,7 @@ const App = () => {
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/payment-history" element={<PaymentHistory />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Footer />

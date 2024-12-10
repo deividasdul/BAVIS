@@ -78,4 +78,34 @@ const reserve = async (req, res) => {
   }
 };
 
-export { reserve };
+const stay = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query(
+      `SELECT 
+      payment_history.id,
+      contact.first_name, 
+      contact.last_name, 
+      dormitory.address,
+      room.number, 
+      TO_CHAR(stay.actual_arrival_date, 'YYYY-MM-DD') AS actual_arrival_date,
+      TO_CHAR(stay.actual_departure_date, 'YYYY-MM-DD') AS actual_departure_date,
+      payment_history.paid,
+      payment_history.amount, 
+      TO_CHAR(payment_history.payment_date, 'YYYY-MM-DD') AS payment_date
+      FROM stay
+      INNER JOIN contact ON stay.user_id = contact.id
+      INNER JOIN room ON stay.room_id = room.id
+      INNER JOIN dormitory ON room.dormitory_id = dormitory.id
+      LEFT JOIN payment_history ON stay.id = payment_history.stay_id
+      WHERE stay.user_id = $1`,
+      [id]
+    );
+    res.status(200).json(result.rows);
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+export { reserve, stay };

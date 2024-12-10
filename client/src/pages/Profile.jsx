@@ -21,6 +21,7 @@ import Grid from "@mui/material/Grid2";
 import { styled } from "@mui/system";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import SnackbarResponse from "../components/ui/SnackbarResponse";
 
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
@@ -34,6 +35,12 @@ import { setError, clearError } from "../utils/formValidation";
 import { UsersContext } from "../context/UsersContext";
 import { InterestsContext } from "../context/InterestsContext";
 import ProtectedRoute from "../components/ProtectedRoute";
+
+import {
+  validateField,
+  validatePassword,
+  validatePhone,
+} from "../utils/formValidation";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -49,6 +56,21 @@ const VisuallyHiddenInput = styled("input")({
 
 const Profile = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const [isUpdateError, setIsUpdateError] = useState(null);
+  const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
+
+  const handleSnackbar = () => {
+    setIsSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setIsSnackbarOpen(false);
+  };
 
   const navigate = useNavigate();
 
@@ -97,29 +119,29 @@ const Profile = () => {
 
     const { newPassword, confirmNewPassword } = contactInput;
 
-    if (newPassword.length <= 0) {
+    if (validateField(newPassword.length)) {
       handleSetError("newPassword", "Slaptažodžio laukas negali būti tuščias");
       isError = true;
-    } else if (newPassword.length <= 8) {
+    } else if (!validatePassword(newPassword.length)) {
       handleSetError(
         "newPassword",
-        "Slaptažodis turi būti ilgesnis nei 8 simboliai"
+        "Slaptažodyje turi būti: bent 1 didžioji, 1 mažoji raidė, 1 simbolis ir 1 skaičius"
       );
       isError = true;
     } else {
       handleClearError("newPassword");
     }
 
-    if (confirmNewPassword.length <= 0) {
+    if (validateField(confirmNewPassword.length)) {
       handleSetError(
         "confirmNewPassword",
         "Slaptažodžio laukas negali būti tuščias"
       );
       isError = true;
-    } else if (confirmNewPassword.length <= 8) {
+    } else if (!validatePassword(confirmNewPassword.length)) {
       handleSetError(
         "confirmNewPassword",
-        "Slaptažodis turi būti ilgesnis nei 8 simboliai"
+        "Slaptažodyje turi būti: bent 1 didžioji, 1 mažoji raidė, 1 simbolis ir 1 skaičius"
       );
       isError = true;
     } else {
@@ -367,7 +389,14 @@ const Profile = () => {
                   { ...contactInput, interests: selectedInterestIds },
                   user["id"]
                 );
-                if (contactInput.oldPassword.length > 0) updatePassword(e);
+                setIsUpdateError(false);
+                handleSnackbar();
+                if (contactInput.oldPassword.length > 0) {
+                  updatePassword(e);
+                } else {
+                  handleClearError("newPassword");
+                  handleClearError("confirmNewPassword");
+                }
               }}
               label="Atnaujinti"
               isFullWidth={true}
@@ -414,6 +443,21 @@ const Profile = () => {
             </DialogActions>
           </Dialog>
         </Paper>
+        {!isUpdateError ? (
+          <SnackbarResponse
+            isOpen={isSnackbarOpen}
+            close={handleSnackbarClose}
+            severity={"success"}
+            message={"Sėkmingai atnaujintas profilis"}
+          />
+        ) : (
+          <SnackbarResponse
+            isOpen={isSnackbarOpen}
+            close={handleSnackbarClose}
+            severity={"error"}
+            message={"Nesėkmingas bandymas atnaujinti profilį"}
+          />
+        )}
       </PageBox>
     </ProtectedRoute>
   );

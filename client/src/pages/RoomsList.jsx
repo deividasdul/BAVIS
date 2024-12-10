@@ -35,8 +35,25 @@ import SuccessButton from "../components/ui/SuccessButton";
 import CloseButton from "../components/ui/CloseButton";
 import CustomTextField from "../components/ui/CustomTextField";
 
+import SnackbarResponse from "../components/ui/SnackbarResponse";
+
 function RoomsList() {
   const { user } = useAuth();
+
+  const [isUpdateError, setIsUpdateError] = useState(null);
+  const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
+
+  const handleSnackbar = () => {
+    setIsSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setIsSnackbarOpen(false);
+  };
 
   dayjs.extend(utc);
 
@@ -178,6 +195,7 @@ function RoomsList() {
         "http://localhost:3000/api/v1/reservation",
         data
       );
+      handleSnackbar();
       handleRequest();
     } catch (e) {
       setHasReserved(true);
@@ -381,6 +399,12 @@ function RoomsList() {
           />
         </DialogActions>
       </Dialog>
+      <SnackbarResponse
+        isOpen={isSnackbarOpen}
+        close={handleSnackbarClose}
+        severity={"success"}
+        message={"Prašymas išnuomoti bendrabučio kambarį buvo sėkmingas"}
+      />
     </ProtectedRoute>
   );
 }

@@ -151,7 +151,7 @@ const Dorms = () => {
                       variant="contained"
                       startIcon={<RemoveRedEyeIcon />}
                     >
-                      peržiūrėti kambarius
+                      Peržiūrėti kambarius
                     </Button>
                     <IconButton
                       onClick={() => {
@@ -164,6 +164,7 @@ const Dorms = () => {
                       <EditIcon fontSize="large" />
                     </IconButton>
                     <IconButton
+                      disabled={dorm.room_count > 0 ? true : false}
                       onClick={() => {
                         setDormId(dorm.id);
                         handleConfirm();
@@ -208,8 +209,9 @@ const Dorms = () => {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
+              p: 10,
             }}
-            size={3}
+            size={{ lg: 4, md: 6, sm: 12, xs: 12 }}
           >
             <Button
               variant="contained"

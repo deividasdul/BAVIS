@@ -27,11 +27,12 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { styled } from "@mui/system";
 
 import { RoomsContext } from "../context/RoomsContext.jsx";
-import ProtectedRoute from "../components/ProtectedRoute.jsx";
 import SuccessButton from "../components/ui/SuccessButton.jsx";
 import CloseButton from "../components/ui/CloseButton.jsx";
 import CustomTextField from "../components/ui/CustomTextField.jsx";
 import { ProtectedRouteAdmin } from "../components/ProtectedRouteAdmin.jsx";
+
+import CloseIcon from "@mui/icons-material/Close";
 
 import { useTheme } from "@emotion/react";
 
@@ -364,6 +365,7 @@ function Rooms() {
                       <EditIcon fontSize="large" />
                     </IconButton>
                     <IconButton
+                      disabled={room.tenants.length > 1 ? true : false}
                       onClick={() => {
                         setRoomId(room.id);
                         handleConfirm();
@@ -382,8 +384,9 @@ function Rooms() {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
+              p: 10,
             }}
-            size={3}
+            size={{ lg: 4, md: 6, sm: 12, xs: 12 }}
           >
             <Button
               variant="contained"
@@ -548,11 +551,15 @@ function Rooms() {
         </Dialog>
 
         <Dialog fullScreen open={viewOpen} onClose={handleView}>
-          <DialogTitle>Kambaryje esantys žmonės</DialogTitle>
+          <DialogActions>
+            <IconButton onClick={handleView} size="large">
+              <CloseIcon fontSize="large" color="warning" />
+            </IconButton>
+          </DialogActions>
           <DialogContent>
             <DialogContentText>
               {viewOpen ? (
-                tenants.length > 0 ? (
+                tenants.length > 1 ? (
                   tenants.map((tenant, index) => {
                     return (
                       <div key={index}>
@@ -591,14 +598,11 @@ function Rooms() {
                     );
                   })
                 ) : (
-                  <div>Nėra žmonių kambaryje</div>
+                  <div>Šiuo metu šį kambarį nuomojančių žmonių nėra</div>
                 )
               ) : null}
             </DialogContentText>
           </DialogContent>
-          <DialogActions>
-            <CloseButton label="Uždaryti" onClick={handleView} />
-          </DialogActions>
         </Dialog>
       </RoomsBox>
     </ProtectedRouteAdmin>

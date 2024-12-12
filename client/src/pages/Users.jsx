@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Paper,
   Box,
@@ -9,13 +9,18 @@ import {
   DialogActions,
   DialogContentText,
   Button,
+  Alert,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
-import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 import { styled } from "@mui/system";
 import Grid from "@mui/material/Grid2";
 
+import PersonIcon from "@mui/icons-material/Person";
+
+import { validateField, validateName } from "../utils/formValidation";
+
+import PersonOffIcon from "@mui/icons-material/PersonOff";
 import { UsersContext } from "../context/UsersContext";
 import { ProtectedRouteAdmin } from "../components/ProtectedRouteAdmin";
 import CustomTextField from "../components/ui/CustomTextField";
@@ -23,9 +28,8 @@ import SuccessButton from "../components/ui/SuccessButton";
 import CloseButton from "../components/ui/CloseButton";
 
 function Users() {
-  const { users, putUser, deleteUser } = useContext(UsersContext);
-
-  const [isPageLoading, setIsPageLoading] = useState(true);
+  const { users, putUser, deactivateUser, activateUser } =
+    useContext(UsersContext);
 
   const [userId, setUserId] = useState(0);
   const [isConfirmRequired, setConfirmedRequired] = useState(false);
@@ -71,15 +75,21 @@ function Users() {
   const editUser = ({ firstName, lastName }, userId) => {
     var isError = false;
 
-    if (firstName.length <= 0) {
+    if (validateField(firstName)) {
       setError("firstName", "Vardo laukas negali būti tuščias");
+      isError = true;
+    } else if (!validateName(firstName)) {
+      setError("firstName", "Vardo lauke turi būti tik raidės");
       isError = true;
     } else {
       clearError("firstName");
     }
 
-    if (lastName.length <= 0) {
+    if (validateField(lastName)) {
       setError("lastName", "Pavardės laukas negali būti tuščias");
+      isError = true;
+    } else if (!validateName(lastName)) {
+      setError("lastName", "Pavardės lauke turi būti tik raidės");
       isError = true;
     } else {
       clearError("lastName");
@@ -87,7 +97,19 @@ function Users() {
 
     if (isError) return;
 
-    putUser(input, userId);
+    const fixedFirstName =
+      input.firstName.slice(0, 1).toUpperCase() +
+      input.firstName.slice(1, input.firstName.length).toLowerCase();
+    const fixedLastName =
+      input.lastName.slice(0, 1).toUpperCase() +
+      input.lastName.slice(1, input.lastName.length).toLowerCase();
+
+    const fixedInput = {
+      firstName: fixedFirstName,
+      lastName: fixedLastName,
+    };
+
+    putUser(fixedInput, userId);
 
     handleEditClose();
   };
@@ -150,10 +172,24 @@ function Users() {
         `${row.first_name || ""} ${row.last_name || ""}`,
     },
     {
+      field: "status",
+      headerName: "Statusas",
+      width: 200,
+      editable: false,
+
+      renderCell: ({ row }) => {
+        return (
+          <Alert severity={row.status == "Active" ? "success" : "error"}>
+            {row.status == "Active" ? "Aktyvus" : "Neaktyvus"}
+          </Alert>
+        );
+      },
+    },
+    {
       field: "action",
       headerName: "Veiksmai",
       sortable: false,
-      width: 150,
+      width: 200,
       disableClickEventBubling: true,
 
       renderCell: ({ row }) => {
@@ -170,12 +206,23 @@ function Users() {
               icon={<EditIcon fontSize="large" />}
             />
             <ActionButton
+              disabled={
+                row.role == "Admin" || row.status == "Inactive" ? true : false
+              }
               onClick={() => {
                 setUserId(row.id);
                 handleConfirm();
               }}
               color="error"
-              icon={<PersonRemoveIcon fontSize="large" />}
+              icon={<PersonOffIcon fontSize="large" />}
+            />
+            <ActionButton
+              disabled={row.status != "Inactive" ? true : false}
+              onClick={() => {
+                activateUser(row.id);
+              }}
+              color="success"
+              icon={<PersonIcon fontSize="large" />}
             />
           </>
         );
@@ -186,7 +233,7 @@ function Users() {
   return (
     <ProtectedRouteAdmin>
       <UsersBox>
-        <Paper elevation={24}>
+        <Paper elevation={12}>
           <DataGrid
             density="comfortable"
             autoHeight={true}
@@ -200,23 +247,13 @@ function Users() {
               },
             }}
             pageSizeOptions={[10]}
-            checkboxSelection
-            disableRowSelectionOnClick
-            disableColumnFilter
           />
         </Paper>
-        <Dialog
-          open={isConfirmRequired}
-          onClose={handleConfirm}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle id="alert-dialog-title">
-            {"Ištrinti šį vartotoją?"}
-          </DialogTitle>
+        <Dialog open={isConfirmRequired} onClose={handleConfirm}>
+          <DialogTitle>{"Deaktyvuoti šį naudotoją?"}</DialogTitle>
           <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              Paspaudus, pasirinktas vartotojas bus ištrintas iš sistemos.
+            <DialogContentText>
+              Paspaudus, naudotojo paskyra sistemoje bus deaktyvuota
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -226,7 +263,7 @@ function Users() {
               color="error"
               disableElevation
               onClick={() => {
-                deleteUser(userId);
+                deactivateUser(userId);
                 handleConfirm();
               }}
               autoFocus
@@ -278,9 +315,9 @@ function Users() {
   );
 }
 
-const ActionButton = ({ icon, color, onClick }) => {
+const ActionButton = ({ icon, color, onClick, disabled = false }) => {
   return (
-    <IconButton onClick={onClick} color={color}>
+    <IconButton disabled={disabled} onClick={onClick} color={color}>
       {icon}
     </IconButton>
   );
@@ -290,6 +327,7 @@ const UsersBox = styled(Box)(({ theme }) => ({
   minHeight: "100vh",
   backgroundColor: theme.palette.background.default,
   color: theme.palette.text.primary,
+  padding: 10,
 }));
 
 export default Users;

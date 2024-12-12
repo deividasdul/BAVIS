@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 const getUsers = async (_, res) => {
   try {
     const result = await pool.query(`SELECT 
-          "user".id, "user".email, "user".role, contact.first_name, contact.last_name
+          "user".id, "user".email, "user".role, "user".status, contact.first_name, contact.last_name
           FROM "user"
           LEFT JOIN contact ON "user".id = contact.id
           ORDER BY "user".id ASC
@@ -27,7 +27,6 @@ const deleteUser = async (req, res) => {
       [id]
     );
 
-    // Destroy the session on the server side (if you're using express-session)
     if (req.session) {
       req.session.destroy((err) => {
         if (err) {
@@ -36,9 +35,40 @@ const deleteUser = async (req, res) => {
       });
     }
 
-    // Clear the connect.sid cookie
     res.clearCookie("connect.sid", { path: "/" });
     res.status(200).json(result.data);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const deactivateUser = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+    await pool.query(
+      'UPDATE "user" SET status = $1 WHERE id = $2 RETURNING *',
+      [status, id]
+    );
+    res.status(200).json({ message: "User deactivated" });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const activateUser = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+    await pool.query(
+      'UPDATE "user" SET status = $1 WHERE id = $2 RETURNING *',
+      [status, id]
+    );
+    res.status(200).json({ message: "User activated" });
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: "Internal server error" });
@@ -201,4 +231,6 @@ export {
   patchUser,
   getUserInterests,
   changePassword,
+  deactivateUser,
+  activateUser,
 };

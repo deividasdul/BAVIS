@@ -116,6 +116,38 @@ export const UsersProvider = ({ children }) => {
     }
   };
 
+  const deactivateUser = async (id) => {
+    const data = {
+      status: "Inactive",
+    };
+
+    try {
+      await axios.patch(
+        `http://localhost:3000/api/v1/users/deactivate/${id}`,
+        data
+      );
+      fetchUsers();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const activateUser = async (id) => {
+    const data = {
+      status: "Active",
+    };
+
+    try {
+      await axios.patch(
+        `http://localhost:3000/api/v1/users/activate/${id}`,
+        data
+      );
+      fetchUsers();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   useEffect(() => {
     fetchUsers();
     // fetchContact();
@@ -125,6 +157,8 @@ export const UsersProvider = ({ children }) => {
     <UsersContext.Provider
       value={{
         users,
+        deactivateUser,
+        activateUser,
         putUser,
         deleteUser,
         isLoading,

@@ -7,29 +7,43 @@ import {
   AccordionSummary,
   AccordionDetails,
   AccordionActions,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
   Stack,
+  Typography,
+  Badge,
+  IconButton,
+  TextField,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import SuccessButton from "../components/ui/SuccessButton";
-import CloseButton from "../components/ui/CloseButton";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { NotificationsContext } from "../context/NotificationsContext";
 import { ProtectedRouteAdmin } from "../components/ProtectedRouteAdmin";
+import MailIcon from "@mui/icons-material/Mail";
+import WarningIcon from "@mui/icons-material/Warning";
+import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
+import { validateField } from "../utils/formValidation";
+import EditNotificationsIcon from "@mui/icons-material/EditNotifications";
+import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
+import DialogBox from "../components/ui/DialogBox";
 
 const Notifications = () => {
   const [addOpen, setAddOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+
+  const [id, setId] = useState(null);
   const [message, setMessage] = useState("");
 
-  const { notifications, changeStatus, addNotification } =
+  const handleEdit = () => {
+    setEditOpen(!editOpen);
+  };
+
+  const { notifications, patchNotification, changeStatus, addNotification } =
     useContext(NotificationsContext);
 
   const handleAdd = () => {
     setMessage("");
+    setIsAddError(false);
+    setAddErrorMessage("");
     setAddOpen(!addOpen);
   };
 
@@ -37,95 +51,218 @@ const Notifications = () => {
     const { value } = e.target;
 
     setMessage(value);
+    setMessageLength(value.length);
+  };
+
+  const [isAddError, setIsAddError] = useState(false);
+  const [addErrorMessage, setAddErrorMessage] = useState("");
+  const [messageLength, setMessageLength] = useState(0);
+
+  const [isEditError, setIssEditError] = useState(false);
+  const [editErrorMessage, setEditErrorMessage] = useState("");
+
+  const validateInput = () => {
+    var isError = false;
+
+    if (validateField(message)) {
+      setIsAddError(true);
+      setAddErrorMessage("Pranešimo laukas negali būti tuščias");
+      isError = true;
+    }
+
+    if (messageLength > 255) {
+      isError = true;
+    }
+
+    if (isError) return;
+
+    addNotification(message);
+    handleAdd();
+  };
+
+  const validateEdit = () => {
+    var isError = false;
+
+    if (validateField(message)) {
+      setIsEditError(true);
+      setEditErrorMessage("Pranešimo laukas negali būti tuščias");
+      isError = true;
+    }
+
+    if (messageLength > 255) {
+      isError = true;
+    }
+
+    if (isError) return;
+
+    patchNotification(message, id);
+    handleEdit();
   };
 
   return (
     <ProtectedRouteAdmin>
       <NotificationBox>
-        <Divider>Rezervacijos</Divider>
-        <Divider sx={{ m: 2 }}>Vartotojo pranešimai</Divider>
-        <Divider sx={{ m: 2 }}>Sistemos pranešimai</Divider>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Stack
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-            direction={"column"}
-          >
-            {notifications.map((notification, index) => {
-              return (
-                <Accordion
-                  sx={{ minWidth: "50%", maxWidth: "50%" }}
-                  key={notification.id}
-                  {...(index === 0 && { defaultExpanded: true })}
-                >
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    {index + 1}. Pranešimas
-                  </AccordionSummary>
-                  <AccordionDetails sx={{ wordBreak: "break-word" }}>
-                    {notification.message}
-                  </AccordionDetails>
-                  <AccordionActions>
-                    <CloseButton
-                      onClick={() => {
-                        changeStatus(notification.id);
-                      }}
-                      label={"Ištrinti"}
-                    />
-                  </AccordionActions>
-                </Accordion>
-              );
-            })}
-          </Stack>
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            m: 2,
-          }}
-        >
-          <SuccessButton label={"Naujas pranešimas"} onClick={handleAdd} />
-        </Box>
-        <Divider></Divider>
+        <Accordion sx={{ p: 2, minWidth: "100%", maxWidth: "100%" }}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="h4">
+              Rezervacijos{" "}
+              <Badge badgeContent={notifications.length} color="warning">
+                <MeetingRoomIcon fontSize="large" />
+              </Badge>{" "}
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={{ wordBreak: "break-word" }}>
+            Turinys
+          </AccordionDetails>
+          <AccordionActions></AccordionActions>
+        </Accordion>
+        <Divider />
+        <Accordion sx={{ p: 2, minWidth: "100%", maxWidth: "100%" }}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="h4">
+              Vartotojo pranešimai{" "}
+              <Badge badgeContent={notifications.length} color="success">
+                <MailIcon fontSize="large" />
+              </Badge>
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={{ wordBreak: "break-word" }}>
+            Turinys
+          </AccordionDetails>
+          <AccordionActions></AccordionActions>
+        </Accordion>
+        <Divider />
+
+        {/* System notifications */}
+        <Accordion sx={{ p: 2, width: "100%" }}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="h4">
+              Sistemos pranešimai{" "}
+              <Badge badgeContent={notifications.length} color="error">
+                <WarningIcon fontSize="large" />
+              </Badge>
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={{ wordBreak: "break-word" }}>
+            <Stack
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              direction={"column"}
+            >
+              {notifications.map((notification, index) => {
+                return (
+                  <Accordion
+                    sx={{ minWidth: "50%", maxWidth: "50%" }}
+                    key={notification.id}
+                  >
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      {index + 1}. Pranešimas
+                    </AccordionSummary>
+                    <AccordionDetails sx={{ wordBreak: "break-word" }}>
+                      {notification.message}
+                    </AccordionDetails>
+                    <AccordionActions>
+                      <IconButton
+                        onClick={() => {
+                          setMessage(notification.message);
+                          setId(notification.id);
+                          setMessageLength(notification.message.length);
+                          handleEdit();
+                        }}
+                        color="primary"
+                      >
+                        <EditNotificationsIcon fontSize="large" />
+                      </IconButton>
+
+                      <IconButton
+                        onClick={() => {
+                          changeStatus(notification.id);
+                        }}
+                        color="error"
+                      >
+                        <NotificationsOffIcon fontSize="large" />
+                      </IconButton>
+                    </AccordionActions>
+                  </Accordion>
+                );
+              })}
+            </Stack>
+          </AccordionDetails>
+          <AccordionActions>
+            <SuccessButton label={"Naujas pranešimas"} onClick={handleAdd} />
+          </AccordionActions>
+        </Accordion>
+        <Divider />
       </NotificationBox>
 
-      <Dialog fullWidth={true} open={addOpen} onClose={handleAdd}>
-        <DialogTitle>Naujas pranešimas</DialogTitle>
-        <DialogContent dividers={true}>
-          <TextField
-            value={message}
-            label="Įveskite pranešimą"
-            type="text"
-            onChange={handleChange}
-            name="message"
-            variant="outlined"
-            multiline
-            fullWidth
-            maxRows={6}
-            minRows={3}
-          ></TextField>
-        </DialogContent>
-        <DialogActions>
-          <CloseButton label="Uždaryti" onClick={handleAdd} />
-          <SuccessButton
-            label="Paskelbti"
-            onClick={() => {
-              addNotification(message);
-              handleAdd();
-            }}
-          />
-        </DialogActions>
-      </Dialog>
+      {/* New notification */}
+      <DialogBox
+        title={"Naujas pranešimas"}
+        open={addOpen}
+        onClose={handleAdd}
+        onClick={() => {
+          validateInput(addNotification, handleAdd);
+        }}
+      >
+        <TextField
+          value={message}
+          fullWidth
+          label={"Įveskite pranešimą"}
+          type={"text"}
+          onChange={handleChange}
+          name={"message"}
+          variant="outlined"
+          error={isAddError}
+          helperText={isAddError && addErrorMessage}
+          multiline
+          maxRows={3}
+          minRows={2}
+        ></TextField>
+        <Typography
+          sx={{
+            color: messageLength > 255 && "red",
+          }}
+          align="right"
+          variant="subtitle2"
+        >
+          {messageLength} / 255
+        </Typography>
+      </DialogBox>
+
+      {/* Edit notification */}
+      <DialogBox
+        title={"Pranešimo redagavimas"}
+        open={editOpen}
+        onClose={handleEdit}
+        onClick={validateEdit}
+      >
+        <TextField
+          value={message}
+          fullWidth
+          label={"Įveskite pranešimą"}
+          type={"text"}
+          onChange={handleChange}
+          name={"message"}
+          variant="outlined"
+          error={isEditError}
+          helperText={isEditError && editErrorMessage}
+          multiline
+          maxRows={3}
+          minRows={2}
+        ></TextField>
+        <Typography
+          sx={{
+            color: messageLength > 255 && "red",
+          }}
+          align="right"
+          variant="subtitle2"
+        >
+          {messageLength} / 255
+        </Typography>
+      </DialogBox>
     </ProtectedRouteAdmin>
   );
 };

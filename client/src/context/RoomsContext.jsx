@@ -46,6 +46,7 @@ export const RoomsProvider = ({ children }) => {
     };
     try {
       await axios.put(`${apiURL}/${roomId}`, data);
+      fetchRooms();
     } catch (e) {
       console.error(e);
     }

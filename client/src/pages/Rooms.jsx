@@ -314,8 +314,14 @@ function Rooms() {
                       }}
                       title={"Kambario nr. " + room.number}
                     />
+
+                    {/* TODO: FIX IMAGES */}
+                    <img
+                      style={{ width: "100%" }}
+                      src="https://img.freepik.com/premium-photo/living-room-interior-with-placeholder-poster-frame-rendered-d_872147-59904.jpg"
+                      alt=""
+                    />
                   </CardActionArea>
-                  <Divider />
                   <CardContent>
                     <Typography gutterBottom>Aukštas: {room.floor}</Typography>
                     <Typography gutterBottom>

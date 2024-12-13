@@ -19,6 +19,7 @@
     "@mui/x-date-pickers": "^7.19.0",
     "axios": "^1.7.7",
     "dayjs": "^1.11.13",
+    "google-maps-react-markers": "^2.0.11",
     "react": "^18.3.1",
     "react-cookie": "^7.2.1",
     "react-dom": "^18.3.1",

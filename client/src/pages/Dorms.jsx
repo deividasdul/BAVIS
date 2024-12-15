@@ -1,4 +1,4 @@
-import React, { useContext, useState, useRef } from "react";
+import React, { useContext, useState, useRef, useEffect } from "react";
 import {
   Card,
   CardActionArea,
@@ -22,6 +22,7 @@ import AddIcon from "@mui/icons-material/Add";
 import PlaceIcon from "@mui/icons-material/Place";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import { styled } from "@mui/system";
+import Map from "../components/Map";
 
 import { DormsContext } from "../context/DormsContext";
 import { ProtectedRouteAdmin } from "../components/ProtectedRouteAdmin";
@@ -116,6 +117,32 @@ const Dorms = () => {
     setConfirmOpen(!confirmOpen);
   };
 
+  const [scriptLoaded, setScriptLoaded] = useState(false);
+
+  useEffect(() => {
+    const loadGoogleMapsAPI = () => {
+      const existingScript = document.getElementById("google-maps-script");
+
+      if (!existingScript) {
+        const script = document.createElement("script");
+        script.id = "google-maps-script";
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_REACT_APP_GOOGLE_MAPS_API_KEY}&libraries=places`;
+        script.async = true;
+        script.defer = true;
+
+        script.onload = () => {
+          setScriptLoaded(true);
+        };
+
+        document.body.appendChild(script);
+      } else {
+        setScriptLoaded(true);
+      }
+    };
+
+    loadGoogleMapsAPI();
+  }, []);
+
   return (
     <ProtectedRouteAdmin>
       <DormsBox sx={{ minHeight: "100vh" }}>
@@ -137,6 +164,12 @@ const Dorms = () => {
                         },
                       }}
                     />
+                    {scriptLoaded ? (
+                      <Map address={dorm.address} />
+                    ) : (
+                      <p>Kraunama...</p>
+                    )}
+                    {/* <Map address={dorm.address} /> */}
                   </CardActionArea>
                   <Divider />
                   <CardContent>

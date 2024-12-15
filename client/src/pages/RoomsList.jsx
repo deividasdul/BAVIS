@@ -36,6 +36,7 @@ import CloseButton from "../components/ui/CloseButton";
 import CustomTextField from "../components/ui/CustomTextField";
 
 import SnackbarResponse from "../components/ui/SnackbarResponse";
+import roomImage from "../assets/room-placeholder.png";
 
 function RoomsList() {
   const { user } = useAuth();
@@ -229,6 +230,7 @@ function RoomsList() {
                       </Box>
                     }
                   />
+                  <img style={{ width: "100%" }} src={roomImage} alt="" />
                 </CardActionArea>
                 <Divider />
                 <CardContent>
@@ -276,6 +278,7 @@ function RoomsList() {
                       sx={{ backgroundColor: theme.palette.success.light }}
                       title={`Kambario nr. ` + room.number}
                     />
+                    <img style={{ width: "100%" }} src={roomImage} alt="" />
                   </CardActionArea>
                   <Divider />
                   <CardContent>

@@ -35,6 +35,7 @@ import { ProtectedRouteAdmin } from "../components/ProtectedRouteAdmin.jsx";
 import CloseIcon from "@mui/icons-material/Close";
 
 import { useTheme } from "@emotion/react";
+import roomImage from "../assets/room-placeholder.png";
 
 function Rooms() {
   const { rooms, fetchRooms, insertRoom, putRoom, deleteRoom } =
@@ -316,11 +317,7 @@ function Rooms() {
                     />
 
                     {/* TODO: FIX IMAGES */}
-                    <img
-                      style={{ width: "100%" }}
-                      src="https://img.freepik.com/premium-photo/living-room-interior-with-placeholder-poster-frame-rendered-d_872147-59904.jpg"
-                      alt=""
-                    />
+                    <img style={{ width: "100%" }} src={roomImage} alt="" />
                   </CardActionArea>
                   <CardContent>
                     <Typography gutterBottom>Aukštas: {room.floor}</Typography>

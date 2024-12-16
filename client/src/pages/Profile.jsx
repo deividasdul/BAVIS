@@ -16,9 +16,10 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  Typography,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import { styled } from "@mui/system";
+import { borderRadius, styled } from "@mui/system";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import SnackbarResponse from "../components/ui/SnackbarResponse";
@@ -314,6 +315,10 @@ const Profile = () => {
                   </MenuItem>
                 ))}
               </Select>
+              <Typography color="warning" variant="subtitle2">
+                * Siūloma pasirinkti ne daugiau kaip 3 interesus, kad sistema
+                galėtų pritaikyti kambarius jūsų poreikiams
+              </Typography>
             </FormControl>
             <PhoneInputField
               value={contactInput.phoneNumber || ""}

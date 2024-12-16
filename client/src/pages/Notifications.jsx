@@ -104,12 +104,14 @@ const Notifications = () => {
       <NotificationBox>
         <Accordion sx={{ p: 2, minWidth: "100%", maxWidth: "100%" }}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="h4">
-              Rezervacijos{" "}
-              <Badge badgeContent={notifications.length} color="warning">
-                <MeetingRoomIcon fontSize="large" />
-              </Badge>{" "}
-            </Typography>
+            <Badge
+              sx={{ mr: 2 }}
+              badgeContent={notifications.length}
+              color="warning"
+            >
+              <MeetingRoomIcon fontSize="large" />
+            </Badge>
+            <Typography variant="h4">Rezervacijos</Typography>
           </AccordionSummary>
           <AccordionDetails sx={{ wordBreak: "break-word" }}>
             Turinys
@@ -119,12 +121,14 @@ const Notifications = () => {
         <Divider />
         <Accordion sx={{ p: 2, minWidth: "100%", maxWidth: "100%" }}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="h4">
-              Vartotojo pranešimai{" "}
-              <Badge badgeContent={notifications.length} color="success">
-                <MailIcon fontSize="large" />
-              </Badge>
-            </Typography>
+            <Badge
+              sx={{ mr: 2 }}
+              badgeContent={notifications.length}
+              color="success"
+            >
+              <MailIcon fontSize="large" />
+            </Badge>
+            <Typography variant="h4">Vartotojo pranešimai</Typography>
           </AccordionSummary>
           <AccordionDetails sx={{ wordBreak: "break-word" }}>
             Turinys
@@ -136,12 +140,14 @@ const Notifications = () => {
         {/* System notifications */}
         <Accordion sx={{ p: 2, width: "100%" }}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="h4">
-              Sistemos pranešimai{" "}
-              <Badge badgeContent={notifications.length} color="error">
-                <WarningIcon fontSize="large" />
-              </Badge>
-            </Typography>
+            <Badge
+              sx={{ mr: 2 }}
+              badgeContent={notifications.length}
+              color="error"
+            >
+              <WarningIcon fontSize="large" />
+            </Badge>
+            <Typography variant="h4">Sistemos pranešimai</Typography>
           </AccordionSummary>
           <AccordionDetails sx={{ wordBreak: "break-word" }}>
             <Stack
@@ -151,6 +157,7 @@ const Notifications = () => {
                 alignItems: "center",
               }}
               direction={"column"}
+              gap={2}
             >
               {notifications.map((notification, index) => {
                 return (
@@ -192,7 +199,13 @@ const Notifications = () => {
             </Stack>
           </AccordionDetails>
           <AccordionActions>
-            <SuccessButton label={"Naujas pranešimas"} onClick={handleAdd} />
+            <SuccessButton
+              label={"Naujas pranešimas"}
+              onClick={() => {
+                handleAdd();
+                setMessageLength(0);
+              }}
+            />
           </AccordionActions>
         </Accordion>
         <Divider />

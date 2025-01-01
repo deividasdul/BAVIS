@@ -170,6 +170,7 @@ function RoomsList() {
     return hasInterestMatch;
   });
 
+  // New array of default rooms
   const defaultRooms = rooms.filter((room) => {
     if (room.tenant_amount == 0) return true;
 

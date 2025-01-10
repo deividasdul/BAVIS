@@ -15,9 +15,12 @@ import {
   DialogContent,
   DialogActions,
   Alert,
+  Stack,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import utc from "dayjs/plugin/utc";
+
+import CircleIcon from "@mui/icons-material/Circle";
 
 import { styled } from "@mui/system";
 import axios from "axios";
@@ -208,6 +211,39 @@ function RoomsList() {
   return (
     <ProtectedRoute>
       <RoomsBox>
+        <Stack direction={"row"} sx={{ m: 1 }} spacing={2}>
+          <Typography
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            variant="subtitle1"
+          >
+            <CircleIcon fontSize="large" color="warning" /> - Rekomenduojamas
+            kambarys
+          </Typography>
+          <Typography
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            variant="subtitle1"
+          >
+            <CircleIcon fontSize="large" color="success" /> - Laisvas kambarys
+          </Typography>
+          <Typography
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            variant="subtitle1"
+          >
+            <CircleIcon fontSize="large" color="error" /> - Pilnas kambarys
+          </Typography>
+        </Stack>
         <Grid container spacing={2}>
           {recommendedRooms.map((room) => (
             <Grid key={room.id} size={{ lg: 4, md: 6, sm: 12, xs: 12 }}>
@@ -268,7 +304,6 @@ function RoomsList() {
             </Grid>
           ))}
         </Grid>
-
         <Grid container spacing={2}>
           {defaultRooms.map((room) => {
             return (

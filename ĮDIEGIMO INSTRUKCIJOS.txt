@@ -1,0 +1,69 @@
+ĮDIEGIMO INSTRUKCIJOS
+Norėdami paleisti projektą lokaliai, vykdykite šiuos veiksmus:
+--------------------------------------------------------------
+
+Reikalavimai:
+ * Įsitikinkite, kad jūsų sistemoje yra įdiegtas Node.js ir npm. Atsisiųsti galite iš oficialios svetainės: https://nodejs.org/en/download
+ * Įsitikinkite, kad yra įdiegtas ir veikia PostgreSQL. Atsisiųsti galite iš oficialios svetainės: https://www.postgresql.org/download/
+--------------------------------------------------------------
+
+Backend diegimas:
+1. Atsidarius projektą programavimo aplinkoje, pereikite į serverio aplanką.
+	cd server  
+
+2. Įdiekite serverio priklausomybes naudodami šią komandą:
+	npm install  
+
+3. Sukonfigūruokite savo PostgreSQL duomenų bazę. Sukurkite .env failą serverio kataloge ir pridėkite reikiamus aplinkos kintamuosius:
+	# APP PORT  
+	SERVER_PORT=3000  
+
+	# DB  
+	PG_USER="postgres"  	# jūsų postgres naudotojo vardas  
+	PG_PASSWORD="postgres"  # jūsų postgres slaptažodis  
+	PG_HOST="localhost"  
+	PG_DATABASE="BAVIS"	# jūsų duomenų bazės pavadinimas
+	PG_PORT=5432  
+
+	# BCRYPT PASSWORD ENCRYPTION  
+	SECRET="GLvTxyH7u7gml8Ug"  
+	SALT_ROUNDS=10  
+
+	# NEBŪTINA, TAČIAU NEVEIKS GMAIL PASLAUGA  
+	# EMAIL SERVICE  
+	GMAIL_ADDRESS="address@gmail.com"  # jūsų elektroninis paštas 
+	GMAIL_APP_PASSWORD="password"  # jūsų sukurto per Google Cloud Gmail aplikacija  
+
+	# JWT TOKEN GENERATOR  
+	JWT_SECRET="3e1b17f3d1ba7e324739a90da1dfa1fdb00c811508e926c5894498c9bef7dfdc"  
+
+4. Sukurkite ir importuokite duomenų bazę:
+
+* Atidarykite pgAdmin.
+* Sukurkite naują duomenų bazę pavadinimu BAVIS:
+   1. Paspauskite dešinį pelės mygtuką ant „Databases“ ir pasirinkite Create → Database.
+   2. Atsidariusiame lange įrašykite BAVIS ir spauskite Save.
+* Importuokite duomenų bazės failą:
+   1. Paspauskite dešinį pelės mygtuką ant ką tik sukurtos BAVIS duomenų bazės ir pasirinkite Restore.
+   2. Atsidariusiame lange, prie Filename, paspauskite mygtuką ir nurodykite pridėtą failą BAVIS_DATABASE.sql.
+   3. Paspauskite Restore ir palaukite, kol procesas bus baigtas.
+
+5. Paleiskite backend serverį:
+	npm start  
+--------------------------------------------------------------
+
+Frontend diegimas:
+1. Atidarykite naują terminalo langą ir pereikite į kliento aplanką.
+	cd client  
+
+2. Įdiekite kliento priklausomybes naudodami šią komandą:
+	npm install  
+
+3. Paleiskite frontend kūrimo serverį:
+	npm run dev 
+--------------------------------------------------------------
+
+Paleidimas:
+
+Backend serveris turėtų veikti adresu: http://localhost:3000
+Frontend kūrimo serveris turėtų veikti adresu: http://localhost:5173

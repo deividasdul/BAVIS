@@ -9,14 +9,14 @@ import {
 import CloseButton from "./CloseButton";
 import SuccessButton from "./SuccessButton";
 
-const DialogBox = ({ title, open, onClose, children, onClick }) => {
+const DialogBox = ({ title, open, onClose, children, onClick, label }) => {
   return (
     <Dialog fullWidth={true} open={open} onClose={onClose}>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent dividers={true}>{children}</DialogContent>
       <DialogActions>
         <CloseButton label="Uždaryti" onClick={onClose} />
-        <SuccessButton label="Redaguoti" onClick={onClick} />
+        <SuccessButton label={label} onClick={onClick} />
       </DialogActions>
     </Dialog>
   );

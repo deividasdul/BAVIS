@@ -18,7 +18,9 @@ import {
   DialogContentText,
   Alert,
   AlertTitle,
+  Stack,
 } from "@mui/material";
+import CircleIcon from "@mui/icons-material/Circle";
 import Grid from "@mui/material/Grid2";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import EditIcon from "@mui/icons-material/Edit";
@@ -300,6 +302,39 @@ function Rooms() {
   return (
     <ProtectedRouteAdmin>
       <RoomsBox>
+        <Stack direction={"row"} sx={{ m: 1 }} spacing={2}>
+          <Typography
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            variant="subtitle1"
+          >
+            <CircleIcon fontSize="large" color="warning" /> - Rekomenduojamas
+            kambarys
+          </Typography>
+          <Typography
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            variant="subtitle1"
+          >
+            <CircleIcon fontSize="large" color="success" /> - Laisvas kambarys
+          </Typography>
+          <Typography
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            variant="subtitle1"
+          >
+            <CircleIcon fontSize="large" color="error" /> - Pilnas kambarys
+          </Typography>
+        </Stack>
         <Grid container spacing={2}>
           {rooms.map((room, _) => {
             return (

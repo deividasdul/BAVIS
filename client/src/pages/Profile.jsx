@@ -17,6 +17,7 @@ import {
   DialogContentText,
   DialogActions,
   Typography,
+  ListSubheader,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { borderRadius, styled } from "@mui/system";
@@ -37,11 +38,7 @@ import { UsersContext } from "../context/UsersContext";
 import { InterestsContext } from "../context/InterestsContext";
 import ProtectedRoute from "../components/ProtectedRoute";
 
-import {
-  validateField,
-  validatePassword,
-  validatePhone,
-} from "../utils/formValidation";
+import { validateField, validatePassword } from "../utils/formValidation";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -183,11 +180,6 @@ const Profile = () => {
     confirmNewPassword: "",
   });
 
-  const handleInterests = (e) => {
-    const { value } = e.target;
-    setSelectedInterestIds(value);
-  };
-
   const handleChange = (e) => {
     const { value, name } = e.target;
     setContactInput((prevValue) => ({
@@ -211,6 +203,11 @@ const Profile = () => {
 
     setAvatarUrl(contact?.avatar_url);
   }, [contact]);
+
+  const handleInterests = (e) => {
+    const { value } = e.target;
+    setSelectedInterestIds(value);
+  };
 
   return (
     <ProtectedRoute>
@@ -296,8 +293,7 @@ const Profile = () => {
                 MenuProps={{
                   PaperProps: {
                     style: {
-                      maxHeight: 224,
-                      width: 250,
+                      maxHeight: 300,
                     },
                   },
                 }}
@@ -311,7 +307,10 @@ const Profile = () => {
                     }
                     value={interest.id}
                   >
-                    {interest.interest}
+                    {interest.interest}{" "}
+                    <ListSubheader color="primary">
+                      [{interest.category}]
+                    </ListSubheader>
                   </MenuItem>
                 ))}
               </Select>

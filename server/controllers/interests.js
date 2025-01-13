@@ -1,10 +1,9 @@
 import { pool } from "../config.js";
 
-// Get all interests
 const getInterests = async (_, res) => {
   try {
     const result = await pool.query(
-      `SELECT * FROM interest ORDER BY interest ASC`
+      `SELECT * FROM interest ORDER BY category ASC`
     );
     res.status(200).json(result.rows);
   } catch (e) {

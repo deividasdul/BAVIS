@@ -213,6 +213,7 @@ const Notifications = () => {
 
       {/* New notification */}
       <DialogBox
+        label={"Pridėti"}
         title={"Naujas pranešimas"}
         open={addOpen}
         onClose={handleAdd}
@@ -248,6 +249,7 @@ const Notifications = () => {
       {/* Edit notification */}
       <DialogBox
         title={"Pranešimo redagavimas"}
+        label={"Redaguoti"}
         open={editOpen}
         onClose={handleEdit}
         onClick={validateEdit}

@@ -77,3 +77,30 @@ app.post("/upload/:id", upload.single("file"), async (req, res) => {
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);
 });
+
+app.get("/userData", async (req, res) => {
+  try {
+    const result = await pool.query(`SELECT count("user".id) AS userCount, 
+      count("user".status) FILTER (WHERE "user".status = 'Active') AS activeCount
+      FROM "user"`);
+    res.status(200).json(result.rows);
+  } catch (e) {
+    console.log(e);
+  }
+});
+
+app.get("/userData/genders", async (req, res) => {
+  try {
+    const result =
+      await pool.query(`SELECT count(contact.gender) FILTER (WHERE contact.gender = 'Vyras' AND contact.status = 'Studentas') AS maleStudents,
+        count(contact.gender) FILTER (WHERE contact.gender = 'Moteris' AND contact.status = 'Studentas') AS femaleStudents,
+        count(contact.gender) FILTER (WHERE contact.gender = 'Vyras' AND contact.status = 'Dėstytojas') AS maleTeachers,
+        count(contact.gender) FILTER (WHERE contact.gender = 'Moteris' AND contact.status = 'Dėstytojas') AS femaleTeachers,
+        count(contact.gender) FILTER (WHERE contact.gender = 'Vyras' AND contact.status = 'Svečias') AS maleGuests,
+        count(contact.gender) FILTER (WHERE contact.gender = 'Moteris' AND contact.status = 'Svečias') AS femaleGuests
+        FROM contact`);
+    res.status(200).json(result.rows);
+  } catch (e) {
+    console.log(e);
+  }
+});

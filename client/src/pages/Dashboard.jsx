@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { ProtectedRouteAdmin } from "../components/ProtectedRouteAdmin";
 import { styled } from "@mui/system";
-import { Box, Typography, Stack } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Stack,
+  useMediaQuery,
+  useTheme,
+  Divider,
+} from "@mui/material";
 import axios from "axios";
 
 import { PieChart } from "@mui/x-charts/PieChart";
@@ -48,14 +55,19 @@ const Dashboard = () => {
     fetchGroupGenders();
   }, []);
 
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
   return (
     <ProtectedRouteAdmin>
       <DashboardBox>
-        <Typography align="center" variant="h1">
+        <Typography align="center" variant="h2">
           INFORMACINIS SKYDELIS
         </Typography>
+        <Divider />
 
-        <Stack sx={{ m: 5 }} direction={"row"}>
+        {/* Interesai */}
+        <Stack spacing={5} direction={!isSmallScreen ? "row" : "column"}>
           <Stack direction={"column"}>
             <Typography align="center" gutterBottom variant="h5">
               Labiausiai išsirinkti interesai
@@ -71,6 +83,7 @@ const Dashboard = () => {
             />
           </Stack>
 
+          {/* Naudotojai */}
           <Stack direction={"column"}>
             <Typography align="center" gutterBottom variant="h5">
               Aktyvūs naudotojai / visi naudotojai
@@ -92,6 +105,7 @@ const Dashboard = () => {
             />
           </Stack>
 
+          {/* Lytis */}
           <Stack direction={"column"}>
             <Typography align="center" gutterBottom variant="h5">
               Lytis pagal grupę

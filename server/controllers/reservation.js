@@ -18,8 +18,8 @@ const reserve = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `INSERT INTO reservation (user_id, room_id, planned_arrival_date, planned_departure_date)
-          VALUES ($1, $2, $3, $4)`,
+      `INSERT INTO reservation (user_id, room_id, planned_arrival_date, planned_departure_date, status)
+          VALUES ($1, $2, $3, $4, 'Active')`,
       [
         userId,
         roomId,
@@ -78,6 +78,32 @@ const reserve = async (req, res) => {
   }
 };
 
+const getReservations = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT 
+        reservation.id,
+        contact.first_name,
+        contact.last_name,
+        room.number,
+        dormitory.address,
+        TO_CHAR(reservation.planned_arrival_date, 'YYYY-MM-DD') AS planned_arrival_date,
+        TO_CHAR(reservation.planned_departure_date, 'YYYY-MM-DD') AS planned_departure_date,
+        reservation.status
+        FROM reservation
+        INNER JOIN "user" ON reservation.user_id = "user".id
+        INNER JOIN contact ON "user".id = contact.id
+        INNER JOIN room ON reservation.room_id = room.id
+        INNER JOIN dormitory ON room.dormitory_id = dormitory.id
+        WHERE reservation.status != 'Inactive'
+        ORDER BY reservation.id ASC;`
+    );
+    res.status(200).json(result.rows);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 const stay = async (req, res) => {
   const { id } = req.params;
 
@@ -108,4 +134,66 @@ const stay = async (req, res) => {
   }
 };
 
-export { reserve, stay };
+const acceptReservation = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await pool.query(
+      `INSERT INTO stay (id, user_id, room_id, planned_arrival_date, planned_departure_date, status)
+      SELECT reservation.id, reservation.user_id, reservation.room_id, reservation.planned_arrival_date, reservation.planned_departure_date, reservation.status
+      FROM reservation
+      WHERE reservation.id = $1`,
+      [id]
+    );
+
+    await pool.query(
+      `UPDATE reservation
+      SET status = 'Inactive'
+      WHERE id = $1`,
+      [id]
+    );
+
+    res.status(200);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+const delayReservation = async (req, res) => {
+  const { id } = req.params;
+
+  console.log(id);
+
+  try {
+    const result = await pool.query(
+      `UPDATE reservation SET status = 'Delayed' WHERE id = $1`,
+      [id]
+    );
+    res.status(200);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+const cancelReservation = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query(
+      `UPDATE reservation SET status = 'Inactive' WHERE id = $1`,
+      [id]
+    );
+    res.status(200);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+export {
+  reserve,
+  stay,
+  getReservations,
+  acceptReservation,
+  cancelReservation,
+  delayReservation,
+};

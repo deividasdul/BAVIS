@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import {
   Box,
@@ -12,6 +12,8 @@ import {
   Badge,
   IconButton,
   TextField,
+  Paper,
+  Alert,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import SuccessButton from "../components/ui/SuccessButton";
@@ -25,10 +27,157 @@ import { validateField } from "../utils/formValidation";
 import EditNotificationsIcon from "@mui/icons-material/EditNotifications";
 import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
 import DialogBox from "../components/ui/DialogBox";
+import { DataGrid } from "@mui/x-data-grid";
+import axios from "axios";
+
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
+import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 
 const Notifications = () => {
   const [addOpen, setAddOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+
+  const [reservations, setReservations] = useState([]);
+
+  const delayReservation = async (id) => {
+    try {
+      await axios.post(`http://localhost:3000/api/v1/reservation/delay/${id}`);
+      fetchReservations();
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const cancelReservation = async (id) => {
+    try {
+      await axios.post(`http://localhost:3000/api/v1/reservation/cancel/${id}`);
+      fetchReservations();
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const acceptReservation = async (id) => {
+    try {
+      await axios.post(`http://localhost:3000/api/v1/reservation/accept/${id}`);
+      fetchReservations();
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const columns = [
+    { field: "id", headerName: "ID", width: 90 },
+    {
+      field: "first_name",
+      headerName: "Vardas",
+      width: 100,
+      editable: false,
+    },
+    {
+      field: "last_name",
+      headerName: "Pavardė",
+      width: 100,
+      editable: false,
+    },
+    {
+      field: "number",
+      headerName: "Kambario numeris",
+      width: 150,
+      editable: false,
+    },
+    {
+      field: "address",
+      headerName: "Bendrabučio adresas",
+      width: 200,
+      editable: false,
+    },
+    {
+      field: "planned_arrival_date",
+      headerName: "Planuojama atvykimo data",
+      width: 200,
+      editable: false,
+    },
+    {
+      field: "planned_departure_date",
+      headerName: "Planuojama išvykimo data",
+      width: 200,
+      editable: false,
+    },
+    {
+      field: "status",
+      headerName: "Statusas",
+      width: 150,
+      editable: false,
+
+      renderCell: ({ row }) => {
+        return (
+          <Alert severity={row.status == "Active" ? "success" : "warning"}>
+            {row.status == "Active" ? "Aktyvus" : "Atidėtas"}
+          </Alert>
+        );
+      },
+    },
+    {
+      field: "action",
+      headerName: "Veiksmai",
+      sortable: false,
+      width: 200,
+      disableClickEventBubling: true,
+
+      renderCell: ({ row }) => {
+        return (
+          <>
+            <IconButton
+              onClick={() => {
+                acceptReservation(row.id);
+              }}
+              color="success"
+              size="large"
+            >
+              <CheckCircleIcon />
+            </IconButton>
+
+            <IconButton
+              onClick={() => {
+                delayReservation(row.id);
+              }}
+              color="warning"
+              size="large"
+            >
+              <HourglassEmptyIcon />
+            </IconButton>
+
+            <IconButton
+              onClick={() => {
+                cancelReservation(row.id);
+              }}
+              color="error"
+              size="large"
+            >
+              <CancelIcon />
+            </IconButton>
+          </>
+        );
+      },
+    },
+  ];
+
+  const fetchReservations = async () => {
+    try {
+      const result = await axios.get(
+        "http://localhost:3000/api/v1/reservation/reservations"
+      );
+      setReservations(result.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    fetchReservations();
+  }, []);
 
   const [id, setId] = useState(null);
   const [message, setMessage] = useState("");
@@ -106,7 +255,7 @@ const Notifications = () => {
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Badge
               sx={{ mr: 2 }}
-              badgeContent={notifications.length}
+              badgeContent={reservations.length}
               color="warning"
             >
               <MeetingRoomIcon fontSize="large" />
@@ -114,7 +263,22 @@ const Notifications = () => {
             <Typography variant="h4">Rezervacijos</Typography>
           </AccordionSummary>
           <AccordionDetails sx={{ wordBreak: "break-word" }}>
-            Turinys
+            <Paper elevation={12}>
+              <DataGrid
+                density="comfortable"
+                autoHeight={true}
+                rows={reservations}
+                columns={columns}
+                initialState={{
+                  pagination: {
+                    paginationModel: {
+                      pageSize: 10,
+                    },
+                  },
+                }}
+                pageSizeOptions={[10]}
+              />
+            </Paper>
           </AccordionDetails>
           <AccordionActions></AccordionActions>
         </Accordion>

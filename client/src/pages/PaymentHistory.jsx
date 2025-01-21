@@ -243,7 +243,11 @@ const PaymentHistory = () => {
         const result = await axios.get(
           `http://localhost:3000/api/v1/reservation/${id}`
         );
-        setStayData(result.data);
+        const dataWithIds = result.data.map((row, index) => ({
+          ...row,
+          id: row.id || `${index + 1}`,
+        }));
+        setStayData(dataWithIds);
       }
     } catch (e) {
       console.error(e);

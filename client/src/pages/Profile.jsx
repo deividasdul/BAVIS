@@ -298,6 +298,22 @@ const Profile = () => {
                   },
                 }}
               >
+                <ListSubheader
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row-reverse",
+                    ml: 50,
+                  }}
+                >
+                  <Button
+                    onClick={() => {
+                      const value = [];
+                      setSelectedInterestIds(value);
+                    }}
+                  >
+                    Išvalyti visus pasirinktus
+                  </Button>
+                </ListSubheader>
                 {interests.map((interest) => (
                   <MenuItem
                     key={interest.id}

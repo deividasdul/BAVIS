@@ -119,7 +119,7 @@ const Notifications = () => {
           <AccordionActions></AccordionActions>
         </Accordion>
         <Divider />
-        <Accordion sx={{ p: 2, minWidth: "100%", maxWidth: "100%" }}>
+        {/* <Accordion sx={{ p: 2, minWidth: "100%", maxWidth: "100%" }}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Badge
               sx={{ mr: 2 }}
@@ -135,7 +135,7 @@ const Notifications = () => {
           </AccordionDetails>
           <AccordionActions></AccordionActions>
         </Accordion>
-        <Divider />
+        <Divider /> */}
 
         {/* System notifications */}
         <Accordion sx={{ p: 2, width: "100%" }}>

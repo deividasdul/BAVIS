@@ -299,6 +299,22 @@ const Register = () => {
     <>
       <PageBox>
         <Paper sx={{ p: 8 }} elevation={12}>
+          <Stack
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Link
+              color="warning"
+              href="/login"
+              variant="button"
+              underline="hover"
+            >
+              Jau turite paskyrą? Prisijunkite
+            </Link>
+          </Stack>
           <Typography
             color="primary.main"
             align="center"
@@ -307,6 +323,7 @@ const Register = () => {
           >
             Registracija
           </Typography>
+
           <form>
             <Grid maxWidth="sm" container spacing={4}>
               <Grid size={{ lg: 6, md: 6, sm: 6, xs: 12 }}>

@@ -9,6 +9,8 @@ import {
   DialogContent,
   DialogActions,
   CircularProgress,
+  Link,
+  Stack,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { useNavigate } from "react-router-dom";
@@ -197,6 +199,22 @@ const Login = () => {
       ) : (
         <PageBox>
           <Paper sx={{ p: 5 }} elevation={12}>
+            <Stack
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Link
+                color="warning"
+                href="/register"
+                variant="button"
+                underline="hover"
+              >
+                Dar neturite paskyros? Užsiregistruokite
+              </Link>
+            </Stack>
             <Typography
               color="primary.main"
               align="center"

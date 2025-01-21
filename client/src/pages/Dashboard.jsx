@@ -61,13 +61,22 @@ const Dashboard = () => {
   return (
     <ProtectedRouteAdmin>
       <DashboardBox>
-        <Typography align="center" variant="h2">
+        <Typography gutterBottom align="center" variant="h2">
           INFORMACINIS SKYDELIS
         </Typography>
         <Divider />
 
         {/* Interesai */}
-        <Stack spacing={5} direction={!isSmallScreen ? "row" : "column"}>
+        {/* <Stack spacing={5} direction={!isSmallScreen ? "row" : "column"}> */}
+        <Stack
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          spacing={5}
+          direction={"column"}
+        >
           <Stack direction={"column"}>
             <Typography align="center" gutterBottom variant="h5">
               Labiausiai išsirinkti interesai
@@ -82,6 +91,7 @@ const Dashboard = () => {
               height={200}
             />
           </Stack>
+          <Divider />
 
           {/* Naudotojai */}
           <Stack direction={"column"}>
@@ -104,6 +114,7 @@ const Dashboard = () => {
               text={({ value, valueMax }) => `${value} / ${valueMax}`}
             />
           </Stack>
+          <Divider />
 
           {/* Lytis */}
           <Stack direction={"column"}>

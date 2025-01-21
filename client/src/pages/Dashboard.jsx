@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { ProtectedRouteAdmin } from "../components/ProtectedRouteAdmin";
 import { styled } from "@mui/system";
-import { Box, Typography, Stack, useTheme, Divider } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Stack,
+  useTheme,
+  Divider,
+  useMediaQuery,
+} from "@mui/material";
 import axios from "axios";
 import Grid from "@mui/material/Grid2";
 
@@ -51,6 +58,10 @@ const Dashboard = () => {
 
   const theme = useTheme();
 
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm")); // Change 'sm' to suit your needs
+
+  const chartWidth = isSmallScreen ? 400 : 800; // Adjust width based on screen size
+
   return (
     <ProtectedRouteAdmin>
       <DashboardBox>
@@ -60,23 +71,19 @@ const Dashboard = () => {
         <Divider />
         <Grid spacing={10} container={true}>
           {/* Interesai */}
-          <Grid size={12}>
+          <Grid direction={"column"} container spacing={3}>
             <Typography sx={{ ml: 5 }} gutterBottom variant="h4">
               Labiausiai išsirinkti interesai:
             </Typography>
             <PieChart
-              series={[
-                {
-                  data: topInterestsData,
-                },
-              ]}
-              width={800}
-              height={400}
+              series={[{ data: topInterestsData }]}
+              width={chartWidth}
+              height={400} // You can also make this responsive if needed
             />
           </Grid>
 
           {/* Naudotojai */}
-          <Grid size={12}>
+          <Grid direction={"column"} container spacing={3}>
             <Typography sx={{ ml: 5 }} gutterBottom variant="h4">
               Aktyvūs naudotojai / visi naudotojai:
             </Typography>
@@ -85,7 +92,7 @@ const Dashboard = () => {
               startAngle={-110}
               endAngle={110}
               height={400}
-              width={800}
+              width={chartWidth}
               valueMax={parseInt(activeUsers.usercount)}
               sx={{
                 [`& .${gaugeClasses.valueText}`]: {
@@ -98,7 +105,7 @@ const Dashboard = () => {
           </Grid>
 
           {/* Lytis */}
-          <Grid size={12}>
+          <Grid direction={"column"} container spacing={3}>
             <Typography sx={{ ml: 5 }} gutterBottom variant="h4">
               Lytis pagal grupę:
             </Typography>
@@ -125,7 +132,7 @@ const Dashboard = () => {
                   ],
                 },
               ]}
-              width={800}
+              width={chartWidth}
               height={400}
             />
             <Stack

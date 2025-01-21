@@ -162,7 +162,6 @@ const Login = () => {
       setIsLoading(true);
       const result = await login(userInfo);
       setIsLoading(false);
-      console.log(result.user.role);
       if (result.user.role === "User") navigate("/profile");
       else navigate("/dashboard");
     } catch (e) {

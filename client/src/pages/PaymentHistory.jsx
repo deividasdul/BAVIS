@@ -75,7 +75,16 @@ const PaymentHistory = () => {
       width: 100,
       renderCell: ({ row }) => (
         <ActionButton
-          onClick={() => {}}
+          onClick={async () => {
+            try {
+              window.location.reload();
+              await axios.post(
+                `http://localhost:3000/api/v1/payment/pay/${row.id}`
+              );
+            } catch (e) {
+              console.log(e);
+            }
+          }}
           color="primary"
           icon={<PaymentIcon fontSize="large" />}
         />

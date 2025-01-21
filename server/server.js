@@ -104,3 +104,16 @@ app.get("/userData/genders", async (req, res) => {
     console.log(e);
   }
 });
+
+app.post("/api/v1/payment/pay/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      `UPDATE payment_history SET paid = $1 WHERE id = $2`,
+      ["true", id]
+    );
+    res.status(200);
+  } catch (e) {
+    console.log(e);
+  }
+});

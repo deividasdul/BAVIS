@@ -1,15 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { ProtectedRouteAdmin } from "../components/ProtectedRouteAdmin";
 import { styled } from "@mui/system";
-import {
-  Box,
-  Typography,
-  Stack,
-  useMediaQuery,
-  useTheme,
-  Divider,
-} from "@mui/material";
+import { Box, Typography, Stack, useTheme, Divider } from "@mui/material";
 import axios from "axios";
+import Grid from "@mui/material/Grid2";
 
 import { PieChart } from "@mui/x-charts/PieChart";
 import { Gauge, gaugeClasses } from "@mui/x-charts/Gauge";
@@ -56,30 +50,19 @@ const Dashboard = () => {
   }, []);
 
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
     <ProtectedRouteAdmin>
       <DashboardBox>
-        <Typography gutterBottom align="center" variant="h2">
+        <Typography gutterBottom align="center" sx={{ mt: 2 }} variant="h2">
           INFORMACINIS SKYDELIS
         </Typography>
         <Divider />
-
-        {/* Interesai */}
-        {/* <Stack spacing={5} direction={!isSmallScreen ? "row" : "column"}> */}
-        <Stack
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-          spacing={5}
-          direction={"column"}
-        >
-          <Stack direction={"column"}>
-            <Typography align="center" gutterBottom variant="h5">
-              Labiausiai išsirinkti interesai
+        <Grid spacing={10} container={true}>
+          {/* Interesai */}
+          <Grid size={12}>
+            <Typography sx={{ ml: 5 }} gutterBottom variant="h4">
+              Labiausiai išsirinkti interesai:
             </Typography>
             <PieChart
               series={[
@@ -87,23 +70,22 @@ const Dashboard = () => {
                   data: topInterestsData,
                 },
               ]}
-              width={550}
-              height={200}
+              width={800}
+              height={400}
             />
-          </Stack>
-          <Divider />
+          </Grid>
 
           {/* Naudotojai */}
-          <Stack direction={"column"}>
-            <Typography align="center" gutterBottom variant="h5">
-              Aktyvūs naudotojai / visi naudotojai
+          <Grid size={12}>
+            <Typography sx={{ ml: 5 }} gutterBottom variant="h4">
+              Aktyvūs naudotojai / visi naudotojai:
             </Typography>
             <Gauge
               value={parseInt(activeUsers.activecount)}
               startAngle={-110}
               endAngle={110}
-              height={200}
-              width={550}
+              height={400}
+              width={800}
               valueMax={parseInt(activeUsers.usercount)}
               sx={{
                 [`& .${gaugeClasses.valueText}`]: {
@@ -113,13 +95,12 @@ const Dashboard = () => {
               }}
               text={({ value, valueMax }) => `${value} / ${valueMax}`}
             />
-          </Stack>
-          <Divider />
+          </Grid>
 
           {/* Lytis */}
-          <Stack direction={"column"}>
-            <Typography align="center" gutterBottom variant="h5">
-              Lytis pagal grupę
+          <Grid size={12}>
+            <Typography sx={{ ml: 5 }} gutterBottom variant="h4">
+              Lytis pagal grupę:
             </Typography>
             <BarChart
               xAxis={[
@@ -144,10 +125,15 @@ const Dashboard = () => {
                   ],
                 },
               ]}
-              width={550}
-              height={300}
+              width={800}
+              height={400}
             />
-            <Stack direction="row" spacing={2} alignItems="center">
+            <Stack
+              sx={{ ml: 2 }}
+              direction="row"
+              spacing={2}
+              alignItems="center"
+            >
               <Box
                 sx={{
                   width: 20,
@@ -165,8 +151,8 @@ const Dashboard = () => {
               />
               <Typography>Moterys</Typography>
             </Stack>
-          </Stack>
-        </Stack>
+          </Grid>
+        </Grid>
       </DashboardBox>
     </ProtectedRouteAdmin>
   );

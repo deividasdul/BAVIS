@@ -161,6 +161,7 @@ function RoomsList() {
 
   const recommendedRooms = rooms.filter((room) => {
     if (room.tenant_amount == 0) return false;
+    if (room.tenant_amount == room.capacity) return false;
 
     const hasOppositeGender = checkOppositeGender(room.tenants);
 
@@ -176,6 +177,7 @@ function RoomsList() {
   // New array of default rooms
   const defaultRooms = rooms.filter((room) => {
     if (room.tenant_amount == 0) return true;
+    if (room.tenant_amount == room.capacity) return false;
 
     const isRecommended = recommendedRooms.includes(room);
 

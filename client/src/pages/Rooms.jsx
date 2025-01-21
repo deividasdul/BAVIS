@@ -597,7 +597,7 @@ function Rooms() {
           <DialogContent>
             <DialogContentText>
               {viewOpen ? (
-                tenants.length > 1 ? (
+                tenants.length >= 1 ? (
                   tenants.map((tenant, index) => {
                     return (
                       <div key={index}>

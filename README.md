@@ -5,6 +5,10 @@
  
 This project is a hostel accommodation management system that allows users to select and rent rooms based on their preferences, providing details on room availability, occupancy, pricing, and personalized recommendations. Administrators can manage room requests, view complaints, and control room data, streamlining the rental process and enhancing the user experience.
 
+[![Watch the video](https://img.youtube.com/vi/-XIb6fIQtQ4/maxresdefault.jpg)](https://youtu.be/-XIb6fIQtQ4)
+
+### [Watch this video on YouTube](https://youtu.be/-XIb6fIQtQ4)
+
 ## Table of Contents
 1. [Installation](#installation)
 2. [Usage](#usage)
